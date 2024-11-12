@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newton's Second Law Simulator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1, h2 {
+      color: #2196F3;
+      text-align: center;
+    }
+
+    .explanation {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .control-group {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    canvas {
+      width: 100%;
+      border: 2px solid #2196F3;
+      border-radius: 8px;
+      margin: 20px 0;
+      background-color: #fff;
+    }
+
+    button {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      display: block;
+      margin: 20px auto;
+    }
+
+    button:hover {
+      background-color: #1976D2;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .result-box {
+      background-color: #e3f2fd;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .vector-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .vector-arrow {
+      width: 20px;
+      height: 20px;
+      margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Newton's Second Law Simulator</h1>
+    
+    <div class="explanation">
+      <h2>F = ma (Force = mass × acceleration)</h2>
+      <p>This simulator demonstrates Newton's Second Law of Motion, which states that the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. The object's motion is shown in both X and Y directions.</p>
+      <p><strong>Units:</strong></p>
+      <ul>
+        <li>Mass (m): kilograms (kg)</li>
+        <li>Force (F): Newtons (N)</li>
+        <li>Acceleration (a): meters per second squared (m/s²)</li>
+        <li>Velocity (v): meters per second (m/s)</li>
+        <li>Position (s): meters (m)</li>
+      </ul>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label for="mass">Mass (kg): <span id="massValue">1.0</span></label><br>
+        <input type="range" id="mass" min="0.1" max="5.0" value="1.0" step="0.1">
+      </div>
+      
+      <div class="control-group">
+        <label for="forceX">Force X (N): <span id="forceXValue">0</span></label><br>
+        <input type="range" id="forceX" min="-10" max="10" value="0" step="0.5">
+      </div>
+
+      <div class="control-group">
+        <label for="forceY">Force Y (N): <span id="forceYValue">0</span></label><br>
+        <input type="range" id="forceY" min="-10" max="10" value="0" step="0.5">
+      </div>
+    </div>
+
+    <button onclick="startSimulation()">Start Simulation</button>
+    <button onclick="resetSimulation()">Reset</button>
+
+    <div class="results">
+      <div class="result-box">
+        <strong>Position</strong><br>
+        X: <span id="positionX">0.00</span> m<br>
+        Y: <span id="positionY">0.00</span> m
+      </div>
+      <div class="result-box">
+        <strong>Velocity</strong><br>
+        X: <span id="velocityX">0.00</span> m/s<br>
+        Y: <span id="velocityY">0.00</span> m/s
+      </div>
+      <div class="result-box">
+        <strong>Acceleration</strong><br>
+        X: <span id="accelerationX">0.00</span> m/s²<br>
+        Y: <span id="accelerationY">0.00</span> m/s²
+      </div>
+      <div class="result-box">
+        <strong>Time</strong><br>
+        <span id="currentTime">0.00</span> s
+      </div>
+    </div>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let animationId = null;
+
+    // Simulation parameters
+    let mass = 1.0;
+    let forceX = 0;
+    let forceY = 0;
+    let positionX = 0;
+    let positionY = 0;
+    let velocityX = 0;
+    let velocityY = 0;
+    let accelerationX = 0;
+    let accelerationY = 0;
+    let time = 0;
+    const scale = 40; // pixels per meter
+
+    // Update display values
+    function updateDisplayValues() {
+      document.getElementById('massValue').textContent = 
+        document.getElementById('mass').value;
+      document.getElementById('forceXValue').textContent = 
+        document.getElementById('forceX').value;
+      document.getElementById('forceYValue').textContent = 
+        document.getElementById('forceY').value;
+    }
+
+    // Add event listeners
+    document.getElementById('mass').addEventListener('input', updateDisplayValues);
+    document.getElementById('forceX').addEventListener('input', updateDisplayValues);
+    document.getElementById('forceY').addEventListener('input', updateDisplayValues);
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw grid
+      ctx.strokeStyle = '#eee';
+      ctx.lineWidth = 1;
+
+      // Vertical lines
+      for(let x = 0; x <= canvas.width; x += scale) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      // Horizontal lines
+      for(let y = 0; y <= canvas.height; y += scale) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Draw axes
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      
+      // X-axis
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height/2);
+      ctx.lineTo(canvas.width, canvas.height/2);
+      ctx.stroke();
+      
+      // Y-axis
+      ctx.beginPath();
+      ctx.moveTo(canvas.width/2, 0);
+      ctx.lineTo(canvas.width/2, canvas.height);
+      ctx.stroke();
+
+      // Draw scale markers and labels
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#666';
+      
+      // X-axis markers
+      for(let x = 0; x <= canvas.width; x += scale) {
+        const value = (x - canvas.width/2)/scale;
+        ctx.fillText(value + 'm', x, canvas.height/2 + 20);
+      }
+      
+      // Y-axis markers
+      ctx.textAlign = 'right';
+      for(let y = 0; y <= canvas.height; y += scale) {
+        const value = -((y - canvas.height/2)/scale);
+        ctx.fillText(value + 'm', canvas.width/2 - 5, y + 4);
+      }
+    }
+
+    function drawObject(x, y) {
+      const screenX = canvas.width/2 + x * scale;
+      const screenY = canvas.height/2 - y * scale;
+      
+      // Draw object
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#2196F3';
+      ctx.fill();
+
+      // Draw force vectors
+      if (forceX !== 0 || forceY !== 0) {
+        ctx.beginPath();
+        ctx.moveTo(screenX, screenY);
+        ctx.lineTo(screenX + forceX * 10, screenY - forceY * 10);
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw arrowhead
+        const angle = Math.atan2(-forceY, forceX);
+        ctx.beginPath();
+        ctx.moveTo(screenX + forceX * 10, screenY - forceY * 10);
+        ctx.lineTo(screenX + forceX * 10 - 15 * Math.cos(angle - Math.PI/6), 
+                  screenY - forceY * 10 + 15 * Math.sin(angle - Math.PI/6));
+        ctx.lineTo(screenX + forceX * 10 - 15 * Math.cos(angle + Math.PI/6),
+                  screenY - forceY * 10 + 15 * Math.sin(angle + Math.PI/6));
+        ctx.closePath();
+        ctx.fillStyle = '#ff0000';
+        ctx.fill();
+      }
+    }
+
+    function updateSimulation(timestamp) {
+      if (!time) time = timestamp;
+      const deltaTime = (timestamp - time) / 1000; // Convert to seconds
+      time = timestamp;
+
+      // Calculate acceleration (F = ma)
+      mass = parseFloat(document.getElementById('mass').value);
+      forceX = parseFloat(document.getElementById('forceX').value);
+      forceY = parseFloat(document.getElementById('forceY').value);
+      
+      accelerationX = forceX / mass;
+      accelerationY = forceY / mass;
+
+      // Update velocity
+      velocityX += accelerationX * deltaTime;
+      velocityY += accelerationY * deltaTime;
+
+      // Update position
+      positionX += velocityX * deltaTime;
+      positionY += velocityY * deltaTime;
+
+      // Update display
+      document.getElementById('positionX').textContent = positionX.toFixed(2);
+      document.getElementById('positionY').textContent = positionY.toFixed(2);
+      document.getElementById('velocityX').textContent = velocityX.toFixed(2);
+      document.getElementById('velocityY').textContent = velocityY.toFixed(2);
+      document.getElementById('accelerationX').textContent = accelerationX.toFixed(2);
+      document.getElementById('accelerationY').textContent = accelerationY.toFixed(2);
+      document.getElementById('currentTime').textContent = ((timestamp - time)/1000).toFixed(2);
+
+      // Draw
+      drawGrid();
+      drawObject(positionX, positionY);
+
+      // Continue animation if object is within bounds
+      if (Math.abs(positionX) < canvas.width/(2*scale) && 
+          Math.abs(positionY) < canvas.height/(2*scale)) {
+        animationId = requestAnimationFrame(updateSimulation);
+      }
+    }
+
+    function startSimulation() {
+      // Cancel any existing animation
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      // Start animation
+      animationId = requestAnimationFrame(updateSimulation);
+    }
+
+    function resetSimulation() {
+      // Cancel animation
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      // Reset parameters
+      mass = parseFloat(document.getElementById('mass').value);
+      forceX = parseFloat(document.getElementById('forceX').value);
+      forceY = parseFloat(document.getElementById('forceY').value);
+      positionX = 0;
+      positionY = 0;
+      velocityX = 0;
+      velocityY = 0;
+      accelerationX = 0;
+      accelerationY = 0;
+      time = 0;
+
+      // Reset display
+      document.getElementById('positionX').textContent = '0.00';
+      document.getElementById('positionY').textContent = '0.00';
+      document.getElementById('velocityX').textContent = '0.00';
+      document.getElementById('velocityY').textContent = '0.00';
+      document.getElementById('accelerationX').textContent = '0.00';
+      document.getElementById('accelerationY').textContent = '0.00';
+      document.getElementById('currentTime').textContent = '0.00';
+
+      // Redraw
+      drawGrid();
+      drawObject(0, 0);
+    }
+
+    // Initial setup
+    drawGrid();
+    updateDisplayValues();
+    drawObject(0, 0);
+  </script>
+</body>
+</html>

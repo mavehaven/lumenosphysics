@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physics Motion Simulator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1, h2, h3 {
+      color: #2196F3;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background-color: #e3f2fd;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .formulas {
+      background-color: #fff3e0;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-family: "Times New Roman", serif;
+    }
+
+    .simple-facts {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .control-box {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .canvas-container {
+      position: relative;
+      margin: 40px 0;
+      padding-left: 40px;
+    }
+
+    canvas {
+      border: 2px solid #2196F3;
+      border-radius: 8px;
+    }
+
+    .y-axis {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 5px;
+      width: 40px;
+      border-right: 2px solid #666;
+    }
+
+    .y-axis-mark {
+      position: absolute;
+      right: 0;
+      transform: translateY(50%);
+      width: 10px;
+      height: 2px;
+      background-color: #666;
+    }
+
+    .y-axis-label {
+      position: absolute;
+      right: 15px;
+      transform: translateY(50%);
+      color: #666;
+      font-size: 12px;
+    }
+
+    button {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      display: block;
+      margin: 20px auto;
+    }
+
+    button:hover {
+      background-color: #1976D2;
+    }
+
+    .result-box {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 5px 0;
+      text-align: center;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .formula {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Physics Motion Simulator</h1>
+    
+    <div class="formulas">
+      <h3>Key Formulas:</h3>
+      <div id="projectile-formulas">
+        <div class="formula">
+          <strong>Position:</strong><br>
+          $$x = v_0 \cos(\theta)t$$
+          $$y = v_0 \sin(\theta)t - \frac{1}{2}gt^2$$
+        </div>
+        <div class="formula">
+          <strong>Maximum Height:</strong><br>
+          $$h_{max} = \frac{v_0^2\sin^2(\theta)}{2g}$$
+        </div>
+        <div class="formula">
+          <strong>Range:</strong><br>
+          $$R = \frac{v_0^2\sin(2\theta)}{g}$$
+        </div>
+        <div class="formula">
+          <strong>Time of Flight:</strong><br>
+          $$T = \frac{2v_0\sin(\theta)}{g}$$
+        </div>
+        <div class="formula">
+          <strong>Units:</strong><br>
+          • Velocity (v): meters per second (m/s)<br>
+          • Acceleration (g): meters per second squared (m/s²)<br>
+          • Position (x,y): meters (m)<br>
+          • Time (t): seconds (s)<br>
+          • Angle (θ): degrees (°)
+        </div>
+      </div>
+      <div id="linear-formulas" style="display: none;">
+        <div class="formula">
+          <strong>Position:</strong><br>
+          $$x = x_0 + v_0t + \frac{1}{2}at^2$$
+        </div>
+        <div class="formula">
+          <strong>Velocity:</strong><br>
+          $$v = v_0 + at$$
+        </div>
+        <div class="formula">
+          <strong>Units:</strong><br>
+          • Initial Position (x₀): meters (m)<br>
+          • Velocity (v): meters per second (m/s)<br>
+          • Acceleration (a): meters per second squared (m/s²)<br>
+          • Time (t): seconds (s)
+        </div>
+      </div>
+    </div>
+
+    <div class="simple-facts" id="projectile-facts">
+      <h3>Projectile Motion Facts:</h3>
+      <ul>
+        <li>Follows a parabolic path due to constant gravitational acceleration (g = 9.8 m/s²)</li>
+        <li>Horizontal motion is constant (no acceleration)</li>
+        <li>Vertical motion has constant acceleration due to gravity</li>
+        <li>Maximum height occurs when vertical velocity becomes zero</li>
+        <li>Range is maximum at 45° launch angle</li>
+        <li>Motion is symmetric about the highest point</li>
+      </ul>
+    </div>
+
+    <div class="simple-facts" id="linear-facts" style="display: none;">
+      <h3>Linear Motion Facts:</h3>
+      <ul>
+        <li>Motion along a straight line</li>
+        <li>Constant acceleration results in linear velocity change</li>
+        <li>Position-time graph is parabolic for constant acceleration</li>
+        <li>Velocity-time graph is linear for constant acceleration</li>
+        <li>Area under v-t graph gives displacement</li>
+      </ul>
+    </div>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="switchMode('projectile')">Projectile Motion</div>
+    </div>
+
+    <div class="controls" id="projectile-controls">
+      <div class="control-box">
+        <label for="angle">Initial Angle (θ): <span id="angle-value">45</span>°</label><br>
+        <input type="range" id="angle" min="0" max="90" value="45">
+        <p>Higher angle = Higher trajectory</p>
+      </div>
+      
+      <div class="control-box">
+        <label for="velocity">Initial Velocity (v₀): <span id="velocity-value">20</span> m/s</label><br>
+        <input type="range" id="velocity" min="5" max="30" value="20">
+        <p>Higher velocity = Greater range</p>
+      </div>
+
+      <div class="control-box">
+        <label for="bounce">Coefficient of Restitution: <span id="bounce-value">0.7</span></label><br>
+        <input type="range" id="bounce" min="0" max="100" value="70">
+        <p>1 = Perfect elastic collision</p>
+      </div>
+    </div>
+
+    <button onclick="startSimulation()">Start Simulation</button>
+
+    <div class="results-grid" id="projectile-results">
+      <div class="result-box">
+        <strong>Maximum Height:</strong><br>
+        <span id="max-height-display">0</span> m
+      </div>
+      <div class="result-box">
+        <strong>Range:</strong><br>
+        <span id="range-display">0</span> m
+      </div>
+      <div class="result-box">
+        <strong>Time of Flight:</strong><br>
+        <span id="time-display">0</span> s
+      </div>
+    </div>
+
+    <div class="canvas-container">
+      <div class="y-axis"></div>
+      <canvas id="canvas" width="800" height="400"></canvas>
+    </div>
+  </div>
+  
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const angleSlider = document.getElementById('angle');
+    const velocitySlider = document.getElementById('velocity');
+    const bounceSlider = document.getElementById('bounce');
+    const angleValue = document.getElementById('angle-value');
+    const velocityValue = document.getElementById('velocity-value');
+    const bounceValue = document.getElementById('bounce-value');
+    const yAxis = document.querySelector('.y-axis');
+
+    let angle = parseFloat(angleSlider.value);
+    let velocity = parseFloat(velocitySlider.value);
+    let bounceFactor = parseFloat(bounceSlider.value) / 100;
+    const g = 9.8;
+    let animationId = null;
+
+    angleSlider.oninput = () => {
+      angle = parseFloat(angleSlider.value);
+      angleValue.textContent = angle;
+      calculateResults();
+    };
+
+    velocitySlider.oninput = () => {
+      velocity = parseFloat(velocitySlider.value);
+      velocityValue.textContent = velocity;
+      calculateResults();
+    };
+
+    bounceSlider.oninput = () => {
+      bounceFactor = parseFloat(bounceSlider.value) / 100;
+      bounceValue.textContent = bounceFactor.toFixed(2);
+    };
+
+    function calculateResults() {
+      const angleRad = angle * (Math.PI / 180);
+      const maxHeight = Math.pow(velocity * Math.sin(angleRad), 2) / (2 * g);
+      const range = Math.pow(velocity, 2) * Math.sin(2 * angleRad) / g;
+      const timeOfFlight = 2 * velocity * Math.sin(angleRad) / g;
+
+      document.getElementById('max-height-display').textContent = maxHeight.toFixed(1);
+      document.getElementById('range-display').textContent = range.toFixed(1);
+      document.getElementById('time-display').textContent = timeOfFlight.toFixed(1);
+      
+      updateYAxis(maxHeight);
+    }
+
+    function updateYAxis(maxHeight) {
+      yAxis.innerHTML = '';
+      const height = canvas.height - 5;
+      const numMarks = 8;
+      const marksSpacing = height / numMarks;
+      const valueSpacing = maxHeight / numMarks;
+
+      for (let i = 0; i <= numMarks; i++) {
+        const mark = document.createElement('div');
+        mark.className = 'y-axis-mark';
+        mark.style.bottom = `${(i * marksSpacing)}px`;
+
+        const label = document.createElement('div');
+        label.className = 'y-axis-label';
+        label.style.bottom = `${(i * marksSpacing)}px`;
+        label.textContent = `${(valueSpacing * i).toFixed(1)}m`;
+
+        yAxis.appendChild(mark);
+        yAxis.appendChild(label);
+      }
+    }
+
+    function startSimulation() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGround();
+
+      const angleRad = angle * (Math.PI / 180);
+      let vx = velocity * Math.cos(angleRad);
+      let vy = velocity * Math.sin(angleRad);
+      let x = 0;
+      let y = 0;
+      let time = 0;
+      const scale = 10; // Pixels per meter
+      let path = [];
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGround();
+
+        // Update position
+        x = x + vx * 0.1;
+        y = y + vy * 0.1;
+        vy = vy - g * 0.1;
+
+        // Check for ground collision
+        if (y < 0) {
+          y = 0;
+          vy = -vy * bounceFactor;  // Reverse velocity and reduce it by bounce factor
+          
+          // Stop if bounce is too small
+          if (Math.abs(vy) < 0.5) {
+            vy = 0;
+            vx = 0;
+          }
+        }
+
+        // Store path point
+        path.push({x: x, y: y});
+
+        // Draw path
+        ctx.beginPath();
+        ctx.strokeStyle = '#E91E63';
+        ctx.lineWidth = 2;
+        path.forEach((point, index) => {
+          if (index === 0) {
+            ctx.moveTo(point.x * scale, canvas.height - point.y * scale);
+          } else {
+            ctx.lineTo(point.x * scale, canvas.height - point.y * scale);
+          }
+        });
+        ctx.stroke();
+
+        // Draw ball
+        ctx.beginPath();
+        ctx.arc(x * scale, canvas.height - y * scale, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#2196F3';
+        ctx.fill();
+
+        // Continue animation if ball is moving
+        if (Math.abs(vx) > 0.01 || Math.abs(vy) > 0.01 || y > 0) {
+          time += 0.1;
+          animationId = requestAnimationFrame(animate);
+        }
+      }
+
+      animate();
+    }
+
+    function drawGround() {
+      // Draw ground
+      ctx.fillStyle = '#4CAF50';
+      ctx.fillRect(0, canvas.height - 5, canvas.width, 5);
+
+      // Draw measurement marks
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      for (let x = 0; x <= canvas.width; x += 100) {
+        ctx.fillRect(x, canvas.height - 10, 2, 10);
+        ctx.fillText(`${x/10}m`, x, canvas.height - 15);
+      }
+    }
+
+    // Initial setup
+    drawGround();
+    calculateResults();
+  </script>
+</body>
+</html>

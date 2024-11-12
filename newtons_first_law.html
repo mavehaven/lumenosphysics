@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Newton's First Law Interactive Lesson</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .lesson-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+        .example-box {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e5edff;
+            border-radius: 8px;
+        }
+        .key-point {
+            background-color: #fef3c7;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #d97706;
+        }
+        .simulation-area {
+            width: 100%;
+            height: 200px;
+            background-color: #eef2f5;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .object {
+            width: 40px;
+            height: 40px;
+            background-color: #2563eb;
+            position: absolute;
+            bottom: 20px;
+            border-radius: 5px;
+            transition: transform 0.05s linear;
+        }
+        .surface {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            height: 2px;
+            background-color: #94a3b8;
+        }
+        .control-panel {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #2563eb;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        .slider-container {
+            margin: 10px 0;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+        }
+        .metric {
+            padding: 8px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .quiz-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f0fdf4;
+            border-radius: 8px;
+            border-left: 4px solid #16a34a;
+        }
+        .quiz-question {
+            margin: 15px 0;
+        }
+        .quiz-options {
+            margin-left: 20px;
+        }
+        #quizFeedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Newton's First Law of Motion: The Law of Inertia</h1>
+        
+        <div class="lesson-section">
+            <h2>Introduction</h2>
+            <p>Newton's First Law states that an object will remain at rest or in uniform motion in a straight line unless acted upon by an external force. This principle is also known as the Law of Inertia.</p>
+            
+            <div class="key-point">
+                <strong>Key Concept:</strong> Inertia is the resistance of any physical object to change its state of motion or rest.
+            </div>
+        </div>
+
+        <div class="lesson-section">
+            <h2>Mathematical Expression</h2>
+            <p>While Newton's First Law is primarily conceptual, it can be expressed mathematically through these related equations:</p>
+            
+            <div class="equations">
+                <p>Net Force (when object maintains constant velocity):</p>
+                <p>\[ \sum F = 0 \]</p>
+                
+                <p>For an object in motion with friction:</p>
+                <p>\[ F_{net} = F_{applied} - F_{friction} \]</p>
+                <p>\[ F_{friction} = \mu N = \mu mg \]</p>
+                
+                <p>When forces are balanced (constant velocity):</p>
+                <p>\[ F_{applied} = F_{friction} \]</p>
+            </div>
+        </div>
+
+        <div class="lesson-section">
+            <h2>Interactive Simulation</h2>
+            <p>Experiment with the simulator below to understand how forces affect motion:</p>
+
+            <div class="simulation-area">
+                <div class="surface"></div>
+                <div class="object" id="object"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="slider-container">
+                    <label>Mass (kg): <span id="massValue">1.0</span></label>
+                    <input type="range" id="massSlider" min="0.5" max="5" step="0.5" value="1.0">
+                </div>
+
+                <div class="slider-container">
+                    <label>Friction Coefficient (μ): <span id="frictionValue">0.1</span></label>
+                    <input type="range" id="frictionSlider" min="0" max="0.5" step="0.05" value="0.1">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="applyForce(-50)">Apply Force Left (50N)</button>
+                    <button onclick="applyForce(50)">Apply Force Right (50N)</button>
+                    <button onclick="reset()">Reset</button>
+                </div>
+
+                <div class="metrics">
+                    <div class="metric">Position: <span id="position">0.00</span> m</div>
+                    <div class="metric">Velocity: <span id="velocity">0.00</span> m/s</div>
+                    <div class="metric">Acceleration: <span id="acceleration">0.00</span> m/s²</div>
+                    <div class="metric">Net Force: <span id="netForce">0.00</span> N</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lesson-section">
+            <h2>Real-World Examples</h2>
+            <div class="example-box">
+                <h3>1. Objects on a Moving Bus</h3>
+                <p>When a bus stops suddenly, passengers tend to continue moving forward due to inertia.</p>
+            </div>
+            <div class="example-box">
+                <h3>2. Tablecloth Trick</h3>
+                <p>A tablecloth can be pulled quickly from under dishes because the dishes resist changes to their state of rest.</p>
+            </div>
+            <div class="example-box">
+                <h3>3. Satellites in Orbit</h3>
+                <p>Satellites continue their orbital motion because there's minimal friction in space to change their state of motion.</p>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h2>Quick Quiz</h2>
+            <div class="quiz-question">
+                <p>1. Why does an object in motion eventually come to a stop on Earth?</p>
+                <div class="quiz-options">
+                    <input type="radio" name="q1" value="a"> a) Because motion naturally stops<br>
+                    <input type="radio" name="q1" value="b"> b) Due to external forces like friction<br>
+                    <input type="radio" name="q1" value="c"> c) Because of gravity<br>
+                    <input type="radio" name="q1" value="d"> d) Due to air pressure
+                </div>
+            </div>
+            <div class="quiz-question">
+                <p>2. An asteroid travels through space in a straight line. According to Newton's First Law, what will happen?</p>
+                <div class="quiz-options">
+                    <input type="radio" name="q2" value="a"> a) It will eventually stop<br>
+                    <input type="radio" name="q2" value="b"> b) It will speed up<br>
+                    <input type="radio" name="q2" value="c"> c) It will continue at constant velocity<br>
+                    <input type="radio" name="q2" value="d"> d) It will slow down
+                </div>
+            </div>
+            <button onclick="checkQuiz()">Check Answers</button>
+            <div id="quizFeedback"></div>
+        </div>
+
+        <div class="lesson-section">
+            <h2>Experiment Suggestions</h2>
+            <p>Try these experiments with the simulator:</p>
+            <ol>
+                <li>Set friction to zero and observe how the object moves after applying force</li>
+                <li>Increase mass and notice how it affects the object's response to force</li>
+                <li>Try different friction values and observe their effect on motion</li>
+                <li>Apply equal forces in opposite directions and observe the result</li>
+            </ol>
+        </div>
+    </div>
+    <script>
+      const g = 9.81; // gravitational acceleration in m/s²
+let position = 400; // starting position in pixels
+let velocity = 0; // in m/s
+let acceleration = 0; // in m/s²
+let appliedForce = 0; // in N
+let isMoving = false;
+let lastTimestamp = null;
+let animationFrameId = null;
+
+// Conversion constants
+const pixelsToMeters = 0.01;
+const metersToPixels = 100;
+
+// DOM Elements
+const object = document.getElementById('object');
+const massSlider = document.getElementById('massSlider');
+const frictionSlider = document.getElementById('frictionSlider');
+const massValue = document.getElementById('massValue');
+const frictionValue = document.getElementById('frictionValue');
+
+// Get current mass and friction values
+function getMass() {
+    return parseFloat(massSlider.value);
+}
+
+function getFrictionCoefficient() {
+    return parseFloat(frictionSlider.value);
+}
+
+// Update display metrics
+function updateMetrics() {
+    document.getElementById('position').textContent = (position * pixelsToMeters).toFixed(2);
+    document.getElementById('velocity').textContent = velocity.toFixed(2);
+    document.getElementById('acceleration').textContent = acceleration.toFixed(2);
+    document.getElementById('netForce').textContent = (getMass() * acceleration).toFixed(2);
+}
+
+// Calculate friction force based on current state
+function calculateFriction() {
+    if (Math.abs(velocity) < 0.01) return 0;
+    const normalForce = getMass() * g;
+    const frictionCoefficient = getFrictionCoefficient();
+    const frictionForce = frictionCoefficient * normalForce;
+    return velocity > 0 ? -frictionForce : frictionForce;
+}
+
+// Main physics simulation loop
+function animate(timestamp) {
+    if (!isMoving) {
+        lastTimestamp = null;
+        animationFrameId = null;
+        return;
+    }
+
+    if (!lastTimestamp) {
+        lastTimestamp = timestamp;
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+    }
+
+    const deltaTime = (timestamp - lastTimestamp) / 1000; // convert to seconds
+    lastTimestamp = timestamp;
+
+    // Calculate forces and acceleration
+    const frictionForce = calculateFriction();
+    const netForce = appliedForce + frictionForce;
+    acceleration = netForce / getMass();
+
+    // Update velocity and position
+    velocity += acceleration * deltaTime;
+    
+    // Apply velocity damping for very small velocities to prevent endless tiny movements
+    if (Math.abs(velocity) < 0.01) {
+        velocity = 0;
+        acceleration = 0;
+        isMoving = false;
+    }
+
+    position += velocity * metersToPixels * deltaTime;
+
+    // Keep object within bounds
+    if (position < 0) {
+        position = 0;
+        velocity = 0;
+        acceleration = 0;
+        isMoving = false;
+    } else if (position > 760) {
+        position = 760;
+        velocity = 0;
+        acceleration = 0;
+        isMoving = false;
+    }
+
+    // Update object position and metrics
+    object.style.transform = `translateX(${position}px)`;
+    updateMetrics();
+
+    if (isMoving) {
+        animationFrameId = requestAnimationFrame(animate);
+    }
+}
+
+// Apply force to the object
+function applyForce(force) {
+    appliedForce = force;
+    isMoving = true;
+    
+    // Cancel any existing animation frame
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+    }
+    
+    // Start new animation
+    animationFrameId = requestAnimationFrame(animate);
+    
+    // Reset applied force after short duration (simulates impulse)
+    setTimeout(() => {
+        appliedForce = 0;
+    }, 100);
+}
+
+// Reset simulation to initial state
+function reset() {
+    // Cancel any ongoing animation
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+    
+    position = 400;
+    velocity = 0;
+    acceleration = 0;
+    appliedForce = 0;
+    isMoving = false;
+    lastTimestamp = null;
+    
+    object.style.transform = `translateX(${position}px)`;
+    updateMetrics();
+}
+
+// Quiz checking function
+function checkQuiz() {
+    const answers = {
+        q1: 'b',
+        q2: 'c'
+    };
+    
+    let score = 0;
+    let feedback = [];
+    
+    // Check question 1
+    const q1Answer = document.querySelector('input[name="q1"]:checked');
+    if (q1Answer) {
+        if (q1Answer.value === answers.q1) {
+            score++;
+            feedback.push("Question 1: Correct! External forces like friction cause objects to stop.");
+        } else {
+            feedback.push("Question 1: Incorrect. Objects stop due to external forces like friction.");
+        }
+    } else {
+        feedback.push("Question 1: Please select an answer.");
+    }
+    
+    // Check question 2
+    const q2Answer = document.querySelector('input[name="q2"]:checked');
+    if (q2Answer) {
+        if (q2Answer.value === answers.q2) {
+            score++;
+            feedback.push("Question 2: Correct! Without external forces, objects maintain constant velocity.");
+        } else {
+            feedback.push("Question 2: Incorrect. In space, with no external forces, objects maintain constant velocity.");
+        }
+    } else {
+        feedback.push("Question 2: Please select an answer.");
+    }
+    
+    // Display feedback
+    const feedbackDiv = document.getElementById('quizFeedback');
+    feedbackDiv.innerHTML = `
+        <p>Score: ${score}/2</p>
+        ${feedback.join('<br>')}
+    `;
+    feedbackDiv.style.backgroundColor = score === 2 ? '#dcfce7' : '#fee2e2';
+}
+
+// Event Listeners
+massSlider.addEventListener('input', function(e) {
+    massValue.textContent = e.target.value;
+});
+
+frictionSlider.addEventListener('input', function(e) {
+    frictionValue.textContent = e.target.value;
+});
+
+// Initialize simulation
+reset();
+
+// Add keyboard controls
+document.addEventListener('keydown', function(event) {
+    switch(event.key) {
+        case 'ArrowLeft':
+            applyForce(-50);
+            break;
+        case 'ArrowRight':
+            applyForce(50);
+            break;
+        case 'r':
+        case 'R':
+            reset();
+            break;
+    }
+});
+    </script>
+</body>
+</html>

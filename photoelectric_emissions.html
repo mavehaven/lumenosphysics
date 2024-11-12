@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quantum Physics Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .simulation-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background-color: black;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .slider-container label {
+            min-width: 150px;
+        }
+        .slider-container input[type="range"] {
+            flex-grow: 1;
+            max-width: 300px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .tab:hover {
+            background-color: #d0d0d0;
+        }
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .simulation {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            pointer-events: none;
+        }
+        .simulation.active {
+            position: relative;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .theory-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .equation {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 1em;
+        }
+        .value-display {
+            min-width: 80px;
+            text-align: right;
+        }
+        /* Improved slider styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #0056b3;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #007bff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        input[type="range"]::-moz-range-thumb:hover {
+            background: #0056b3;
+        }
+        /* Content wrapper to handle positioning */
+        .content-wrapper {
+            position: relative;
+            min-height: 600px; /* Adjust based on your content */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quantum Physics Simulator</h1>
+        
+        <div class="tabs">
+            <button class="tab active" data-simulation="wave-particle">Wave-Particle Duality</button>
+            <button class="tab" data-simulation="photoelectric">Photoelectric Effect</button>
+        </div>
+
+        <div class="content-wrapper">
+            <div id="wave-particle" class="simulation active">
+                <h2>Wave-Particle Duality Demonstration</h2>
+                
+                <div class="theory-section">
+                    <h3>Mathematical Foundation</h3>
+                    <div class="equation">
+                        <p>De Broglie Wavelength:</p>
+                        \[ \lambda = \frac{h}{p} = \frac{h}{mv} \]
+                        <p>where:</p>
+                        \[ h = 6.626 \times 10^{-34} \text{ J⋅s (Planck's constant)} \]
+                        \[ p = \text{momentum} \]
+                        \[ m = \text{mass} \]
+                        \[ v = \text{velocity} \]
+                    </div>
+                    
+                    <div class="equation">
+                        <p>Wave Function (Schrödinger Equation):</p>
+                        \[ i\hbar \frac{\partial}{\partial t}\Psi(x,t) = -\frac{\hbar^2}{2m}\frac{\partial^2}{\partial x^2}\Psi(x,t) + V(x)\Psi(x,t) \]
+                        <p>Wave packet equation:</p>
+                        \[ \Psi(x,t) = A\exp\left(-\frac{(x-x_0)^2}{4\sigma^2}\right)\exp\left(i(kx-\omega t)\right) \]
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="slider-container">
+                        <label for="wavelength">Wavelength (nm):</label>
+                        <input type="range" id="wavelength" min="380" max="750" value="550">
+                        <span id="wavelength-value" class="value-display">550 nm</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="particle-rate">Particle Rate:</label>
+                        <input type="range" id="particle-rate" min="1" max="100" value="50">
+                        <span id="rate-value" class="value-display">50</span>
+                    </div>
+                </div>
+                <canvas id="duality-canvas" width="600" height="400"></canvas>
+            </div>
+
+            <div id="photoelectric" class="simulation">
+                <h2>Photoelectric Effect Simulation</h2>
+
+                <div class="theory-section">
+                    <h3>Mathematical Foundation</h3>
+                    <div class="equation">
+                        <p>Einstein's Photoelectric Equation:</p>
+                        \[ E_k = hf - \phi \]
+                        <p>where:</p>
+                        \[ E_k = \frac{1}{2}mv^2 \text{ (kinetic energy of ejected electron)} \]
+                        \[ hf = \text{photon energy} \]
+                        \[ \phi = \text{work function of the metal} \]
+                    </div>
+
+                    <div class="equation">
+                        <p>Photon Energy:</p>
+                        \[ E = hf = \frac{hc}{\lambda} \]
+                        <p>Threshold Frequency:</p>
+                        \[ f_0 = \frac{\phi}{h} \]
+                        <p>Maximum Velocity of Ejected Electrons:</p>
+                        \[ v_{max} = \sqrt{\frac{2(hf - \phi)}{m}} \]
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="slider-container">
+                        <label for="light-frequency">Light Frequency (THz):</label>
+                        <input type="range" id="light-frequency" min="500" max="1500" value="1000">
+                        <span id="frequency-value" class="value-display">1000 THz</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="light-intensity">Light Intensity:</label>
+                        <input type="range" id="light-intensity" min="0" max="100" value="50">
+                        <span id="intensity-value" class="value-display">50%</span>
+                    </div>
+                </div>
+                <canvas id="photoelectric-canvas" width="600" height="400"></canvas>
+
+                <div class="theory-section">
+                    <h3>Real-time Calculations</h3>
+                    <div id="calculations" class="equation">
+                        <!-- Updated dynamically by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      // Constants
+const CONSTANTS = {
+    h: 6.626e-34,    // Planck's constant (J⋅s)
+    c: 3e8,          // Speed of light (m/s)
+    e: 1.602e-19,    // Elementary charge (C)
+    me: 9.1093837015e-31, // Electron mass (kg)
+    workFunction: 4.5 // Work function (eV)
+};
+
+class QuantumSimulator {
+    constructor() {
+        // Initialize MathJax configuration
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            }
+        });
+        
+        // Canvas setup for wave-particle duality
+        this.dualityCanvas = document.getElementById('duality-canvas');
+        this.dualityCtx = this.dualityCanvas.getContext('2d');
+        
+        // Canvas setup for photoelectric effect
+        this.photoelectricCanvas = document.getElementById('photoelectric-canvas');
+        this.photoelectricCtx = this.photoelectricCanvas.getContext('2d');
+        
+        // Simulation state
+        this.particles = [];
+        this.electrons = [];
+        this.time = 0;
+        this.isRunning = true;
+        
+        // Animation frame IDs
+        this.waveParticleAnimationId = null;
+        this.photoelectricAnimationId = null;
+        
+        // Initialize event listeners
+        this.initializeEventListeners();
+    }
+
+    initializeEventListeners() {
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                this.switchTab(e.target.dataset.simulation);
+            });
+        });
+        
+        // Wave-particle controls
+        document.getElementById('wavelength').addEventListener('input', (e) => {
+            this.updateWavelength(e.target.value);
+        });
+        
+        document.getElementById('particle-rate').addEventListener('input', (e) => {
+            this.updateParticleRate(e.target.value);
+        });
+        
+        // Photoelectric controls
+        document.getElementById('light-frequency').addEventListener('input', (e) => {
+            this.updateFrequency(e.target.value);
+        });
+        
+        document.getElementById('light-intensity').addEventListener('input', (e) => {
+            this.updateIntensity(e.target.value);
+        });
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.pause();
+            } else {
+                this.resume();
+            }
+        });
+    }
+
+    switchTab(simulationType) {
+        // Remove active class from all tabs and simulations
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.simulation').forEach(sim => {
+            sim.classList.remove('active');
+        });
+        
+        // Add active class to selected tab and simulation
+        document.querySelector(`[data-simulation="${simulationType}"]`).classList.add('active');
+        document.getElementById(simulationType).classList.add('active');
+        
+        // Ensure proper animation is running
+        this.resetCanvases();
+    }
+
+    resetCanvases() {
+        // Clear both canvases
+        this.dualityCtx.clearRect(0, 0, this.dualityCanvas.width, this.dualityCanvas.height);
+        this.photoelectricCtx.clearRect(0, 0, this.photoelectricCanvas.width, this.photoelectricCanvas.height);
+        
+        // Reset simulation states
+        this.particles = [];
+        this.electrons = [];
+        this.time = 0;
+    }
+
+    // Wave-Particle Duality Methods
+    createParticle() {
+        const wavelength = parseInt(document.getElementById('wavelength').value);
+        const hue = ((wavelength - 380) / (750 - 380)) * 240;
+        
+        return {
+            x: 0,
+            y: this.dualityCanvas.height / 2,
+            angle: 0,
+            wavelength: wavelength,
+            frequency: CONSTANTS.c / (wavelength * 1e-9),
+            color: `hsl(${hue}, 100%, 50%)`,
+            // De Broglie wavelength calculations
+            momentum: CONSTANTS.h / (wavelength * 1e-9),
+            energy: (CONSTANTS.h * CONSTANTS.c) / (wavelength * 1e-9)
+        };
+    }
+
+    updateWaveFunction(particle) {
+        // Calculate wave function parameters
+        const k = 2 * Math.PI / particle.wavelength;
+        const omega = 2 * Math.PI * particle.frequency;
+        const sigma = 20; // Wave packet width
+        
+        // Position and time
+        const x = particle.x;
+        const t = this.time;
+        
+        // Wave packet amplitude
+        const amplitude = Math.exp(-Math.pow(x - particle.x, 2) / (4 * Math.pow(sigma, 2)));
+        const phase = k * x - omega * t;
+        
+        // Return wave function value
+        return {
+            realPart: amplitude * Math.cos(phase),
+            imagPart: amplitude * Math.sin(phase)
+        };
+    }
+
+    animateWaveParticle() {
+        if (!this.isRunning) return;
+
+        this.dualityCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        this.dualityCtx.fillRect(0, 0, this.dualityCanvas.width, this.dualityCanvas.height);
+
+        // Add new particles based on rate
+        const rate = parseInt(document.getElementById('particle-rate').value);
+        if (Math.random() < rate / 100) {
+            this.particles.push(this.createParticle());
+        }
+
+        // Update and draw particles
+        this.particles = this.particles.filter(particle => {
+            // Update particle position
+            particle.x += 2;
+            particle.angle += 0.1;
+            
+            // Calculate wave function
+            const waveFunc = this.updateWaveFunction(particle);
+            const waveY = waveFunc.realPart * 50; // Scale for visualization
+            
+            // Draw particle
+            this.dualityCtx.beginPath();
+            this.dualityCtx.arc(
+                particle.x,
+                particle.y + waveY,
+                2,
+                0,
+                Math.PI * 2
+            );
+            this.dualityCtx.fillStyle = particle.color;
+            this.dualityCtx.fill();
+            
+            // Draw probability density
+            const probabilityDensity = Math.pow(waveFunc.realPart, 2) + 
+                                     Math.pow(waveFunc.imagPart, 2);
+            this.dualityCtx.fillStyle = `rgba(255, 255, 255, ${probabilityDensity * 0.1})`;
+            this.dualityCtx.fillRect(particle.x, 0, 1, this.dualityCanvas.height);
+
+            return particle.x < this.dualityCanvas.width;
+        });
+
+        this.time += 0.016; // Approximate time step for 60 FPS
+        this.waveParticleAnimationId = requestAnimationFrame(() => this.animateWaveParticle());
+    }
+
+    // Photoelectric Effect Methods
+    createElectron(x, y, energy) {
+        const velocity = Math.sqrt(2 * energy * CONSTANTS.e / CONSTANTS.me);
+        const angle = Math.random() * Math.PI - Math.PI / 2; // Emission angle
+        
+        return {
+            x: x,
+            y: y,
+            vx: velocity * Math.cos(angle),
+            vy: velocity * Math.sin(angle),
+            energy: energy // in eV
+        };
+    }
+
+    calculatePhotoelectricEffect() {
+        const frequency = parseInt(document.getElementById('light-frequency').value) * 1e12; // THz to Hz
+        const intensity = parseInt(document.getElementById('light-intensity').value);
+        
+        // Calculate photon energy in eV
+        const photonEnergy = (CONSTANTS.h * frequency) / CONSTANTS.e;
+        
+        // Calculate excess energy
+        const excessEnergy = photonEnergy - CONSTANTS.workFunction;
+        
+        // Calculate maximum velocity
+        const maxVelocity = excessEnergy > 0 ? 
+            Math.sqrt(2 * excessEnergy * CONSTANTS.e / CONSTANTS.me) : 0;
+        
+        return {
+            photonEnergy,
+            excessEnergy,
+            maxVelocity,
+            emissionProbability: (intensity / 100) * (excessEnergy > 0 ? 0.5 : 0)
+        };
+    }
+
+    animatePhotoelectric() {
+        if (!this.isRunning) return;
+
+        this.photoelectricCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        this.photoelectricCtx.fillRect(0, 0, this.photoelectricCanvas.width, this.photoelectricCanvas.height);
+
+        // Draw metal plate
+        this.photoelectricCtx.fillStyle = '#666';
+        this.photoelectricCtx.fillRect(
+            0,
+            this.photoelectricCanvas.height - 50,
+            this.photoelectricCanvas.width,
+            50
+        );
+
+        // Calculate photoelectric effect parameters
+        const effect = this.calculatePhotoelectricEffect();
+        
+        // Emit electrons
+        if (Math.random() < effect.emissionProbability) {
+            const x = Math.random() * this.photoelectricCanvas.width;
+            const y = this.photoelectricCanvas.height - 50;
+            this.electrons.push(this.createElectron(x, y, effect.excessEnergy));
+        }
+
+        // Update and draw electrons
+        this.electrons = this.electrons.filter(electron => {
+            // Update position with basic physics
+            electron.x += electron.vx * 0.1; // Scale for visualization
+            electron.y += electron.vy * 0.1;
+            electron.vy += 0.1; // Gravity effect
+            
+            // Draw electron
+            this.photoelectricCtx.beginPath();
+            this.photoelectricCtx.arc(electron.x, electron.y, 2, 0, Math.PI * 2);
+            this.photoelectricCtx.fillStyle = '#00ff00';
+            this.photoelectricCtx.fill();
+            
+            // Draw electron energy indicator
+            const energyColor = `hsl(${(electron.energy / 10) * 240}, 100%, 50%)`;
+            this.photoelectricCtx.strokeStyle = energyColor;
+            this.photoelectricCtx.beginPath();
+            this.photoelectricCtx.moveTo(electron.x, electron.y);
+            this.photoelectricCtx.lineTo(
+                electron.x + electron.vx * 0.5,
+                electron.y + electron.vy * 0.5
+            );
+            this.photoelectricCtx.stroke();
+
+            return electron.y < this.photoelectricCanvas.height && 
+                   electron.x > 0 && 
+                   electron.x < this.photoelectricCanvas.width;
+        });
+
+        // Draw light beam
+        const intensity = parseInt(document.getElementById('light-intensity').value);
+        const gradient = this.photoelectricCtx.createLinearGradient(
+            0, 0, 0, this.photoelectricCanvas.height
+        );
+        gradient.addColorStop(0, `rgba(255, 255, 0, ${intensity / 200})`);
+        gradient.addColorStop(1, 'rgba(255, 255, 0, 0)');
+        this.photoelectricCtx.fillStyle = gradient;
+        this.photoelectricCtx.fillRect(
+            0, 0,
+            this.photoelectricCanvas.width,
+            this.photoelectricCanvas.height - 50
+        );
+
+        // Update calculations display
+        this.updateCalculationsDisplay(effect);
+
+        this.photoelectricAnimationId = requestAnimationFrame(() => this.animatePhotoelectric());
+    }
+
+    updateCalculationsDisplay(effect) {
+        const calculationsDiv = document.getElementById('calculations');
+        calculationsDiv.innerHTML = `
+            <p>Current Values:</p>
+            \\[ E_{photon} = ${effect.photonEnergy.toFixed(2)} \\text{ eV} \\]
+            \\[ E_{excess} = ${effect.excessEnergy.toFixed(2)} \\text{ eV} \\]
+            \\[ v_{max} = ${(effect.maxVelocity/1000).toFixed(2)} \\text{ km/s} \\]
+        `;
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, calculationsDiv]);
+    }
+
+    // UI Update Methods
+    updateWavelength(value) {
+        document.getElementById('wavelength-value').textContent = `${value} nm`;
+    }
+
+    updateParticleRate(value) {
+        document.getElementById('rate-value').textContent = value;
+    }
+
+    updateFrequency(value) {
+        document.getElementById('frequency-value').textContent = `${value} THz`;
+    }
+
+    updateIntensity(value) {
+        document.getElementById('intensity-value').textContent = `${value}%`;
+    }
+
+    pause() {
+        this.isRunning = false;
+        if (this.waveParticleAnimationId) {
+            cancelAnimationFrame(this.waveParticleAnimationId);
+        }
+        if (this.photoelectricAnimationId) {
+            cancelAnimationFrame(this.photoelectricAnimationId);
+        }
+    }
+
+    resume() {
+        this.isRunning = true;
+        this.animateWaveParticle();
+        this.animatePhotoelectric();
+    }
+
+    // Initialize simulations
+    start() {
+        this.animateWaveParticle();
+        this.animatePhotoelectric();
+    }
+}
+
+// Initialize and start the simulator
+document.addEventListener('DOMContentLoaded', () => {
+    const simulator = new QuantumSimulator();
+    simulator.start();
+});
+    </script>
+</body>
+</html>

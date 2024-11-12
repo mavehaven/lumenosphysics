@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuclear Reactions Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        #canvas-container {
+            flex: 2;
+            position: relative;
+        }
+        .controls {
+            flex: 1;
+            padding: 20px;
+            background: #2a2a2a;
+            overflow-y: auto;
+            min-width: 300px;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background: #45a049;
+        }
+        .equation {
+            background: #333;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        #energy-output {
+            font-size: 1.2em;
+            margin: 10px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
+        .stats {
+            margin-top: 20px;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
+        .error {
+            color: #ff4444;
+            margin: 10px 0;
+            padding: 10px;
+            background: #332222;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="canvas-container"></div>
+        <div class="controls">
+            <h2>Nuclear Reaction Simulator</h2>
+            
+            <div class="error" id="error-message"></div>
+
+            <div class="slider-container">
+                <label for="nucleus-size">Nucleus Size (Mass Number):</label>
+                <input type="range" id="nucleus-size" min="1" max="238" value="235">
+                <span id="nucleus-size-value">235</span>
+            </div>
+
+            <div class="slider-container">
+                <label for="temperature">Temperature (K):</label>
+                <input type="range" id="temperature" min="0" max="100000000" step="1000000" value="0">
+                <span id="temperature-value">0 K</span>
+            </div>
+
+            <button id="fusion-btn">Start Fusion</button>
+            <button id="fission-btn">Start Fission</button>
+            <button id="reset-btn">Reset Simulation</button>
+
+            <div class="equation">
+                <h3>Mass-Energy Equivalence:</h3>
+                <div>$$E = mc^2$$</div>
+                <div>Where:</div>
+                <div>$$E = \text{Energy (MeV)}$$</div>
+                <div>$$m = \text{Mass defect (u)}$$</div>
+                <div>$$c = 3 \times 10^8 \text{ m/s}$$</div>
+            </div>
+
+            <div id="energy-output">
+                Energy Released: 0 MeV
+            </div>
+
+            <div class="stats">
+                <h3>Simulation Statistics</h3>
+                <div id="particle-count">Particles: 0</div>
+                <div id="binding-energy">Binding Energy: 0 MeV</div>
+            </div>
+        </div>
+    </div>
+    <script>
+      // Constants for physics calculations
+const SPEED_OF_LIGHT = 299792458; // m/s
+const AMU_TO_KG = 1.660539067e-27; // kg
+const MEV_PER_C2 = 931.494061; // MeV/c²
+
+// Three.js setup
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth / 2, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+// Lighting setup
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const pointLight = new THREE.PointLight(0xffffff, 1);
+pointLight.position.set(5, 5, 5);
+scene.add(pointLight);
+
+const pointLight2 = new THREE.PointLight(0xffffff, 0.5);
+pointLight2.position.set(-5, -5, -5);
+scene.add(pointLight2);
+
+class Particle {
+    constructor(type, position, fragment = null) {
+        const geometry = new THREE.SphereGeometry(0.2, 32, 32);
+        const material = new THREE.MeshPhongMaterial({
+            color: type === 'proton' ? 0xff4444 : 0x4444ff,
+            emissive: type === 'proton' ? 0x441111 : 0x111144,
+            shininess: 30,
+            specular: 0x444444
+        });
+        
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh.position.copy(position);
+        this.velocity = new THREE.Vector3();
+        this.acceleration = new THREE.Vector3();
+        this.type = type;
+        this.fragment = fragment;
+        this.mass = type === 'proton' ? 1.007276466 : 1.008664915; // atomic mass units
+        
+        scene.add(this.mesh);
+    }
+
+    update(deltaTime) {
+        // Verlet integration for more stable physics
+        this.velocity.add(this.acceleration.multiplyScalar(deltaTime));
+        this.mesh.position.add(this.velocity.clone().multiplyScalar(deltaTime));
+        
+        // Add rotation based on velocity
+        this.mesh.rotation.x += this.velocity.length() * 0.1;
+        this.mesh.rotation.y += this.velocity.length() * 0.1;
+        
+        // Reset acceleration for next frame
+        this.acceleration.set(0, 0, 0);
+    }
+
+    applyForce(force) {
+        // F = ma
+        const acc = force.divideScalar(this.mass);
+        this.acceleration.add(acc);
+    }
+}
+
+class Nucleus {
+    constructor(size) {
+        this.particles = [];
+        this.size = size;
+        this.isFissioning = false;
+        this.isFusing = false;
+        this.createParticles();
+        this.updateStats();
+    }
+
+    createParticles() {
+        const protons = Math.floor(this.size * 0.4); // Approximate proton count
+        const radius = Math.pow(this.size, 1/3) * 0.2; // Scale radius with nucleus size
+        
+        for (let i = 0; i < this.size; i++) {
+            // Fibonacci sphere distribution for more uniform particle placement
+            const phi = Math.acos(1 - 2 * (i + 0.5) / this.size);
+            const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
+            
+            const position = new THREE.Vector3(
+                radius * Math.cos(theta) * Math.sin(phi),
+                radius * Math.sin(theta) * Math.sin(phi),
+                radius * Math.cos(phi)
+            );
+            
+            const type = i < protons ? 'proton' : 'neutron';
+            this.particles.push(new Particle(type, position));
+        }
+    }
+
+    calculateBindingEnergy() {
+        // Semi-empirical mass formula components
+        const A = this.size;
+        const Z = Math.floor(this.size * 0.4);
+        
+        const a1 = 15.75; // Volume term
+        const a2 = 17.804; // Surface term
+        const a3 = 0.711; // Coulomb term
+        const a4 = 23.69; // Asymmetry term
+        
+        return (
+            a1 * A -
+            a2 * Math.pow(A, 2/3) -
+            a3 * Z * (Z - 1) / Math.pow(A, 1/3) -
+            a4 * Math.pow(A - 2 * Z, 2) / A
+        );
+    }
+
+    startFission() {
+        if (this.size < 230) {
+            throw new Error("Nucleus too small for fission! Need at least atomic mass of 230.");
+        }
+        
+        this.isFissioning = true;
+        const splitIndex = Math.floor(this.size * 0.4);
+        
+        this.particles.forEach((particle, index) => {
+            if (index < splitIndex) {
+                particle.fragment = 1;
+                particle.velocity.set(-0.02, 0, 0);
+            } else {
+                particle.fragment = 2;
+                particle.velocity.set(0.02, 0, 0);
+            }
+            
+            // Add thermal motion
+            particle.velocity.add(new THREE.Vector3(
+                (Math.random() - 0.5) * 0.01,
+                (Math.random() - 0.5) * 0.01,
+                (Math.random() - 0.5) * 0.01
+            ));
+        });
+
+        return this.calculateFissionEnergy();
+    }
+
+    startFusion(temperature) {
+        if (temperature < 10000000) {
+            throw new Error("Temperature too low for fusion! Need at least 10 million K.");
+        }
+
+        if (this.size > 4) {
+            throw new Error("Nucleus too large for fusion! Only light nuclei can undergo fusion.");
+        }
+
+        this.isFusing = true;
+        
+        // Add thermal motion to particles
+        this.particles.forEach(particle => {
+            particle.mesh.scale.multiplyScalar(0.9);
+            const velocity = Math.sqrt(3 * 1.380649e-23 * temperature / (particle.mass * AMU_TO_KG));
+            particle.velocity.set(
+                (Math.random() - 0.5) * velocity * 1e-11,
+                (Math.random() - 0.5) * velocity * 1e-11,
+                (Math.random() - 0.5) * velocity * 1e-11
+            );
+        });
+
+        return this.calculateFusionEnergy();
+    }
+
+    calculateFissionEnergy() {
+        // U-235 fission releases approximately 200 MeV
+        return this.size >= 235 ? 200 : 180;
+    }
+
+    calculateFusionEnergy() {
+        // D-T fusion releases approximately 17.6 MeV
+        return this.size <= 4 ? 17.6 : 0;
+    }
+
+    update(deltaTime) {
+        if (this.isFissioning || this.isFusing) {
+            this.particles.forEach(particle => {
+                particle.update(deltaTime);
+            });
+        } else {
+            // Gentle oscillation in stable state
+            this.particles.forEach(particle => {
+                particle.mesh.rotation.x += 0.005;
+                particle.mesh.rotation.y += 0.005;
+            });
+        }
+    }
+
+    updateStats() {
+        const protonCount = this.particles.filter(p => p.type === 'proton').length;
+        const neutronCount = this.particles.filter(p => p.type === 'neutron').length;
+        
+        document.getElementById('particle-count').textContent = 
+            `Particles: ${this.particles.length} (${protonCount} protons, ${neutronCount} neutrons)`;
+        
+        document.getElementById('binding-energy').textContent = 
+            `Binding Energy: ${this.calculateBindingEnergy().toFixed(2)} MeV`;
+    }
+
+    clear() {
+        this.particles.forEach(particle => {
+            scene.remove(particle.mesh);
+        });
+        this.particles = [];
+        this.isFissioning = false;
+        this.isFusing = false;
+    }
+}
+
+// Animation state
+let nucleus = new Nucleus(235);
+let lastTime = 0;
+
+// Animation loop
+function animate(currentTime) {
+    requestAnimationFrame(animate);
+    
+    const deltaTime = (currentTime - lastTime) / 1000;
+    lastTime = currentTime;
+    
+    nucleus.update(deltaTime);
+    renderer.render(scene, camera);
+}
+
+// Event handlers
+function handleNucleusResize(event) {
+    const size = parseInt(event.target.value);
+    document.getElementById('nucleus-size-value').textContent = size;
+    nucleus.clear();
+    nucleus = new Nucleus(size);
+}
+
+function handleTemperatureChange(event) {
+    const temp = parseInt(event.target.value);
+    document.getElementById('temperature-value').textContent = `${temp} K`;
+}
+
+function handleFission() {
+    try {
+        const energy = nucleus.startFission();
+        document.getElementById('energy-output').textContent = 
+            `Energy Released: ${energy.toFixed(2)} MeV`;
+        hideError();
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+function handleFusion() {
+    try {
+        const temp = parseInt(document.getElementById('temperature').value);
+        const energy = nucleus.startFusion(temp);
+        document.getElementById('energy-output').textContent = 
+            `Energy Released: ${energy.toFixed(2)} MeV`;
+        hideError();
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+function handleReset() {
+    const size = parseInt(document.getElementById('nucleus-size').value);
+    nucleus.clear();
+    nucleus = new Nucleus(size);
+    document.getElementById('energy-output').textContent = 'Energy Released: 0 MeV';
+    hideError();
+}
+
+function showError(message) {
+    const errorElement = document.getElementById('error-message');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    setTimeout(hideError, 3000);
+}
+
+function hideError() {
+    document.getElementById('error-message').style.display = 'none';
+}
+
+// Event listeners
+document.getElementById('nucleus-size').addEventListener('input', handleNucleusResize);
+document.getElementById('temperature').addEventListener('input', handleTemperatureChange);
+document.getElementById('fission-btn').addEventListener('click', handleFission);
+document.getElementById('fusion-btn').addEventListener('click', handleFusion);
+document.getElementById('reset-btn').addEventListener('click', handleReset);
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / 2 / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth / 2, window.innerHeight);
+});
+
+// Start animation
+animate(0);
+    </script>

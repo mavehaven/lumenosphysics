@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Force and Motion Simulator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1, h2, h3 {
+      color: #2196F3;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .formulas {
+      background-color: #fff3e0;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-family: "Times New Roman", serif;
+    }
+
+    .simple-facts {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .control-box {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    canvas {
+      border: 2px solid #2196F3;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    button {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      display: block;
+      margin: 20px auto;
+    }
+
+    button:hover {
+      background-color: #1976D2;
+    }
+
+    .result-box {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 5px 0;
+      text-align: center;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .formula {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Force and Motion Simulator</h1>
+
+    <div class="formulas">
+      <h3>Key Formulas:</h3>
+      <div class="formula">
+        <strong>Newton's Second Law:</strong><br>
+        $$F = ma$$
+      </div>
+      <div class="formula">
+        <strong>Friction Force:</strong><br>
+        $$F_f = \mu N$$
+      </div>
+      <div class="formula">
+        <strong>Motion Equations:</strong><br>
+        $$v = v_0 + at$$
+        $$x = x_0 + v_0t + \frac{1}{2}at^2$$
+      </div>
+      <div class="formula">
+        <strong>Units:</strong><br>
+        • Force (F): Newtons (N)<br>
+        • Mass (m): kilograms (kg)<br>
+        • Acceleration (a): meters per second squared (m/s²)<br>
+        • Friction coefficient (μ): dimensionless<br>
+        • Normal force (N): Newtons (N)
+      </div>
+    </div>
+
+    <div class="simple-facts">
+      <h3>Physics Facts:</h3>
+      <ul>
+        <li>Net force determines acceleration (F = ma)</li>
+        <li>Friction opposes motion and depends on surface type</li>
+        <li>Objects maintain constant velocity when forces are balanced</li>
+        <li>Greater mass requires more force for the same acceleration</li>
+      </ul>
+    </div>
+
+    <div class="controls">
+      <div class="control-box">
+        <label for="mass">Mass (m): <span id="mass-value">1.0</span> kg</label><br>
+        <input type="range" id="mass" min="0.1" max="10" step="0.1" value="1.0">
+        <p>More mass = More inertia</p>
+      </div>
+      
+      <div class="control-box">
+        <label for="applied-force">Applied Force (F): <span id="force-value">5.0</span> N</label><br>
+        <input type="range" id="applied-force" min="-20" max="20" step="0.5" value="5.0">
+        <p>Positive = Right, Negative = Left</p>
+      </div>
+
+      <div class="control-box">
+        <label for="friction">Friction Coefficient (μ): <span id="friction-value">0.2</span></label><br>
+        <input type="range" id="friction" min="0" max="1" step="0.05" value="0.2">
+        <p>Higher value = More friction</p>
+      </div>
+    </div>
+
+    <button onclick="startSimulation()">Start Simulation</button>
+
+    <div class="results-grid">
+      <div class="result-box">
+        <strong>Net Force:</strong><br>
+        <span id="net-force-display">0</span> N
+      </div>
+      <div class="result-box">
+        <strong>Acceleration:</strong><br>
+        <span id="acceleration-display">0</span> m/s²
+      </div>
+      <div class="result-box">
+        <strong>Velocity:</strong><br>
+        <span id="velocity-display">0</span> m/s
+      </div>
+      <div class="result-box">
+        <strong>Position:</strong><br>
+        <span id="position-display">0</span> m
+      </div>
+    </div>
+
+    <canvas id="canvas" width="800" height="400"></canvas>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let animationId = null;
+
+    // Constants
+    const fps = 60;
+    const dt = 1/fps;
+    const scale = 50; // pixels per meter
+
+    class PhysicsObject {
+      constructor(mass, friction) {
+        this.reset();
+        this.mass = mass;
+        this.friction = friction;
+      }
+
+      reset() {
+        this.position = 4; // Start at 4 meters from left
+        this.velocity = 0;
+        this.acceleration = 0;
+        this.path = [];
+      }
+
+      update(appliedForce, dt) {
+        // Calculate forces
+        const normalForce = this.mass * 9.81; // g = 9.81 m/s²
+        const frictionForce = -Math.sign(this.velocity) * this.friction * normalForce;
+        const netForce = appliedForce + frictionForce;
+
+        // Update motion
+        this.acceleration = netForce / this.mass;
+        this.velocity += this.acceleration * dt;
+        this.position += this.velocity * dt;
+
+        // Store path point
+        this.path.push({ x: this.position, y: canvas.height/2/scale });
+
+        // Return forces for display
+        return {
+          netForce: netForce.toFixed(2),
+          frictionForce: frictionForce.toFixed(2)
+        };
+      }
+    }
+
+    class Renderer {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+      }
+
+      clear() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+
+      drawGrid() {
+        this.ctx.strokeStyle = '#ddd';
+        this.ctx.lineWidth = 0.5;
+
+        // Draw vertical lines
+        for (let x = 0; x <= this.canvas.width; x += scale) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(x, 0);
+          this.ctx.lineTo(x, this.canvas.height);
+          this.ctx.stroke();
+        }
+
+        // Draw horizontal lines
+        for (let y = 0; y <= this.canvas.height; y += scale) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, y);
+          this.ctx.lineTo(this.canvas.width, y);
+          this.ctx.stroke();
+        }
+
+        // Draw axes
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 2;
+        
+        // x-axis
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, this.canvas.height/2);
+        this.ctx.lineTo(this.canvas.width, this.canvas.height/2);
+        this.ctx.stroke();
+
+        // Add scale markers
+        this.drawScaleMarkers();
+      }
+
+      drawScaleMarkers() {
+        this.ctx.fillStyle = '#666';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'top';
+
+        // X-axis markers
+        for (let x = 0; x <= this.canvas.width; x += scale) {
+          this.ctx.fillText(`${x/scale}m`, x, this.canvas.height/2 + 5);
+        }
+      }
+
+      drawObject(x) {
+        const screenX = x * scale;
+        const screenY = this.canvas.height/2;
+
+        // Draw box
+        this.ctx.fillStyle = '#2196F3';
+        this.ctx.fillRect(screenX - 20, screenY - 20, 40, 40);
+      }
+
+      drawForces(x, appliedForce, frictionForce) {
+        const screenX = x * scale;
+        const screenY = this.canvas.height/2;
+        
+        // Draw applied force arrow
+        if (appliedForce !== 0) {
+          this.drawArrow(screenX, screenY, appliedForce * 10, '#E91E63');
+        }
+        
+        // Draw friction force arrow
+        if (frictionForce !== 0) {
+          this.drawArrow(screenX, screenY - 30, frictionForce * 10, '#FF9800');
+        }
+      }
+
+      drawArrow(x, y, force, color) {
+        const arrowLength = force;
+        const headLength = 10;
+        const headAngle = Math.PI / 6;
+
+        this.ctx.strokeStyle = color;
+        this.ctx.fillStyle = color;
+        this.ctx.lineWidth = 3;
+
+        // Draw line
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x + arrowLength, y);
+        this.ctx.stroke();
+
+        // Draw arrowhead
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + arrowLength, y);
+        this.ctx.lineTo(x + arrowLength - headLength * Math.cos(headAngle), 
+                       y - headLength * Math.sin(headAngle));
+        this.ctx.lineTo(x + arrowLength - headLength * Math.cos(headAngle),
+                       y + headLength * Math.sin(headAngle));
+        this.ctx.closePath();
+        this.ctx.fill();
+      }
+    }
+
+    class Simulator {
+      constructor() {
+        this.object = null;
+        this.renderer = new Renderer(canvas, ctx);
+        this.isRunning = false;
+      }
+
+      init() {
+        const mass = parseFloat(document.getElementById('mass').value);
+        const friction = parseFloat(document.getElementById('friction').value);
+        this.object = new PhysicsObject(mass, friction);
+        this.renderer.clear();
+        this.renderer.drawGrid();
+      }
+
+      start() {
+        if (this.isRunning) {
+          cancelAnimationFrame(animationId);
+        }
+
+        this.init();
+        this.isRunning = true;
+        this.animate();
+      }
+
+      animate() {
+        this.renderer.clear();
+        this.renderer.drawGrid();
+
+        const appliedForce = parseFloat(document.getElementById('applied-force').value);
+        const forces = this.object.update(appliedForce, dt);
+
+        // Update display values
+        document.getElementById('net-force-display').textContent = forces.netForce;
+        document.getElementById('acceleration-display').textContent = 
+          this.object.acceleration.toFixed(2);
+        document.getElementById('velocity-display').textContent = 
+          this.object.velocity.toFixed(2);
+        document.getElementById('position-display').textContent = 
+          this.object.position.toFixed(2);
+
+        // Draw current state
+        this.renderer.drawObject(this.object.position);
+        this.renderer.drawForces(this.object.position, appliedForce, 
+                               parseFloat(forces.frictionForce));
+
+        // Continue animation if object is within bounds
+        if (this.object.position >= 0 && this.object.position <= canvas.width/scale) {
+          animationId = requestAnimationFrame(() => this.animate());
+        } else {
+          this.isRunning = false;
+        }
+      }
+    }
+
+    // Initialize simulator
+    const simulator = new Simulator();
+    simulator.init();
+
+    // Event listeners
+    function startSimulation() {
+      simulator.start();
+    }
+
+    // Update display values when sliders change
+    document.getElementById('mass').addEventListener('input', function(e) {
+      document.getElementById('mass-value').textContent = e.target.value;
+    });
+
+    document.getElementById('applied-force').addEventListener('input', function(e) {
+      document.getElementById('force-value').textContent = e.target.value;
+    });
+
+    document.getElementById('friction').addEventListener('input', function(e) {
+      document.getElementById('friction-value').textContent = e.target.value;
+    });
+  </script>
+</body>
+</html>

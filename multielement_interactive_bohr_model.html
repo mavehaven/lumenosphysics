@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Multi-Element Bohr Model</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <style>
+        body { 
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        canvas { 
+            display: block; 
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 300px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        #explanation {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .electron-shell {
+            margin-top: 10px;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div class="control-group">
+            <label for="element">Select Element:</label>
+            <select id="element">
+                <option value="1">Hydrogen (H)</option>
+                <option value="2">Helium (He)</option>
+                <option value="3">Lithium (Li)</option>
+                <option value="4">Beryllium (Be)</option>
+                <option value="5">Boron (B)</option>
+                <option value="6">Carbon (C)</option>
+                <option value="7">Nitrogen (N)</option>
+                <option value="8">Oxygen (O)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="principal">Principal Quantum Number (n):</label>
+            <input type="range" id="principal" min="1" max="4" value="1" step="1">
+            <span id="principalValue">1</span>
+        </div>
+        <div class="control-group">
+            <label for="angular">Angular Momentum Number (l):</label>
+            <input type="range" id="angular" min="0" max="2" value="0" step="1">
+            <span id="angularValue">0</span>
+        </div>
+        <div class="control-group">
+            <label for="magnetic">Magnetic Quantum Number (m):</label>
+            <input type="range" id="magnetic" min="-2" max="2" value="0" step="1">
+            <span id="magneticValue">0</span>
+        </div>
+        <button id="transition">Trigger Transition</button>
+    </div>
+
+    <div id="explanation">
+        <h2>Atomic Structure Explanation</h2>
+        <div id="elementInfo"></div>
+        <div id="quantumInfo"></div>
+        <div id="electronConfig"></div>
+    </div>
+
+    <script>
+        // Element configurations and properties
+        const elements = {
+            1: { 
+                symbol: 'H',
+                name: 'Hydrogen',
+                electronConfig: '1s¹',
+                shellConfig: [1],
+                color: 0xFFFFFF
+            },
+            2: {
+                symbol: 'He',
+                name: 'Helium',
+                electronConfig: '1s²',
+                shellConfig: [2],
+                color: 0xFFA07A
+            },
+            3: {
+                symbol: 'Li',
+                name: 'Lithium',
+                electronConfig: '1s²2s¹',
+                shellConfig: [2, 1],
+                color: 0xFF6B6B
+            },
+            4: {
+                symbol: 'Be',
+                name: 'Beryllium',
+                electronConfig: '1s²2s²',
+                shellConfig: [2, 2],
+                color: 0x90EE90
+            },
+            5: {
+                symbol: 'B',
+                name: 'Boron',
+                electronConfig: '1s²2s²2p¹',
+                shellConfig: [2, 3],
+                color: 0xA0522D
+            },
+            6: {
+                symbol: 'C',
+                name: 'Carbon',
+                electronConfig: '1s²2s²2p²',
+                shellConfig: [2, 4],
+                color: 0x808080
+            },
+            7: {
+                symbol: 'N',
+                name: 'Nitrogen',
+                electronConfig: '1s²2s²2p³',
+                shellConfig: [2, 5],
+                color: 0x0000FF
+            },
+            8: {
+                symbol: 'O',
+                name: 'Oxygen',
+                electronConfig: '1s²2s²2p⁴',
+                shellConfig: [2, 6],
+                color: 0xFF0000
+            }
+        };
+
+        // Initialize Three.js scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create nucleus
+        const nucleusGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const nucleusMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
+        scene.add(nucleus);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        // Create electrons array
+        let electrons = [];
+        let orbits = [];
+
+        function createElectron() {
+            const electronGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+            const electronMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+            const electron = new THREE.Mesh(electronGeometry, electronMaterial);
+            scene.add(electron);
+            return electron;
+        }
+
+        function createOrbitPath(radius) {
+            const curve = new THREE.EllipseCurve(
+                0, 0,
+                radius, radius,
+                0, 2 * Math.PI,
+                false,
+                0
+            );
+            const points = curve.getPoints(50);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({ color: 0x808080, transparent: true, opacity: 0.5 });
+            const ellipse = new THREE.Line(geometry, material);
+            ellipse.rotation.x = Math.PI / 2;
+            return ellipse;
+        }
+
+        // Initialize camera position
+        camera.position.z = 15;
+
+        // Animation variables
+        let angles = [];
+        let currentRadii = [];
+        let targetRadii = [];
+        let transitioning = false;
+
+        // Controls
+        const elementSelect = document.getElementById('element');
+        const principalInput = document.getElementById('principal');
+        const angularInput = document.getElementById('angular');
+        const magneticInput = document.getElementById('magnetic');
+        const transitionButton = document.getElementById('transition');
+
+        // Event listeners
+        elementSelect.addEventListener('change', updateElement);
+        principalInput.addEventListener('input', updateQuantumNumbers);
+        angularInput.addEventListener('input', updateQuantumNumbers);
+        magneticInput.addEventListener('input', updateQuantumNumbers);
+        transitionButton.addEventListener('click', triggerTransition);
+
+        function updateElement() {
+            const elementNumber = parseInt(elementSelect.value);
+            const element = elements[elementNumber];
+            
+            // Update nucleus
+            nucleusMaterial.color.setHex(element.color);
+            
+            // Clear existing electrons and orbits
+            electrons.forEach(electron => scene.remove(electron));
+            orbits.forEach(orbit => scene.remove(orbit));
+            
+            electrons = [];
+            orbits = [];
+            angles = [];
+            currentRadii = [];
+            targetRadii = [];
+
+            // Create new electrons and orbits based on configuration
+            element.shellConfig.forEach((electronCount, shellIndex) => {
+                const shellRadius = (shellIndex + 1) * 2;
+                const orbit = createOrbitPath(shellRadius);
+                scene.add(orbit);
+                orbits.push(orbit);
+
+                for (let i = 0; i < electronCount; i++) {
+                    const electron = createElectron();
+                    electrons.push(electron);
+                    angles.push((2 * Math.PI * i) / electronCount);
+                    currentRadii.push(shellRadius);
+                    targetRadii.push(shellRadius);
+                }
+            });
+
+            updateExplanation(elementNumber);
+        }
+
+        function updateExplanation(elementNumber) {
+            const element = elements[elementNumber];
+            const elementInfo = document.getElementById('elementInfo');
+            const quantumInfo = document.getElementById('quantumInfo');
+            const electronConfig = document.getElementById('electronConfig');
+
+            elementInfo.innerHTML = `
+                <h3>${element.name} (${element.symbol})</h3>
+                <p>Atomic Number: ${elementNumber}</p>
+                <p>Electronic Configuration: $$${element.electronConfig}$$</p>
+            `;
+
+            quantumInfo.innerHTML = `
+                <h3>Quantum Numbers</h3>
+                <p>Principal Quantum Number (n): $$n = 1, 2, 3, ...$$</p>
+                <p>Angular Momentum Number (l): $$l = 0, 1, ..., (n-1)$$</p>
+                <p>Magnetic Quantum Number (m): $$m = -l, ..., 0, ..., +l$$</p>
+                <p>Energy Level: $$E_n = -13.6\\text{ eV} \\cdot \\frac{1}{n^2}$$</p>
+            `;
+
+            electronConfig.innerHTML = `
+                <h3>Shell Structure</h3>
+                <p>Allowed electrons per shell:</p>
+                <p>$$2n^2$$ electrons in shell n</p>
+            `;
+
+            // Refresh MathJax
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+        }
+
+        function updateQuantumNumbers() {
+            const n = parseInt(principalInput.value);
+            const l = parseInt(angularInput.value);
+            const m = parseInt(magneticInput.value);
+
+            document.getElementById('principalValue').textContent = n;
+            document.getElementById('angularValue').textContent = l;
+            document.getElementById('magneticValue').textContent = m;
+
+            angularInput.max = n - 1;
+            if (l > n - 1) angularInput.value = n - 1;
+            
+            magneticInput.min = -l;
+            magneticInput.max = l;
+            if (m < -l || m > l) magneticInput.value = 0;
+
+            updateOrbitVisualization(n, l, m);
+        }
+
+        function updateOrbitVisualization(n, l, m) {
+            orbits.forEach((orbit, index) => {
+                orbit.rotation.y = (l * Math.PI) / 4;
+                orbit.rotation.z = (m * Math.PI) / 4;
+                targetRadii[index] = (index + 1) * 2;
+            });
+        }
+
+        function triggerTransition() {
+            transitioning = true;
+            const newRadius = parseInt(principalInput.value) * 2;
+            targetRadii = targetRadii.map(() => newRadius);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate camera
+            camera.position.x = Math.sin(Date.now() * 0.001) * 15;
+            camera.position.z = Math.cos(Date.now() * 0.001) * 15;
+            camera.lookAt(scene.position);
+
+            // Update electron positions
+            electrons.forEach((electron, index) => {
+                angles[index] += 0.05;
+                if (transitioning) {
+                    currentRadii[index] += (targetRadii[index] - currentRadii[index]) * 0.05;
+                }
+
+                electron.position.x = Math.cos(angles[index]) * currentRadii[index];
+                electron.position.y = Math.sin(angles[index]) * currentRadii[index];
+            });
+
+            if (transitioning && currentRadii.every((r, i) => Math.abs(r - targetRadii[i]) < 0.1)) {
+                transitioning = false;
+                currentRadii = [...targetRadii];
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Initialize
+        updateElement();
+        updateQuantumNumbers();
+        animate();
+    </script>
+</body>
+</html

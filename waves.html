@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Simulator - Learn About Waves!</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            background-color: #007bff;
+            padding: 0 20px;
+            color: white;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .controls, .slider-container {
+            padding: 20px;
+        }
+        .slider {
+            width: 100%;
+        }
+        .toggle {
+            cursor: pointer;
+        }
+        #waveContainer {
+            flex: 1;
+            width: 100%;
+        }
+        .explanation {
+            padding: 20px;
+            background-color: #e9ecef;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        .formula {
+            background-color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .dark-mode {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+        .dark-mode .explanation {
+            background-color: #2d2d2d;
+        }
+        .dark-mode .formula {
+            background-color: #3d3d3d;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script type="text/javascript" id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"> </script>
+</head>
+<body>
+    <header>
+        <h1>Wave Simulator</h1>
+        <div>
+            <label>Dark Mode:</label>
+            <input type="checkbox" id="darkModeToggle" class="toggle" onclick="toggleTheme()">
+        </div>
+    </header>
+
+    <div class="explanation">
+        <h2>📚 How Waves Work</h2>
+        <p>Welcome to the Wave Simulator! This tool helps you understand how waves behave. Let's break down what each part means:</p>
+        
+        <div class="formula">
+            <h3>🌊 The Wave Equation</h3>
+            <p>For a sine wave, we use this formula:</p>
+            <p>$$y(x,t) = A \cdot e^{-dx} \cdot \sin(2\pi ft + \frac{2\pi x}{\lambda} + \phi)$$</p>
+            <p>Where:</p>
+            <ul>
+                <li>$$A$$ = Amplitude (height of the wave)</li>
+                <li>$$d$$ = Damping factor (how quickly the wave dies out)</li>
+                <li>$$f$$ = Frequency (how many waves per second)</li>
+                <li>$$\lambda$$ = Wavelength (distance between wave peaks)</li>
+                <li>$$\phi$$ = Phase (wave shift left or right)</li>
+                <li>$$t$$ = Time</li>
+                <li>$$x$$ = Position</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <div class="slider-container">
+                <label for="amplitudeSlider">Amplitude (Wave Height): </label>
+                <input type="range" id="amplitudeSlider" min="0" max="10" value="5" step="0.1" oninput="updateWaveParams()">
+                <span>Controls how tall the waves are</span>
+            </div>
+            <div class="slider-container">
+                <label for="frequencySlider1">Frequency (Speed): </label>
+                <input type="range" id="frequencySlider1" min="0.1" max="2" value="0.5" step="0.1" oninput="updateWaveParams()">
+                <span>Controls how fast the waves move</span>
+            </div>
+            <div class="slider-container">
+                <label for="wavelengthSlider">Wavelength (Wave Width): </label>
+                <input type="range" id="wavelengthSlider" min="5" max="50" value="20" step="1" oninput="updateWaveParams()">
+                <span>Controls the distance between wave peaks</span>
+            </div>
+            <div class="slider-container">
+                <label for="phaseSlider">Phase (Wave Shift): </label>
+                <input type="range" id="phaseSlider" min="0" max="360" value="0" step="1" oninput="updateWaveParams()">
+                <span>Shifts the wave left or right</span>
+            </div>
+            <div class="slider-container">
+                <label for="dampingSlider">Damping (Wave Decay): </label>
+                <input type="range" id="dampingSlider" min="0" max="0.1" value="0" step="0.001" oninput="updateWaveParams()">
+                <span>Controls how quickly the wave dies out</span>
+            </div>
+            <div class="slider-container">
+                <label for="waveTypeSelect">Wave Type: </label>
+                <select id="waveTypeSelect" onchange="updateWaveParams()">
+                    <option value="sine">Sine (Smooth waves)</option>
+                    <option value="square">Square (Sharp waves)</option>
+                    <option value="sawtooth">Sawtooth (Ramp waves)</option>
+                    <option value="triangle">Triangle (Pointed waves)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="waveContainer"></div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, waveField;
+        let amplitude = 5;
+        let frequency1 = 0.5;
+        let wavelength = 20;
+        let phase = 0;
+        let damping = 0;
+        let waveType = 'sine';
+        let time = 0;
+
+        const gridSize = 100;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('waveContainer').appendChild(renderer.domElement);
+
+            camera.position.set(0, 50, 100);
+            camera.lookAt(0, 0, 0);
+
+            const geometry = new THREE.PlaneGeometry(100, 100, gridSize - 1, gridSize - 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x007bff, wireframe: true });
+            waveField = new THREE.Mesh(geometry, material);
+            scene.add(waveField);
+
+            animate();
+        }
+
+        function updateWaveParams() {
+            amplitude = parseFloat(document.getElementById('amplitudeSlider').value);
+            frequency1 = parseFloat(document.getElementById('frequencySlider1').value);
+            wavelength = parseFloat(document.getElementById('wavelengthSlider').value);
+            phase = parseFloat(document.getElementById('phaseSlider').value) * Math.PI / 180;
+            damping = parseFloat(document.getElementById('dampingSlider').value);
+            waveType = document.getElementById('waveTypeSelect').value;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderWaveField();
+            renderer.render(scene, camera);
+        }
+
+        function getWaveValue(type, angle) {
+            switch(type) {
+                case 'sine': return Math.sin(angle);
+                case 'square': return Math.sign(Math.sin(angle));
+                case 'sawtooth': return 2 * (angle / (2 * Math.PI) - Math.floor(0.5 + angle / (2 * Math.PI)));
+                case 'triangle': return Math.abs(2 * (angle / Math.PI - Math.floor(0.5 + angle / Math.PI)));
+                default: return Math.sin(angle);
+            }
+        }
+
+        function renderWaveField() {
+            time += 0.05;
+            const position = waveField.geometry.attributes.position;
+            for (let i = 0; i < position.count; i++) {
+                const x = position.getX(i);
+                const y = position.getY(i);
+                const dist = Math.sqrt(x * x + y * y);
+                const angle = (frequency1 * time + dist * 2 * Math.PI / wavelength + phase);
+                const z = amplitude * getWaveValue(waveType, angle) * Math.exp(-damping * dist);
+                position.setZ(i, z);
+            }
+            position.needsUpdate = true;
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        init();
+    </script>
+</body>
+</html>

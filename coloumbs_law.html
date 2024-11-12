@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .theory-section {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .formula-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .key-points {
+            background-color: #e9f5f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .example {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .interactive-note {
+            font-style: italic;
+            color: #666;
+            margin: 10px 0;
+        }
+        .simulator {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .canvas-container {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin: 20px 0;
+            position: relative;
+        }
+        canvas {
+            background: #fff;
+        }
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .material-selector {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .info-panel {
+            background: #e9f5f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            max-width: 200px;
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+        }
+        .legend {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+  <h2>Understanding Coulomb's Law</h2>
+    
+    <p>Coulomb's Law describes the electrostatic force between two charged particles. It is one of the fundamental principles of electrostatics.</p>
+
+    <div class="formula-box">
+        <h3>Mathematical Expression</h3>
+        <p>The force between two point charges is given by:</p>
+        $$F = k\frac{q_1q_2}{r^2}$$
+        <p>Where:</p>
+        <ul>
+            <li>$$F$$ is the electrostatic force in Newtons (N)</li>
+            <li>$$k$$ is Coulomb's constant = $$8.99 \times 10^9 \, \text{N}\cdot\text{m}^2/\text{C}^2$$</li>
+            <li>$$q_1$$ and $$q_2$$ are the magnitudes of the charges in Coulombs (C)</li>
+            <li>$$r$$ is the distance between the charges in meters (m)</li>
+        </ul>
+    </div>
+
+    <div class="key-points">
+        <h3>Key Properties</h3>
+        <ol>
+            <li><strong>Direction:</strong> The force is:
+                <ul>
+                    <li>Repulsive (positive) when charges have the same sign</li>
+                    <li>Attractive (negative) when charges have opposite signs</li>
+                </ul>
+            </li>
+            <li><strong>Inverse Square Law:</strong> The force decreases with the square of the distance:
+                $$F \propto \frac{1}{r^2}$$
+            </li>
+            <li><strong>Vector Nature:</strong> The force acts along the line joining the charges:
+                $$\vec{F} = k\frac{q_1q_2}{r^2}\hat{r}$$
+            </li>
+        </ol>
+    </div>
+
+    <div class="example">
+        <h3>Example Calculation</h3>
+        <p>Consider two charges:</p>
+        <p>$$q_1 = +2\mu\text{C}$$ and $$q_2 = -3\mu\text{C}$$ separated by $$r = 0.1\text{m}$$</p>
+        <p>The force magnitude is:</p>
+        $$\begin{align*}
+        F &= (8.99 \times 10^9)\frac{(2 \times 10^{-6})(-3 \times 10^{-6})}{(0.1)^2} \\
+        &= -5.39 \, \text{N}
+        \end{align*}$$
+        <p>The negative sign indicates an attractive force.</p>
+    </div>
+
+    <div class="interactive-note">
+        <p>In the interactive simulator above, you can observe these principles in action:</p>
+        <ul>
+            <li>Like charges (same color) repel each other</li>
+            <li>Unlike charges (different colors) attract each other</li>
+            <li>The force strength is indicated by the motion of the charges</li>
+            <li>Electric field lines show the direction of force on a positive test charge</li>
+        </ul>
+    </div>
+</div>
+    <div class="simulator">
+        <h1>Electric Charge Simulator</h1>
+        <p>Explore how electric charges interact with different materials!</p>
+        
+        <div class="controls">
+            <select id="materialSelect" class="material-selector" title="Choose between materials that allow charge movement (conductors) or restrict it (insulators)">
+                <option value="conductor">Conductor (Metal)</option>
+                <option value="insulator">Insulator (Plastic)</option>
+            </select>
+            <button onclick="addCharge('positive')" title="Add a positive charge to the simulation">Add Positive Charge</button>
+            <button onclick="addCharge('negative')" title="Add a negative charge to the simulation">Add Negative Charge</button>
+            <button onclick="clearCanvas()" title="Reset the simulation">Clear</button>
+        </div>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="showFieldLines" checked>
+            <label for="showFieldLines">Show Electric Field Lines</label>
+            <input type="checkbox" id="showTooltips" checked>
+            <label for="showTooltips">Show Educational Tooltips</label>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="simCanvas" width="700" height="400"></canvas>
+            <div id="tooltip" class="tooltip"></div>
+        </div>
+
+        <div class="legend">
+            <h3>Visualization Guide:</h3>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff4444;"></div>
+                <span>Positive Charge</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4444ff;"></div>
+                <span>Negative Charge</span>
+            </div>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; position: relative;">
+                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #666;"></div>
+                </div>
+                <span>Electric Field Lines</span>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>How it works:</h3>
+            <ul>
+                <li>Positive charges (red) and negative charges (blue) interact through electromagnetic forces</li>
+                <li>Electric field lines show the direction of force on a positive test charge</li>
+                <li>In conductors, charges move freely due to the sea of electrons</li>
+                <li>In insulators, charges remain fixed due to strong atomic bonds</li>
+                <li>Like charges repel, unlike charges attract (Coulomb's Law)</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+      class ElectricChargeSimulator {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.charges = [];
+        this.isDragging = false;
+        this.selectedCharge = null;
+        this.lastMousePos = { x: 0, y: 0 };
+
+        this.tooltipMessages = {
+            conductor: "Conductors allow charges to move freely due to their loosely bound electrons",
+            insulator: "Insulators restrict charge movement due to tightly bound electrons",
+            positive: "Positive charges represent a deficit of electrons",
+            negative: "Negative charges represent an excess of electrons",
+            field: "Electric field lines show the direction of force on a positive test charge"
+        };
+
+        this.setupEventListeners();
+        this.animate();
+    }
+
+    setupEventListeners() {
+        this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
+        this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
+        this.canvas.addEventListener('mouseout', this.hideTooltip.bind(this));
+    }
+
+    addCharge(type) {
+        const material = document.getElementById('materialSelect').value;
+        const x = Math.random() * (this.canvas.width - 40) + 20;
+        const y = Math.random() * (this.canvas.height - 40) + 20;
+        this.charges.push(new Charge(x, y, type, material));
+    }
+
+    clearCanvas() {
+        this.charges = [];
+    }
+
+    calculateForce(charge1, charge2) {
+        const dx = charge2.x - charge1.x;
+        const dy = charge2.y - charge1.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 1) return { x: 0, y: 0 };
+        
+        const forceMagnitude = 300 / (distance * distance);
+        const sign = (charge1.type === charge2.type) ? 1 : -1;
+        
+        return {
+            x: (dx / distance) * forceMagnitude * sign,
+            y: (dy / distance) * forceMagnitude * sign
+        };
+    }
+
+    updatePhysics() {
+        for (let i = 0; i < this.charges.length; i++) {
+            if (this.charges[i].isFixed) continue;
+            
+            let totalForce = { x: 0, y: 0 };
+            
+            for (let j = 0; j < this.charges.length; j++) {
+                if (i !== j) {
+                    const force = this.calculateForce(this.charges[i], this.charges[j]);
+                    totalForce.x += force.x;
+                    totalForce.y += force.y;
+                }
+            }
+
+            if (this.charges[i].material === 'conductor') {
+                this.charges[i].velocity.x = totalForce.x * 0.1;
+                this.charges[i].velocity.y = totalForce.y * 0.1;
+                
+                this.charges[i].x += this.charges[i].velocity.x;
+                this.charges[i].y += this.charges[i].velocity.y;
+
+                // Boundary collision
+                if (this.charges[i].x < this.charges[i].radius) {
+                    this.charges[i].x = this.charges[i].radius;
+                    this.charges[i].velocity.x *= -0.5;
+                }
+                if (this.charges[i].x > this.canvas.width - this.charges[i].radius) {
+                    this.charges[i].x = this.canvas.width - this.charges[i].radius;
+                    this.charges[i].velocity.x *= -0.5;
+                }
+                if (this.charges[i].y < this.charges[i].radius) {
+                    this.charges[i].y = this.charges[i].radius;
+                    this.charges[i].velocity.y *= -0.5;
+                }
+                if (this.charges[i].y > this.canvas.height - this.charges[i].radius) {
+                    this.charges[i].y = this.canvas.height - this.charges[i].radius;
+                    this.charges[i].velocity.y *= -0.5;
+                }
+            }
+        }
+    }
+
+    drawFieldLines() {
+        if (!document.getElementById('showFieldLines').checked) return;
+
+        const gridSize = 20;
+        const strength = 50;
+
+        for (let x = 0; x < this.canvas.width; x += gridSize) {
+            for (let y = 0; y < this.canvas.height; y += gridSize) {
+                let fieldX = 0;
+                let fieldY = 0;
+
+                this.charges.forEach(charge => {
+                    const dx = x - charge.x;
+                    const dy = y - charge.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 10) {
+                        const magnitude = (charge.type === 'positive' ? 1 : -1) / (distance * distance);
+                        fieldX += dx / distance * magnitude;
+                        fieldY += dy / distance * magnitude;
+                    }
+                });
+
+                const fieldMagnitude = Math.sqrt(fieldX * fieldX + fieldY * fieldY);
+                if (fieldMagnitude > 0.001) {
+                    const normalizedX = fieldX / fieldMagnitude;
+                    const normalizedY = fieldY / fieldMagnitude;
+
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, y);
+                    this.ctx.lineTo(x + normalizedX * strength, y + normalizedY * strength);
+                    this.ctx.strokeStyle = `rgba(100, 100, 100, ${Math.min(fieldMagnitude * 2, 0.5)})`;
+                    this.ctx.stroke();
+
+                    // Draw arrowhead
+                    const arrowSize = 5;
+                    const angle = Math.atan2(normalizedY, normalizedX);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x + normalizedX * strength, y + normalizedY * strength);
+                    this.ctx.lineTo(
+                        x + normalizedX * strength - arrowSize * Math.cos(angle - Math.PI / 6),
+                        y + normalizedY * strength - arrowSize * Math.sin(angle - Math.PI / 6)
+                    );
+                    this.ctx.lineTo(
+                        x + normalizedX * strength - arrowSize * Math.cos(angle + Math.PI / 6),
+                        y + normalizedY * strength - arrowSize * Math.sin(angle + Math.PI / 6)
+                    );
+                    this.ctx.closePath();
+                    this.ctx.fillStyle = `rgba(100, 100, 100, ${Math.min(fieldMagnitude * 2, 0.5)})`;
+                    this.ctx.fill();
+                }
+            }
+        }
+    }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawFieldLines();
+        this.charges.forEach(charge => charge.draw(this.ctx));
+    }
+
+    animate() {
+        this.updatePhysics();
+        this.draw();
+        requestAnimationFrame(this.animate.bind(this));
+    }
+
+    showTooltip(text, x, y) {
+        if (!document.getElementById('showTooltips').checked) return;
+        
+        const tooltip = document.getElementById('tooltip');
+        tooltip.style.display = 'block';
+        tooltip.style.left = `${x + 20}px`;
+        tooltip.style.top = `${y}px`;
+        tooltip.textContent = text;
+    }
+
+    hideTooltip() {
+        const tooltip = document.getElementById('tooltip');
+        tooltip.style.display = 'none';
+    }
+
+    handleMouseDown(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        this.charges.forEach(charge => {
+            const dx = mouseX - charge.x;
+            const dy = mouseY - charge.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < charge.radius) {
+                this.isDragging = true;
+                this.selectedCharge = charge;
+                this.showTooltip(this.tooltipMessages[charge.type], e.clientX, e.clientY);
+            }
+        });
+
+        this.lastMousePos = { x: mouseX, y: mouseY };
+    }
+
+    handleMouseMove(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        if (this.isDragging && this.selectedCharge) {
+            if (!this.selectedCharge.isFixed) {
+                this.selectedCharge.x = mouseX;
+                this.selectedCharge.y = mouseY;
+            }
+            this.showTooltip(this.tooltipMessages[this.selectedCharge.type], e.clientX, e.clientY);
+            this.lastMousePos = { x: mouseX, y: mouseY };
+        } else {
+            let hoveredCharge = this.charges.find(charge => {
+                const dx = mouseX - charge.x;
+                const dy = mouseY - charge.y;
+                return Math.sqrt(dx * dx + dy * dy) < charge.radius;
+            });
+
+            if (hoveredCharge) {
+                this.showTooltip(this.tooltipMessages[hoveredCharge.material], e.clientX, e.clientY);
+            } else {
+                this.hideTooltip();
+            }
+        }
+    }
+
+    handleMouseUp() {
+        this.isDragging = false;
+        this.selectedCharge = null;
+        this.hideTooltip();
+    }
+}
+
+class Charge {
+    constructor(x, y, type, material) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.material = material;
+        this.radius = 10;
+        this.velocity = { x: 0, y: 0 };
+        this.isFixed = material === 'insulator';
+    }
+
+    draw(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.type === 'positive' ? '#ff4444' : '#4444ff';
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.stroke();
+
+        ctx.fillStyle = 'white';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.type === 'positive' ? '+' : '-', this.x, this.y);
+    }
+}
+
+// Initialize the simulator
+const simulator = new ElectricChargeSimulator('simCanvas');
+
+// Expose methods for HTML buttons
+window.addCharge = (type) => simulator.addCharge(type);
+window.clearCanvas = () => simulator.clearCanvas();
+    </script>
+    </body>
+    </html>

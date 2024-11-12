@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optical Physics Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .simulation {
+            flex-grow: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        input[type="range"] {
+            padding: 0;
+        }
+
+        .value-display {
+            font-size: 0.9em;
+            color: #666;
+            text-align: right;
+        }
+
+        canvas {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #steps {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .step {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 3px solid #0077ff;
+            background: #f8f9fa;
+        }
+
+        .formula {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .formula-content {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        .formula-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        h1 {
+            color: #0077ff;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Optical Physics Simulator</h1>
+    <div class="container">
+        <div class="controls">
+            <div class="control-group">
+                <label for="elementType">Optical Element:</label>
+                <select id="elementType">
+                    <option value="convexLens">Convex Lens</option>
+                    <option value="concaveLens">Concave Lens</option>
+                    <option value="refraction">Refraction Block</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="rayCount">Number of Rays:</label>
+                <input type="range" id="rayCount" min="1" max="10" value="5">
+                <div class="value-display" id="rayCountValue">5 rays</div>
+            </div>
+            
+            <div class="control-group">
+                <label for="focalLength">Focal Length (mm):</label>
+                <input type="range" id="focalLength" min="50" max="200" value="100">
+                <div class="value-display" id="focalLengthValue">100mm</div>
+            </div>
+            
+            <div class="control-group">
+                <label for="refractiveIndex">Refractive Index (x100):</label>
+                <input type="range" id="refractiveIndex" min="100" max="200" value="150">
+                <div class="value-display" id="refractiveIndexValue">n = 1.50</div>
+            </div>
+        </div>
+        
+        <div class="simulation">
+            <canvas id="canvas" width="800" height="400"></canvas>
+        </div>
+    </div>
+    
+    <div id="steps">
+        <!-- Explanation steps will be added here dynamically -->
+    </div>
+    <script>
+    const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-svg.js';
+script.async = true;
+document.head.appendChild(script);
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const steps = document.getElementById('steps');
+
+// Input elements
+const elementTypeSelect = document.getElementById('elementType');
+const rayCountInput = document.getElementById('rayCount');
+const focalLengthInput = document.getElementById('focalLength');
+const refractiveIndexInput = document.getElementById('refractiveIndex');
+
+// Display elements
+const rayCountValue = document.getElementById('rayCountValue');
+const focalLengthValue = document.getElementById('focalLengthValue');
+const refractiveIndexValue = document.getElementById('refractiveIndexValue');
+
+// Constants
+const CENTER_X = canvas.width / 2;
+const CENTER_Y = canvas.height / 2;
+const LENS_HEIGHT = 200;
+
+// Physics formulas for LaTeX rendering
+const FORMULAS = {
+    snellsLaw: '$$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$',
+    lensEquation: '$$\\frac{1}{f} = \\frac{1}{u} + \\frac{1}{v}$$',
+    magnification: '$$m = -\\frac{v}{u} = \\frac{h_i}{h_o}$$'
+};
+
+// Utility functions
+function addExplanationStep(stepText) {
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'step';
+    stepDiv.innerHTML = stepText;
+    steps.appendChild(stepDiv);
+    
+    // Render LaTeX if MathJax is available
+    if (window.MathJax) {
+        MathJax.typeset([stepDiv]);
+    }
+}
+
+function clearExplanation() {
+    steps.innerHTML = '';
+}
+
+function addFormula(formula, description) {
+    const formulaDiv = document.createElement('div');
+    formulaDiv.className = 'formula';
+    formulaDiv.innerHTML = `
+        <div class="formula-content">${formula}</div>
+        <div class="formula-description">${description}</div>
+    `;
+    return formulaDiv;
+}
+
+// Drawing functions
+function drawOpticalAxis(y) {
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.strokeStyle = '#999';
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+function drawConvexLens(x, y, width, height) {
+    const curveAmount = width / 2;
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y - height/2);
+    ctx.quadraticCurveTo(x + curveAmount, y, x, y + height/2);
+    ctx.quadraticCurveTo(x - curveAmount, y, x, y - height/2);
+    ctx.strokeStyle = '#0077ff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
+    ctx.fill();
+
+    drawOpticalAxis(y);
+    addLensMeasurements(x, y, width, height, curveAmount);
+}
+
+function drawConcaveLens(x, y, width, height) {
+    const curveAmount = width / 2;
+    
+    ctx.beginPath();
+    ctx.moveTo(x - width/4, y - height/2);
+    ctx.quadraticCurveTo(x - curveAmount, y, x - width/4, y + height/2);
+    ctx.lineTo(x + width/4, y + height/2);
+    ctx.quadraticCurveTo(x + curveAmount, y, x + width/4, y - height/2);
+    ctx.closePath();
+    ctx.strokeStyle = '#0077ff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
+    ctx.fill();
+
+    drawOpticalAxis(y);
+    addLensMeasurements(x, y, width, height, curveAmount);
+}
+
+function drawRefractionBlock(x, y, width, height) {
+    ctx.beginPath();
+    ctx.rect(x - width/2, y - height/2, width, height);
+    ctx.strokeStyle = '#0077ff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
+    ctx.fill();
+
+    // Draw normal lines
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(x - width/2, y - height/2);
+    ctx.lineTo(x - width/2, y + height/2);
+    ctx.moveTo(x + width/2, y - height/2);
+    ctx.lineTo(x + width/2, y + height/2);
+    ctx.strokeStyle = '#999';
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    addBlockMeasurements(x, y, width, height);
+}
+
+function addLensMeasurements(x, y, width, height, curveAmount) {
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText(`h = ${height}mm`, x + width/2 + 10, y);
+    ctx.fillText(`R = ${curveAmount}mm`, x - width/2 - 40, y - height/4);
+}
+
+function addBlockMeasurements(x, y, width, height) {
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText(`w = ${width}mm`, x, y + height/2 + 20);
+    ctx.fillText(`h = ${height}mm`, x + width/2 + 10, y);
+}
+
+function calculateRefractedRay(x1, y1, x2, y2, n1, n2, normalAngle) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const incidentAngle = Math.atan2(dy, dx) - normalAngle;
+    
+    // Check for total internal reflection
+    const criticalAngle = n2 > n1 ? Math.asin(n1/n2) : Math.PI/2;
+    if (Math.abs(incidentAngle) > criticalAngle) {
+        return {
+            angle: Math.PI - incidentAngle + normalAngle,
+            incidentAngle: incidentAngle,
+            refractedAngle: null,
+            totalInternalReflection: true
+        };
+    }
+    
+    const refractedAngle = Math.asin((n1 * Math.sin(incidentAngle)) / n2);
+    return {
+        angle: normalAngle + refractedAngle,
+        incidentAngle: incidentAngle,
+        refractedAngle: refractedAngle,
+        totalInternalReflection: false
+    };
+}
+
+function drawRay(startX, startY, angle, length, color = '#ff0000', showAngle = true) {
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    const endX = startX + length * Math.cos(angle);
+    const endY = startY + length * Math.sin(angle);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    if (showAngle && Math.abs(angle) > 0.01) {
+        drawAngleArc(startX, startY, angle);
+    }
+    
+    return { endX, endY };
+}
+
+function drawAngleArc(x, y, angle) {
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, -angle, angle > 0);
+    ctx.strokeStyle = '#999';
+    ctx.stroke();
+
+    const degrees = Math.abs(Math.round(angle * 180 / Math.PI));
+    ctx.fillStyle = '#666';
+    ctx.font = '12px Arial';
+    ctx.fillText(`${degrees}°`, x + 25, y + 15);
+}
+
+function drawFocalPoints(x, focalLength) {
+    // Draw focal points
+    ctx.beginPath();
+    ctx.arc(x - focalLength, CENTER_Y, 4, 0, Math.PI * 2);
+    ctx.arc(x + focalLength, CENTER_Y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff0000';
+    ctx.fill();
+
+    // Label focal points
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#000';
+    ctx.fillText('F', x - focalLength - 15, CENTER_Y - 10);
+    ctx.fillText('F', x + focalLength + 10, CENTER_Y - 10);
+
+    // Add focal length measurement
+    drawFocalLengthMarker(x, focalLength);
+}
+
+function drawFocalLengthMarker(x, focalLength) {
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(x, CENTER_Y + 50);
+    ctx.lineTo(x + focalLength, CENTER_Y + 50);
+    ctx.strokeStyle = '#666';
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#666';
+    ctx.fillText(`f = ${focalLength}mm`, x + focalLength/2 - 30, CENTER_Y + 70);
+}
+
+function simulateRays() {
+    const elementType = elementTypeSelect.value;
+    const rayCount = parseInt(rayCountInput.value);
+    const focalLength = parseInt(focalLengthInput.value);
+    const n2 = parseFloat(refractiveIndexInput.value) / 100;
+    const n1 = 1.0; // Air
+
+    updateDisplayValues(rayCount, focalLength, n2);
+    clearCanvas();
+    drawOpticalElement(elementType, focalLength);
+    addPhysicsExplanation(elementType, n1, n2, focalLength);
+    simulateRayPaths(elementType, rayCount, focalLength, n1, n2);
+}
+
+function updateDisplayValues(rayCount, focalLength, n2) {
+    rayCountValue.textContent = `${rayCount} rays`;
+    focalLengthValue.textContent = `${focalLength}mm`;
+    refractiveIndexValue.textContent = `n = ${n2.toFixed(2)}`;
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    clearExplanation();
+}
+
+function drawOpticalElement(elementType, focalLength) {
+    switch(elementType) {
+        case 'convexLens':
+            drawConvexLens(CENTER_X, CENTER_Y, 40, LENS_HEIGHT);
+            drawFocalPoints(CENTER_X, focalLength);
+            break;
+        case 'concaveLens':
+            drawConcaveLens(CENTER_X, CENTER_Y, 40, LENS_HEIGHT);
+            drawFocalPoints(CENTER_X, focalLength);
+            break;
+        default:
+            drawRefractionBlock(CENTER_X, CENTER_Y, 40, LENS_HEIGHT);
+    }
+}
+
+function addPhysicsExplanation(elementType, n1, n2, focalLength) {
+    const explanations = {
+        convexLens: `<strong>Convex Lens Properties:</strong><br>
+            • Converging lens focuses parallel rays at focal point<br>
+            • ${FORMULAS.lensEquation}<br>
+            • Real image formed beyond focal point`,
+        concaveLens: `<strong>Concave Lens Properties:</strong><br>
+            • Diverging lens spreads parallel rays<br>
+            • Virtual image formed between lens and focal point<br>
+            • Always produces diminished virtual image`,
+        refraction: `<strong>Refraction Block Properties:</strong><br>
+            • ${FORMULAS.snellsLaw}<br>
+            • Light bends toward normal when n₂ > n₁<br>
+            • Light bends away from normal when n₂ < n₁`
+    };
+
+    addExplanationStep(`<strong>Physical Properties:</strong><br>
+        Refractive Index of Air (n₁) = ${n1}<br>
+        ${elementType === 'refraction' ? 
+            `Refractive Index of Block (n₂) = ${n2}` : 
+            `Focal Length (f) = ${focalLength}mm`}`);
+    
+    addExplanationStep(explanations[elementType] || explanations.refraction);
+}
+
+function simulateRayPaths(elementType, rayCount, focalLength, n1, n2) {
+    const raySpacing = LENS_HEIGHT / (rayCount + 1);
+
+    for (let i = 1; i <= rayCount; i++) {
+        const startY = CENTER_Y - LENS_HEIGHT/2 + i * raySpacing;
+        
+        switch(elementType) {
+            case 'convexLens':
+                simulateConvergingRay(startY, focalLength, i === 1);
+                break;
+            case 'concaveLens':
+                simulateDivergingRay(startY, focalLength, i === 1);
+                break;
+            default:
+                simulateRefractionRay(startY, n1, n2, i === 1);
+        }
+    }
+}
+
+function simulateConvergingRay(startY, focalLength, isFirstRay) {
+    const angleToFocus = Math.atan2(CENTER_Y - startY, focalLength);
+    drawRay(0, startY, 0, CENTER_X);
+    const { endX, endY } = drawRay(CENTER_X, startY, angleToFocus, canvas.width - CENTER_X);
+    
+    if (isFirstRay) {
+        addExplanationStep(`<strong>Ray Path:</strong> Angle of convergence = ${Math.round(angleToFocus * 180 / Math.PI)}°`);
+    }
+}
+
+function simulateDivergingRay(startY, focalLength, isFirstRay) {
+    const virtualFocusAngle = Math.atan2(startY - CENTER_Y, focalLength);
+    drawRay(0, startY, 0, CENTER_X);
+    const divergeAngle = -virtualFocusAngle;
+    const { endX, endY } = drawRay(CENTER_X, startY, divergeAngle, canvas.width - CENTER_X);
+    
+    if (isFirstRay) {
+        addExplanationStep(`<strong>Ray Path:</strong> Angle of divergence = ${Math.round(Math.abs(divergeAngle) * 180 / Math.PI)}°`);
+    }
+}
+
+function simulateRefractionRay(startY, n1, n2, isFirstRay) {
+    const incidentRayLength = CENTER_X - 50;
+    drawRay(50, startY, 0, incidentRayLength);
+
+    const { angle: refractedAngle1, incidentAngle: theta1 } = 
+        calculateRefractedRay(50, startY, CENTER_X - 20, startY, n1, n2, Math.PI/2);
+    
+    drawRay(CENTER_X - 20, startY, refractedAngle1, 40, '#ff6666');
+const { angle: exitAngle, refractedAngle: theta2 } = 
+        calculateRefractedRay(CENTER_X + 20, startY, CENTER_X - 20, startY, n2, n1, Math.PI/2);
+    
+    drawRay(CENTER_X + 20, startY, exitAngle, canvas.width - CENTER_X - 20);
+
+    if (isFirstRay) {
+        addExplanationStep(`<strong>Ray Path:</strong><br>
+            • Incident angle (θ₁) = ${Math.round(theta1 * 180 / Math.PI)}°<br>
+            • Refracted angle (θ₂) = ${Math.round(theta2 * 180 / Math.PI)}°<br>
+            • ${theta2 === null ? 'Total internal reflection occurred' : ''}`);
+    }
+}
+
+// Event listeners for controls
+elementTypeSelect.addEventListener('change', () => {
+    const isRefraction = elementTypeSelect.value === 'refraction';
+    focalLengthInput.parentElement.style.display = isRefraction ? 'none' : 'block';
+    refractiveIndexInput.parentElement.style.display = isRefraction ? 'block' : 'none';
+    simulateRays();
+});
+
+rayCountInput.addEventListener('input', simulateRays);
+focalLengthInput.addEventListener('input', simulateRays);
+refractiveIndexInput.addEventListener('input', simulateRays);
+
+// Initialize MathJax configuration if available
+if (window.MathJax) {
+    window.MathJax.config = {
+        tex: {
+            inlineMath: [['$$', '$$']],
+            displayMath: [['$$', '$$']],
+            processEscapes: true
+        },
+        svg: {
+            fontCache: 'global'
+        }
+    };
+}
+
+// Add resize handler for responsive canvas
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = Math.min(400, window.innerHeight - 300);
+    simulateRays();
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Initial simulation
+simulateRays();
+  </script>
+</body>
+</html>

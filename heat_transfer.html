@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D Heat Transfer Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat.gui/0.7.7/dat.gui.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            background-color: #f0f0f0;
+        }
+        #controls {
+            width: 300px;
+            padding: 20px;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            height: 100vh;
+        }
+        #simulation-container {
+            flex-grow: 1;
+            height: 100vh;
+        }
+        .equation-container {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        select, input {
+            width: 100%;
+            margin: 5px 0;
+            padding: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .material-info {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        
+        <div id="educational-panel" style="padding: 25px; background: linear-gradient(145deg, #1a1a2e, #16213e); color: #e2e2e2; border-radius: 12px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            options: {
+                enableMenu: false
+            },
+            chtml: {
+                scale: 1.05,
+                matchFontHeight: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <h2 style="color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 15px; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Understanding Heat Transfer Simulation</h2>
+
+    <div style="margin: 25px 0; background: rgba(76, 175, 80, 0.1); padding: 20px; border-radius: 8px; border-left: 4px solid #4CAF50;">
+        <h3 style="color: #4CAF50; margin-top: 0;">What This Simulation Shows</h3>
+        <p style="line-height: 1.6;">This 3D simulation demonstrates three fundamental modes of heat transfer:</p>
+        <ul style="list-style-type: none; padding-left: 0;">
+            <li style="margin: 10px 0; padding-left: 25px; position: relative;">
+                <span style="position: absolute; left: 0; color: #4CAF50;">▶</span>
+                <strong style="color: #4CAF50;">Conduction:</strong> Heat transfer through direct contact
+            </li>
+            <li style="margin: 10px 0; padding-left: 25px; position: relative;">
+                <span style="position: absolute; left: 0; color: #4CAF50;">▶</span>
+                <strong style="color: #4CAF50;">Convection:</strong> Heat transfer through fluid motion
+            </li>
+            <li style="margin: 10px 0; padding-left: 25px; position: relative;">
+                <span style="position: absolute; left: 0; color: #4CAF50;">▶</span>
+                <strong style="color: #4CAF50;">Radiation:</strong> Heat transfer through electromagnetic waves
+            </li>
+        </ul>
+    </div>
+
+    <div style="margin: 25px 0;">
+        <h3 style="color: #4CAF50; border-bottom: 1px solid rgba(76, 175, 80, 0.3); padding-bottom: 10px;">Key Equations and Constants</h3>
+        
+        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid rgba(76, 175, 80, 0.2); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h4 style="color: #4CAF50; margin-top: 0;">1. Fourier's Law of Conduction</h4>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 10px 0;">
+                \[q = -k\frac{\partial T}{\partial x}\]
+            </div>
+            <p style="color: #bbb;">Where:</p>
+            <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin: 8px 0;">$q$ = heat flux (W/m²)</li>
+                <li style="margin: 8px 0;">$k$ = thermal conductivity (W/m·K)</li>
+                <li style="margin: 8px 0;">$\frac{\partial T}{\partial x}$ = temperature gradient</li>
+            </ul>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid rgba(76, 175, 80, 0.2); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h4 style="color: #4CAF50; margin-top: 0;">2. Newton's Law of Cooling</h4>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 10px 0;">
+                \[q = h(T_s - T_{\infty})\]
+            </div>
+            <p style="color: #bbb;">Where:</p>
+            <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin: 8px 0;">$h$ = convection coefficient (W/m²·K)</li>
+                <li style="margin: 8px 0;">$T_s$ = surface temperature</li>
+                <li style="margin: 8px 0;">$T_{\infty}$ = ambient temperature</li>
+            </ul>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid rgba(76, 175, 80, 0.2); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h4 style="color: #4CAF50; margin-top: 0;">3. Stefan-Boltzmann Law</h4>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin: 10px 0;">
+                \[q = \epsilon\sigma(T_s^4 - T_{\infty}^4)\]
+            </div>
+            <p style="color: #bbb;">Where:</p>
+            <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin: 8px 0;">$\epsilon$ = emissivity</li>
+                <li style="margin: 8px 0;">$\sigma$ = Stefan-Boltzmann constant</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="margin: 25px 0;">
+        <h3 style="color: #4CAF50; border-bottom: 1px solid rgba(76, 175, 80, 0.3); padding-bottom: 10px;">Material Properties</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin: 15px 0; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <thead>
+                    <tr style="background: rgba(76, 175, 80, 0.2);">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid rgba(76, 175, 80, 0.3);">Property</th>
+                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid rgba(76, 175, 80, 0.3);">Copper</th>
+                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid rgba(76, 175, 80, 0.3);">Aluminum</th>
+                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid rgba(76, 175, 80, 0.3);">Iron</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">Thermal Conductivity (W/m·K)</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">385</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">205</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">80</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">Density (kg/m³)</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">8960</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">2700</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(76, 175, 80, 0.1);">7874</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px;">Specific Heat (J/kg·K)</td>
+                        <td style="padding: 12px; text-align: center;">385</td>
+                        <td style="padding: 12px; text-align: center;">900</td>
+                        <td style="padding: 12px; text-align: center;">449</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="margin: 25px 0; background: rgba(76, 175, 80, 0.1); padding: 20px; border-radius: 8px; border-left: 4px solid #4CAF50;">
+        <h3 style="color: #4CAF50; margin-top: 0;">Observation Guide</h3>
+        <ol style="list-style-type: none; padding-left: 0;">
+            <li style="margin: 15px 0; padding-left: 35px; position: relative;">
+                <span style="position: absolute; left: 0; color: #4CAF50; font-weight: bold;">01.</span>
+                <strong style="color: #4CAF50;">Temperature Gradient:</strong>
+                <p style="margin: 5px 0; line-height: 1.6;">Watch the color transitions from hot (red) to cold (blue)</p>
+            </li>
+            <li style="margin: 15px 0; padding-left: 35px; position: relative;">
+                <span style="position: absolute; left: 0; color: #4CAF50; font-weight: bold;">02.</span>
+                <strong style="color: #4CAF50;">Material Effects:</strong>
+                <p style="margin: 5px 0; line-height: 1.6;">Compare conductivity differences between materials</p>
+            </li>
+            <li style="margin: 15px 0; padding-left: 35px; position: relative;">
+                <span style="position: absolute; left: 0; color: #4CAF50; font-weight: bold;">03.</span>
+                <strong style="color: #4CAF50;">Transfer Modes:</strong>
+                <p style="margin: 5px 0; line-height: 1.6;">Observe different patterns for each heat transfer mechanism</p>
+            </li>
+        </ol>
+    </div>
+</div>
+        <div class="equation-container">
+            <h3>Governing Equations</h3>
+            <div id="conduction-eq">
+                Conduction (Fourier's Law):
+                $$q = -k\frac{\partial T}{\partial x}$$
+            </div>
+            <div id="convection-eq">
+                Convection (Newton's Law):
+                $$q = h(T_s - T_\infty)$$
+            </div>
+            <div id="radiation-eq">
+                Radiation (Stefan-Boltzmann):
+                $$q = \epsilon\sigma(T_s^4 - T_\infty^4)$$
+            </div>
+        </div>
+
+        <div>
+            <label for="transfer-type">Heat Transfer Method:</label>
+            <select id="transfer-type">
+                <option value="conduction">Conduction</option>
+                <option value="convection">Convection</option>
+                <option value="radiation">Radiation</option>
+            </select>
+        </div>
+        
+        <div>
+            <label for="material">Material:</label>
+            <select id="material">
+                <option value="copper">Copper</option>
+                <option value="aluminum">Aluminum</option>
+                <option value="iron">Iron</option>
+                <option value="wood">Wood</option>
+                <option value="plastic">Plastic</option>
+            </select>
+        </div>
+        
+        <div>
+            <label for="temperature">Initial Temperature (°C):</label>
+            <input type="range" id="temperature" min="0" max="500" value="100">
+            <span id="temp-value">100°C</span>
+        </div>
+        
+        <div>
+            <label for="ambient-temp">Ambient Temperature (°C):</label>
+            <input type="range" id="ambient-temp" min="0" max="50" value="25">
+            <span id="ambient-temp-value">25°C</span>
+        </div>
+        
+        <button id="start-sim">Start Simulation</button>
+        <button id="reset-sim">Reset</button>
+        
+        <div class="material-info">
+            <h4>Material Properties:</h4>
+            <p id="material-details"></p>
+        </div>
+    </div>
+    
+    <div id="simulation-container"></div>
+
+    <script>
+        // Material properties
+        const materials = {
+            copper: { 
+                conductivity: 385,
+                density: 8960,
+                specificHeat: 385,
+                color: 0xb87333,
+                name: 'Copper',
+                emissivity: 0.03
+            },
+            aluminum: {
+                conductivity: 205,
+                density: 2700,
+                specificHeat: 900,
+                color: 0x848789,
+                name: 'Aluminum',
+                emissivity: 0.04
+            },
+            iron: {
+                conductivity: 80,
+                density: 7874,
+                specificHeat: 449,
+                color: 0x727472,
+                name: 'Iron',
+                emissivity: 0.06
+            },
+            wood: {
+                conductivity: 0.12,
+                density: 700,
+                specificHeat: 1700,
+                color: 0x966F33,
+                name: 'Wood',
+                emissivity: 0.90
+            },
+            plastic: {
+                conductivity: 0.2,
+                density: 1200,
+                specificHeat: 1200,
+                color: 0xf0f0f0,
+                name: 'Plastic',
+                emissivity: 0.97
+            }
+        };
+
+        // Three.js setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth - 300, window.innerHeight);
+        document.getElementById('simulation-container').appendChild(renderer.domElement);
+
+        // Grid settings
+        const gridSize = 10;
+        const cubeSize = 1;
+        const gap = 0.1;
+        const cubes = [];
+        const temperatures = [];
+
+        // Initialize temperature grid
+        function initTemperatures() {
+            for (let x = 0; x < gridSize; x++) {
+                temperatures[x] = [];
+                for (let y = 0; y < gridSize; y++) {
+                    temperatures[x][y] = [];
+                    for (let z = 0; z < gridSize; z++) {
+                        temperatures[x][y][z] = ambientTemp;
+                    }
+                }
+            }
+            // Set heat source
+            for (let y = 0; y < gridSize; y++) {
+                for (let z = 0; z < gridSize; z++) {
+                    temperatures[0][y][z] = currentTemp;
+                }
+            }
+        }
+
+        // Create 3D grid
+        function createGrid() {
+            // Clear existing cubes
+            cubes.forEach(cube => scene.remove(cube));
+            cubes.length = 0;
+
+            const material = new THREE.MeshPhongMaterial({
+                color: materials[selectedMaterial].color,
+                opacity: 0.8,
+                transparent: true
+            });
+
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    for (let z = 0; z < gridSize; z++) {
+                        const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+                        const cube = new THREE.Mesh(geometry, material.clone());
+                        cube.position.set(
+                            x * (cubeSize + gap),
+                            y * (cubeSize + gap),
+                            z * (cubeSize + gap)
+                        );
+                        scene.add(cube);
+                        cubes.push(cube);
+                    }
+                }
+            }
+        }
+
+        // Update cube colors based on temperature
+        function updateCubeColors() {
+            let index = 0;
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    for (let z = 0; z < gridSize; z++) {
+                        const temp = temperatures[x][y][z];
+                        const intensity = (temp - ambientTemp) / (currentTemp - ambientTemp);
+                        const cube = cubes[index];
+                        
+                        cube.material.color.setRGB(
+                            intensity,
+                            0,
+                            1 - intensity
+                        );
+                        index++;
+                    }
+                }
+            }
+        }
+
+        // Heat transfer calculations
+        function updateTemperatures() {
+            const newTemps = JSON.parse(JSON.stringify(temperatures));
+            const material = materials[selectedMaterial];
+
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    for (let z = 0; z < gridSize; z++) {
+                        if (x === 0) continue; // Skip heat source
+
+                        let newTemp = temperatures[x][y][z];
+                        
+                        switch (transferType) {
+                            case 'conduction':
+                                const neighbors = [];
+                                if (x > 0) neighbors.push(temperatures[x-1][y][z]);
+                                if (x < gridSize-1) neighbors.push(temperatures[x+1][y][z]);
+                                if (y > 0) neighbors.push(temperatures[x][y-1][z]);
+                                if (y < gridSize-1) neighbors.push(temperatures[x][y+1][z]);
+                                if (z > 0) neighbors.push(temperatures[x][y][z-1]);
+                                if (z < gridSize-1) neighbors.push(temperatures[x][y][z+1]);
+
+                                const avgTemp = neighbors.reduce((a, b) => a + b, 0) / neighbors.length;
+                                const conductionRate = material.conductivity / 1000;
+                                newTemp += (avgTemp - newTemp) * conductionRate;
+                                break;
+
+                            case 'convection':
+                                const convectionCoeff = 25; // W/(m²·K)
+                                const convectionRate = convectionCoeff / (material.density * material.specificHeat);
+                                newTemp += (ambientTemp - newTemp) * convectionRate;
+                                break;
+
+                            case 'radiation':
+                                const stefanBoltzmann = 5.67e-8; // W/(m²·K⁴)
+                                const radiationRate = material.emissivity * stefanBoltzmann;
+                                const T1 = newTemp + 273.15; // Convert to Kelvin
+                                const T2 = ambientTemp + 273.15;
+                                newTemp += radiationRate * (Math.pow(T2, 4) - Math.pow(T1, 4)) / 1e6;
+                                break;
+                        }
+                        
+                        newTemps[x][y][z] = newTemp;
+                    }
+                }
+            }
+
+            Object.assign(temperatures, newTemps);
+        }
+
+        // Animation
+        let isSimulating = false;
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (isSimulating) {
+                updateTemperatures();
+                updateCubeColors();
+            }
+
+            // Rotate the camera around the scene
+            camera.position.x = 20 * Math.cos(Date.now() * 0.0005);
+            camera.position.z = 20 * Math.sin(Date.now() * 0.0005);
+            camera.position.y = 15;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(10, 10, 10);
+        scene.add(directionalLight);
+
+        // Event listeners
+        document.getElementById('start-sim').addEventListener('click', () => {
+            isSimulating = !isSimulating;
+            document.getElementById('start-sim').textContent = 
+                isSimulating ? 'Pause' : 'Start Simulation';
+        });
+
+        document.getElementById('reset-sim').addEventListener('click', () => {
+            isSimulating = false;
+            document.getElementById('start-sim').textContent = 'Start Simulation';
+            initTemperatures();
+            updateCubeColors();
+        });
+
+        let currentTemp = 100;
+        let ambientTemp = 25;
+        let selectedMaterial = 'copper';
+        let transferType = 'conduction';
+
+        document.getElementById('temperature').addEventListener('input', (e) => {
+            currentTemp = parseInt(e.target.value);
+            document.getElementById('temp-value').textContent = `${currentTemp}°C`;
+            initTemperatures();
+            updateCubeColors();
+        });
+
+        document.getElementById('ambient-temp').addEventListener('input', (e) => {
+            ambientTemp = parseInt(e.target.value);
+            document.getElementById('ambient-temp-value').textContent = `${ambientTemp}°C`;
+            initTemperatures();
+            updateCubeColors();
+        });
+
+        document.getElementById('material').addEventListener('change', (e) => {
+            selectedMaterial = e.target.value;
+            updateMaterialInfo();
+            createGrid();
+        });
+
+        document.getElementById('transfer-type').addEventListener('change', (e) => {
+            transferType = e.target.value;
+            initTemperatures();
+            updateCubeColors();
+        });
+
+        function updateMaterialInfo() {
+            const material = materials[selectedMaterial];
+            document.getElementById('material-details').innerHTML = `
+                Name: ${material.name}<br>
+                Thermal Conductivity: ${material.conductivity} W/(m·K)<br>
+                Density: ${material.density} kg/m³<br>
+                Specific Heat: ${material.specificHeat} J/(kg·K)<br>
+                Emissivity: ${material.emissivity}
+            `;
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = (window.innerWidth - 300) / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth - 300, window.innerHeight);
+        });
+
+        // Initialize
+        camera.position.set(20, 15, 20);
+        camera.lookAt(scene.position);
+        createGrid();
+        initTemperatures();
+        updateCubeColors();
+        updateMaterialInfo();
+        animate();
+
+        // Initialize MathJax
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    </script>
+</body>
+</html>

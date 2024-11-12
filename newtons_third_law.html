@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newton's Third Law Simulator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1, h2, h3 {
+      color: #2196F3;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .law-description {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+
+    .formula {
+      text-align: center;
+      margin: 15px 0;
+      font-size: 1.2em;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .control-box {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    canvas {
+      border: 2px solid #2196F3;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    button {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+
+    button:hover {
+      background-color: #1976D2;
+    }
+
+    .button-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .result-box {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 5px 0;
+      text-align: center;
+    }
+
+    .force-arrow {
+      height: 4px;
+      position: absolute;
+      background-color: #4CAF50;
+      transform-origin: left center;
+    }
+
+    .force-arrow::after {
+      content: '';
+      position: absolute;
+      right: -8px;
+      top: -6px;
+      border-left: 8px solid #4CAF50;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Newton's Third Law Simulator</h1>
+
+    <div class="law-description">
+      <h3>Newton's Third Law of Motion:</h3>
+      <p>"For every action, there is an equal and opposite reaction."</p>
+      <div class="formula">
+        $$F = ma$$
+        <p>where F is force (N), m is mass (kg), and a is acceleration (m/s²)</p>
+      </div>
+      <ul>
+        <li>Forces always occur in pairs</li>
+        <li>The force pairs are equal in magnitude but opposite in direction</li>
+        <li>One force is the "action" and the other is the "reaction"</li>
+        <li>The forces act on different objects</li>
+      </ul>
+    </div>
+
+    <div class="controls">
+      <div class="control-box">
+        <h3>Object 1 (Blue)</h3>
+        <div class="object-controls">
+          <label for="mass1">Mass: <span id="mass1-value">1</span> kg</label><br>
+          <input type="range" id="mass1" min="1" max="5" step="0.5" value="1"><br>
+          <label for="applied-force">Applied Force: <span id="force-value">0</span> N</label><br>
+          <input type="range" id="applied-force" min="-50" max="50" step="1" value="0">
+        </div>
+      </div>
+      
+      <div class="control-box">
+        <h3>Object 2 (Red)</h3>
+        <div class="object-controls">
+          <label for="mass2">Mass: <span id="mass2-value">1</span> kg</label><br>
+          <input type="range" id="mass2" min="1" max="5" step="0.5" value="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <button onclick="resetSimulation()">Reset</button>
+      <button onclick="startSimulation()">Start</button>
+    </div>
+
+    <div class="results-grid">
+      <div class="result-box">
+        <strong>Force on Object 1:</strong><br>
+        <span id="force1-display">0</span> N
+      </div>
+      <div class="result-box">
+        <strong>Force on Object 2:</strong><br>
+        <span id="force2-display">0</span> N
+      </div>
+      <div class="result-box">
+        <strong>Acceleration (Object 1):</strong><br>
+        <span id="acc1-display">0</span> m/s²
+      </div>
+      <div class="result-box">
+        <strong>Acceleration (Object 2):</strong><br>
+        <span id="acc2-display">0</span> m/s²
+      </div>
+    </div>
+
+    <canvas id="canvas" width="800" height="300"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let objects = [
+      {
+        x: 300,
+        y: canvas.height / 2,
+        velocity: 0,
+        acceleration: 0,
+        mass: 1,
+        radius: 20,
+        color: '#2196F3'
+      },
+      {
+        x: 500,
+        y: canvas.height / 2,
+        velocity: 0,
+        acceleration: 0,
+        mass: 1,
+        radius: 20,
+        color: '#E91E63'
+      }
+    ];
+    
+    let appliedForce = 0;
+    let isSimulating = false;
+    let lastTimestamp = 0;
+
+    function init() {
+      drawScene();
+      updateDisplay();
+      setupEventListeners();
+    }
+
+    function setupEventListeners() {
+      document.getElementById('mass1').addEventListener('input', function(e) {
+        document.getElementById('mass1-value').textContent = e.target.value;
+        objects[0].mass = parseFloat(e.target.value);
+        objects[0].radius = 15 + 5 * objects[0].mass;
+        updateDisplay();
+        drawScene();
+      });
+
+      document.getElementById('mass2').addEventListener('input', function(e) {
+        document.getElementById('mass2-value').textContent = e.target.value;
+        objects[1].mass = parseFloat(e.target.value);
+        objects[1].radius = 15 + 5 * objects[1].mass;
+        updateDisplay();
+        drawScene();
+      });
+
+      document.getElementById('applied-force').addEventListener('input', function(e) {
+        document.getElementById('force-value').textContent = e.target.value;
+        appliedForce = parseFloat(e.target.value);
+        updateDisplay();
+        drawScene();
+      });
+    }
+
+    function drawScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      drawForces();
+      objects.forEach(drawObject);
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = '#ddd';
+      ctx.lineWidth = 0.5;
+      
+      for (let x = 0; x <= canvas.width; x += 50) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      
+      for (let y = 0; y <= canvas.height; y += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawObject(obj) {
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+      ctx.fillStyle = obj.color;
+      ctx.fill();
+    }
+
+    function drawForces() {
+      if (appliedForce !== 0) {
+        // Draw force arrows
+        const arrowLength = Math.min(Math.abs(appliedForce), 100);
+        const direction = Math.sign(appliedForce);
+        
+        // Force on object 1
+        ctx.beginPath();
+        ctx.moveTo(objects[0].x + direction * objects[0].radius, objects[0].y);
+        ctx.lineTo(objects[0].x + direction * (objects[0].radius + arrowLength), objects[0].y);
+        ctx.strokeStyle = '#4CAF50';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        
+        // Arrow head
+        drawArrowHead(
+          objects[0].x + direction * (objects[0].radius + arrowLength),
+          objects[0].y,
+          direction > 0 ? 0 : Math.PI
+        );
+        
+        // Equal and opposite force on object 2
+        ctx.beginPath();
+        ctx.moveTo(objects[1].x - direction * objects[1].radius, objects[1].y);
+        ctx.lineTo(objects[1].x - direction * (objects[1].radius + arrowLength), objects[1].y);
+        ctx.stroke();
+        
+        // Arrow head
+        drawArrowHead(
+          objects[1].x - direction * (objects[1].radius + arrowLength),
+          objects[1].y,
+          direction > 0 ? Math.PI : 0
+        );
+      }
+    }
+
+    function drawArrowHead(x, y, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-10, 5);
+      ctx.lineTo(-10, -5);
+      ctx.closePath();
+      ctx.fillStyle = '#4CAF50';
+      ctx.fill();
+      
+      ctx.restore();
+    }
+
+    function updateSimulation(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const deltaTime = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+      
+      if (isSimulating) {
+        objects.forEach((obj, index) => {
+          // Calculate acceleration based on F = ma
+          obj.acceleration = (index === 0 ? 1 : -1) * appliedForce / obj.mass;
+          
+          // Update velocity and position
+          obj.velocity += obj.acceleration * deltaTime;
+          obj.x += obj.velocity * deltaTime * 50; // Scale for visualization
+          
+          // Keep objects within bounds
+          if (obj.x < obj.radius) {
+            obj.x = obj.radius;
+            obj.velocity = 0;
+          }
+          if (obj.x > canvas.width - obj.radius) {
+            obj.x = canvas.width - obj.radius;
+            obj.velocity = 0;
+          }
+        });
+        
+        // Check for collision
+        const dx = objects[1].x - objects[0].x;
+        if (dx <= (objects[0].radius + objects[1].radius)) {
+          // Stop simulation if objects collide
+          isSimulating = false;
+        }
+        
+        updateDisplay();
+        drawScene();
+        
+        if (isSimulating) {
+          requestAnimationFrame(updateSimulation);
+        }
+      }
+    }
+
+    function updateDisplay() {
+      // Update force displays
+      document.getElementById('force1-display').textContent = appliedForce.toFixed(1);
+      document.getElementById('force2-display').textContent = (-appliedForce).toFixed(1);
+      
+      // Update acceleration displays
+      const acc1 = appliedForce / objects[0].mass;
+      const acc2 = -appliedForce / objects[1].mass;
+      document.getElementById('acc1-display').textContent = acc1.toFixed(2);
+      document.getElementById('acc2-display').textContent = acc2.toFixed(2);
+    }
+
+    function resetSimulation() {
+      isSimulating = false;
+      objects[0].x = 300;
+      objects[1].x = 500;
+      objects[0].velocity = 0;
+      objects[1].velocity = 0;
+      objects[0].acceleration = 0;
+      objects[1].acceleration = 0;
+      lastTimestamp = 0;
+      drawScene();
+      updateDisplay();
+    }
+
+    function startSimulation() {
+      if (!isSimulating) {
+        isSimulating = true;
+        lastTimestamp = 0;
+        requestAnimationFrame(updateSimulation);
+      }
+    }
+
+    // Initialize the simulation
+    init();
+  </script>
+</body>
+</html>
