@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Simulator Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-blue-800 text-white">
+            <div class="p-4">
+                <div class="flex items-center mb-6">
+                    <a href="dashboard.html">
+                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                             alt="Logo" 
+                             class="h-8 w-8">
+                    </a>
+                    <span class="ml-2 text-lg font-bold">Physics Sim</span>
+                </div>
+                <nav>
+                    <ul class="space-y-2">
+                        <li class="hover:bg-blue-700 rounded p-2">
+                            <a href="dashboard.html" class="flex items-center">
+                                <i class="fas fa-home w-6"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="hover:bg-blue-700 rounded p-2">
+                            <a href="tabs.html" class="flex items-center">
+                                <i class="fas fa-table w-6"></i>
+                                <span>All Topics</span>
+                            </a>
+                        </li>
+                        <li class="hover:bg-blue-700 rounded p-2">
+                            <a href="progress.html" class="flex items-center">
+                                <i class="fas fa-chart-line w-6"></i>
+                                <span>Progress</span>
+                            </a>
+                        </li>
+                        <li class="hover:bg-blue-700 rounded p-2">
+                            <a href="achievements.html" class="flex items-center">
+                                <i class="fas fa-trophy w-6"></i>
+                                <span>Achievements</span>
+                            </a>
+                        </li>
+                        <li class="hover:bg-blue-700 rounded p-2">
+                            <a href="notes.html" class="flex items-center">
+                                <i class="fas fa-book w-6"></i>
+                                <span>Study Notes</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Navigation -->
+            <div class="bg-white shadow-sm">
+                <div class="flex justify-between items-center px-6 py-3">
+                    <h1 class="text-2xl font-bold text-gray-800">Physics Topics</h1>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 hover:bg-gray-100 rounded-full">
+                            <i class="fas fa-bell text-gray-600"></i>
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
+                            <span class="text-gray-700">Student</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topics Grid -->
+            <div class="p-6">
+                <!-- Mechanics Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Mechanics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="newtons_first_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's First Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Law of Inertia Simulation</p>
+                        </a>
+                        <a href="newtons_second_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Second Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Force and Acceleration</p>
+                        </a>
+                        <a href="newtons_third_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Third Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Action-Reaction Pairs</p>
+                        </a>
+                        <a href="friction_force.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Friction Force</h3>
+                            <p class="text-gray-600 text-sm mt-2">Surface Interaction Study</p>
+                        </a>
+                        <a href="projectile_motion.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Projectile Motion</h3>
+                            <p class="text-gray-600 text-sm mt-2">2D Motion Analysis</p>
+                        </a>
+                        <a href="work.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Work and Power</h3>
+                            <p class="text-gray-600 text-sm mt-2">Energy Transfer Study</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Electricity & Magnetism Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Electricity & Magnetism</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="coulombs_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Coulomb's Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Electric Force Simulation</p>
+                        </a>
+                        <a href="electromagnetic_flux.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Electromagnetic Flux</h3>
+                            <p class="text-gray-600 text-sm mt-2">Magnetic Field Study</p>
+                        </a>
+                        <a href="circuit_simulator.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Circuit Simulator</h3>
+                            <p class="text-gray-600 text-sm mt-2">Electric Circuit Builder</p>
+                        </a>
+                        <a href="induction.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Induction</h3>
+                            <p class="text-gray-600 text-sm mt-2">Electromagnetic Induction</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Waves & Optics Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Waves & Optics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="waves.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Waves</h3>
+                            <p class="text-gray-600 text-sm mt-2">Wave Properties & Behavior</p>
+                        </a>
+                        <a href="optics_simulator.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Optics Simulator</h3>
+                            <p class="text-gray-600 text-sm mt-2">Light & Lenses</p>
+                        </a>
+                        <a href="snells_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Snell's Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Light Refraction</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Modern Physics Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Modern Physics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="bohr_model.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Interactive Bohr Model</h3>
+                            <p class="text-gray-600 text-sm mt-2">Atomic Structure</p>
+                        </a>
+                        <a href="photoelectric.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Photoelectric Emissions</h3>
+                            <p class="text-gray-600 text-sm mt-2">Quantum Physics</p>
+                        </a>
+                        <a href="nuclear_reactor.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Nuclear Reactor</h3>
+                            <p class="text-gray-600 text-sm mt-2">Nuclear Physics</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Additional Topics -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Additional Topics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="energy_transformation.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Energy Transformation</h3>
+                            <p class="text-gray-600 text-sm mt-2">Energy Conversion Study</p>
+                        </a>
+                        <a href="gravitational_field.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Gravitational Field</h3>
+                            <p class="text-gray-600 text-sm mt-2">Gravity Simulation</p>
+                        </a>
+                        <a href="heat_transfer.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Heat Transfer</h3>
+                            <p class="text-gray-600 text-sm mt-2">Thermal Physics</p>
+                        </a>
+                        <a href="newtons_law_quiz.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Laws Quiz</h3>
+                            <p class="text-gray-600 text-sm mt-2">Test Your Knowledge</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
