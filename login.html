@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Physics Simulator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="flex justify-center items-center h-screen">
+        <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
+            <h1 class="text-2xl font-bold mb-4">Login</h1>
+            <button id="google-signin" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo" class="h-6 mr-2">
+                Sign in with Google
+            </button>
+        </div>
+    </div>
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithRedirect, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+        authDomain: "lumenosphys.firebaseapp.com",
+        projectId: "lumenosphys",
+        storageBucket: "lumenosphys.firebasestorage.app",
+        messagingSenderId: "501424803085",
+        appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
+        measurementId: "G-7RTGWQ515B"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Handle Google sign-in button click
+    const googleSigninButton = document.getElementById('google-signin');
+    googleSigninButton.addEventListener('click', () => {
+        signInWithRedirect(auth, new GoogleAuthProvider())
+            .then(() => {
+                // Redirect to the dashboard after successful sign-in
+                window.location.href = 'dashboard.html';
+            })
+            .catch((error) => {
+                console.error('Error signing in:', error);
+            });
+    });
+</script>
+</body>
+</html>
