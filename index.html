@@ -1,244 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physics Simulator Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Updated Firebase SDKs -->
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js"></script>
-</head>
-<body class="bg-gray-50">
-    <!-- Login Modal -->
-    <div id="loginModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-            <h2 class="text-2xl font-bold mb-4">Login</h2>
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700">Email</label>
-                    <input type="email" id="loginEmail" class="w-full border rounded p-2" required>
+<!-- Inside the main content div in paste-2.txt -->
+<div class="flex-1 overflow-auto">
+    <div class="bg-white shadow-sm">
+        <div class="flex justify-between items-center px-6 py-3">
+            <h1 class="text-2xl font-bold text-gray-800">Physics Topics</h1>
+            <div class="flex items-center space-x-4">
+                <!-- Added subscription status indicator -->
+                <div id="subscriptionBadge" class="hidden px-3 py-1 rounded-full text-sm"></div>
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <i class="fas fa-bell text-gray-600"></i>
+                </button>
+                <div id="userSection" class="flex items-center space-x-2">
+                    <!-- User profile will be dynamically populated -->
                 </div>
-                <div>
-                    <label class="block text-gray-700">Password</label>
-                    <input type="password" id="loginPassword" class="w-full border rounded p-2" required>
-                </div>
-                <button type="submit" class="w-full bg-blue-800 text-white rounded p-2 hover:bg-blue-700">Login</button>
-            </form>
-            <p class="mt-4 text-center">
-                <a href="#" id="showSignup" class="text-blue-800">Don't have an account? Sign up</a>
-            </p>
+            </div>
         </div>
     </div>
 
-    <!-- Signup Modal -->
-    <div id="signupModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-            <h2 class="text-2xl font-bold mb-4">Sign Up</h2>
-            <form id="signupForm" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700">Email</label>
-                    <input type="email" id="signupEmail" class="w-full border rounded p-2" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700">Password</label>
-                    <input type="password" id="signupPassword" class="w-full border rounded p-2" required>
-                </div>
-                <button type="submit" class="w-full bg-blue-800 text-white rounded p-2 hover:bg-blue-700">Sign Up</button>
-            </form>
-            <p class="mt-4 text-center">
-                <a href="#" id="showLogin" class="text-blue-800">Already have an account? Login</a>
-            </p>
-        </div>
-    </div>
-
-    <div class="flex h-screen">
-        <div class="w-64 bg-blue-800 text-white">
-            <!-- Sidebar content -->
+    <div class="p-6" id="topicsContainer">
+        <!-- Basic Topics - Always visible -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Basic Mechanics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Basic content here -->
+            </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="flex-1 overflow-auto">
-            <div class="bg-white shadow-sm">
-                <div class="flex justify-between items-center px-6 py-3">
-                    <h1 class="text-2xl font-bold text-gray-800">Physics Topics</h1>
-                    <div class="flex items-center space-x-4">
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-bell text-gray-600"></i>
-                        </button>
-                        <div id="userSection" class="flex items-center space-x-2">
-                            <!-- User profile will be dynamically populated -->
-                        </div>
+        <!-- Premium Topics - Visibility controlled by subscription -->
+        <div id="premiumContent" class="premium-content mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Advanced Topics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Premium content here -->
+            </div>
+        </div>
+
+        <!-- Premium Content Lock/Upgrade Message -->
+        <div id="premiumLock" class="hidden">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-lock text-yellow-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            Unlock advanced physics topics with a premium subscription
+                        </p>
+                        <a href="/subscription.html" class="mt-2 inline-block px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">
+                            Upgrade Now
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <div class="p-6" id="topicsContainer">
-                <!-- Content will be dynamically populated based on auth status -->
-            </div>
         </div>
     </div>
+</div>
 
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } 
-        from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+<!-- Update the JavaScript section -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
-            authDomain: "lumenosphys.firebaseapp.com",
-            projectId: "lumenosphys",
-            storageBucket: "lumenosphys.firebasestorage.app",
-            messagingSenderId: "501424803085",
-            appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
-            measurementId: "G-7RTGWQ515B"
-        };
+    // Your existing Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+        // ... rest of your config
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const analytics = getAnalytics(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // DOM Elements
-        const loginModal = document.getElementById('loginModal');
-        const signupModal = document.getElementById('signupModal');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const userSection = document.getElementById('userSection');
-        const topicsContainer = document.getElementById('topicsContainer');
+    // DOM Elements
+    const premiumContent = document.getElementById('premiumContent');
+    const premiumLock = document.getElementById('premiumLock');
+    const subscriptionBadge = document.getElementById('subscriptionBadge');
+    const userSection = document.getElementById('userSection');
 
-        // Authentication state observer
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                updateUIForAuthenticatedUser(user);
-                hideAuthModals();
-                loadTopics(true);
-            } else {
-                updateUIForUnauthenticatedUser();
-                loadTopics(false);
-            }
-        });
-
-        // UI Update Functions
-        function updateUIForAuthenticatedUser(user) {
-            userSection.innerHTML = `
-                <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
-                <span class="text-gray-700">${user.email}</span>
-                <button id="logoutBtn" class="ml-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                    Logout
-                </button>
-            `;
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                signOut(auth);
-            });
+    // Check subscription status
+    async function checkSubscription(userId) {
+        try {
+            const subscriptionDoc = await getDoc(doc(db, 'subscriptions', userId));
+            return subscriptionDoc.exists() ? subscriptionDoc.data() : null;
+        } catch (error) {
+            console.error('Error checking subscription:', error);
+            return null;
         }
+    }
 
-        function updateUIForUnauthenticatedUser() {
+    // Update UI based on subscription status
+    function updateUI(user, subscription) {
+        if (!user) {
+            // Not logged in
+            premiumContent.classList.add('hidden');
+            premiumLock.classList.remove('hidden');
+            subscriptionBadge.classList.add('hidden');
             userSection.innerHTML = `
-                <button id="loginBtn" class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">
+                <button onclick="window.location.href='/login.html'" class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">
                     Login
                 </button>
             `;
-            document.getElementById('loginBtn').addEventListener('click', showLoginModal);
+            return;
         }
 
-        // Modal Control Functions
-        function showLoginModal() {
-            loginModal.style.display = 'flex';
-            signupModal.style.display = 'none';
+        // User is logged in
+        userSection.innerHTML = `
+            <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
+            <span class="text-gray-700">${user.email}</span>
+            ${!subscription ? `
+                <a href="/subscription.html" class="ml-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    Upgrade
+                </a>
+            ` : ''}
+            <button id="logoutBtn" class="ml-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                Logout
+            </button>
+        `;
+
+        // Update subscription badge
+        if (subscription) {
+            subscriptionBadge.textContent = 'Premium';
+            subscriptionBadge.classList.remove('hidden');
+            subscriptionBadge.classList.add('bg-green-100', 'text-green-800');
+            premiumContent.classList.remove('hidden');
+            premiumLock.classList.add('hidden');
+        } else {
+            subscriptionBadge.textContent = 'Free Plan';
+            subscriptionBadge.classList.remove('hidden');
+            subscriptionBadge.classList.add('bg-gray-100', 'text-gray-800');
+            premiumContent.classList.add('hidden');
+            premiumLock.classList.remove('hidden');
         }
 
-        function showSignupModal() {
-            signupModal.style.display = 'flex';
-            loginModal.style.display = 'none';
-        }
-
-        function hideAuthModals() {
-            loginModal.style.display = 'none';
-            signupModal.style.display = 'none';
-        }
-
-        // Load Topics Based on Auth Status
-        function loadTopics(isAuthenticated) {
-            const basicTopics = `
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Mechanics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="newtons_first_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's First Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Law of Inertia Simulation</p>
-                        </a>
-                        <a href="newtons_second_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's Second Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Force and Acceleration</p>
-                        </a>
-                        <a href="newtons_third_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's Third Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Action-Reaction Pairs</p>
-                        </a>
-                    </div>
-                </div>
-            `;
-
-            const premiumTopics = `
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Premium Topics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Premium topic cards here -->
-                    </div>
-                </div>
-            `;
-
-            topicsContainer.innerHTML = basicTopics + (isAuthenticated ? premiumTopics : `
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-lock text-yellow-400"></i>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-yellow-700">
-                                Premium content is locked. Please <a href="#" class="font-medium underline" onclick="showLoginModal()">login</a> or <a href="#" class="font-medium underline" onclick="showSignupModal()">sign up</a> to access all topics.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-
-        // Event Listeners
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                hideAuthModals();
-            } catch (error) {
-                alert('Login failed: ' + error.message);
-            }
+        // Add logout handler
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            auth.signOut();
         });
+    }
 
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                hideAuthModals();
-            } catch (error) {
-                alert('Signup failed: ' + error.message);
-            }
-        });
-
-        document.getElementById('showSignup').addEventListener('click', showSignupModal);
-        document.getElementById('showLogin').addEventListener('click', showLoginModal);
-    </script>
-</body>
-</html>
+    // Auth state observer
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const subscription = await checkSubscription(user.uid);
+            updateUI(user, subscription);
+        } else {
+            updateUI(null, null);
+        }
+    });
+</script>
