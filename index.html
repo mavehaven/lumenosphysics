@@ -194,5 +194,29 @@
             </div>
         </div>
     </div>
+    <script> 
+        type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+    authDomain: "lumenosphys.firebaseapp.com",
+    projectId: "lumenosphys",
+    storageBucket: "lumenosphys.firebasestorage.app",
+    messagingSenderId: "501424803085",
+    appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
+    measurementId: "G-7RTGWQ515B"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
