@@ -194,3 +194,164 @@
             </div>
         </div>
     </div>
+        <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } 
+        from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+            authDomain: "lumenosphys.firebaseapp.com",
+            projectId: "lumenosphys",
+            storageBucket: "lumenosphys.firebasestorage.app",
+            messagingSenderId: "501424803085",
+            appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
+            measurementId: "G-7RTGWQ515B"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const userSection = document.getElementById('userSection');
+        const topicsContainer = document.getElementById('topicsContainer');
+
+        // Authentication state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                updateUIForAuthenticatedUser(user);
+                hideAuthModals();
+                loadTopics(true);
+            } else {
+                updateUIForUnauthenticatedUser();
+                loadTopics(false);
+            }
+        });
+
+        // UI Update Functions
+        function updateUIForAuthenticatedUser(user) {
+            userSection.innerHTML = `
+                <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
+                <span class="text-gray-700">${user.email}</span>
+                <button id="logoutBtn" class="ml-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                    Logout
+                </button>
+            `;
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                signOut(auth);
+            });
+        }
+
+        function updateUIForUnauthenticatedUser() {
+            userSection.innerHTML = `
+                <button id="loginBtn" class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">
+                    Login
+                </button>
+            `;
+            document.getElementById('loginBtn').addEventListener('click', showLoginModal);
+        }
+
+        // Modal Control Functions
+        function showLoginModal() {
+            loginModal.style.display = 'flex';
+            signupModal.style.display = 'none';
+        }
+
+        function showSignupModal() {
+            signupModal.style.display = 'flex';
+            loginModal.style.display = 'none';
+        }
+
+        function hideAuthModals() {
+            loginModal.style.display = 'none';
+            signupModal.style.display = 'none';
+        }
+
+        // Load Topics Based on Auth Status
+        function loadTopics(isAuthenticated) {
+            const basicTopics = `
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Mechanics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="newtons_first_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's First Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Law of Inertia Simulation</p>
+                        </a>
+                        <a href="newtons_second_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Second Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Force and Acceleration</p>
+                        </a>
+                        <a href="newtons_third_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Third Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Action-Reaction Pairs</p>
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            const premiumTopics = `
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Premium Topics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Premium topic cards here -->
+                    </div>
+                </div>
+            `;
+
+            topicsContainer.innerHTML = basicTopics + (isAuthenticated ? premiumTopics : `
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-lock text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                Premium content is locked. Please <a href="#" class="font-medium underline" onclick="showLoginModal()">login</a> or <a href="#" class="font-medium underline" onclick="showSignupModal()">sign up</a> to access all topics.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+
+        // Event Listeners
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                hideAuthModals();
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                hideAuthModals();
+            } catch (error) {
+                alert('Signup failed: ' + error.message);
+            }
+        });
+
+        document.getElementById('showSignup').addEventListener('click', showSignupModal);
+        document.getElementById('showLogin').addEventListener('click', showLoginModal);
+    </script>
+</body>
+</html>
