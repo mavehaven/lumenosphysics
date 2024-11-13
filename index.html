@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-</script>
-    
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physics Simulator Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
@@ -200,24 +194,3 @@
             </div>
         </div>
     </div>
- <script type="module">
-
-  const firebaseConfig = {
-    // Your Firebase configuration goes here
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in, show the content
-      document.getElementById("content").style.display = "block";
-    } else {
-      // User is signed out, redirect to the login page or show an error message
-      window.location.href = "login.html";
-    }
-  });
-</script>
-</body>
-</html>
