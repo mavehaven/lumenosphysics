@@ -1,65 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physics Simulator Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Updated Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js"></script>
 </head>
 <body class="bg-gray-50">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-64 bg-blue-800 text-white">
-            <div class="p-4">
-                <div class="flex items-center mb-6">
-                    <a href="dashboard.html">
-                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
-                             alt="Logo" 
-                             class="h-8 w-8">
-                    </a>
-                    <span class="ml-2 text-lg font-bold">Physics Sim</span>
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h2 class="text-2xl font-bold mb-4">Login</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700">Email</label>
+                    <input type="email" id="loginEmail" class="w-full border rounded p-2" required>
                 </div>
-                <nav>
-                    <ul class="space-y-2">
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="dashboard.html" class="flex items-center">
-                                <i class="fas fa-home w-6"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="tabs.html" class="flex items-center">
-                                <i class="fas fa-table w-6"></i>
-                                <span>All Topics</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="progress.html" class="flex items-center">
-                                <i class="fas fa-chart-line w-6"></i>
-                                <span>Progress</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="achievements.html" class="flex items-center">
-                                <i class="fas fa-trophy w-6"></i>
-                                <span>Achievements</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="notes.html" class="flex items-center">
-                                <i class="fas fa-book w-6"></i>
-                                <span>Study Notes</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+                <div>
+                    <label class="block text-gray-700">Password</label>
+                    <input type="password" id="loginPassword" class="w-full border rounded p-2" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-800 text-white rounded p-2 hover:bg-blue-700">Login</button>
+            </form>
+            <p class="mt-4 text-center">
+                <a href="#" id="showSignup" class="text-blue-800">Don't have an account? Sign up</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h2 class="text-2xl font-bold mb-4">Sign Up</h2>
+            <form id="signupForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700">Email</label>
+                    <input type="email" id="signupEmail" class="w-full border rounded p-2" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Password</label>
+                    <input type="password" id="signupPassword" class="w-full border rounded p-2" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-800 text-white rounded p-2 hover:bg-blue-700">Sign Up</button>
+            </form>
+            <p class="mt-4 text-center">
+                <a href="#" id="showLogin" class="text-blue-800">Already have an account? Login</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="flex h-screen">
+        <div class="w-64 bg-blue-800 text-white">
+            <!-- Sidebar content -->
         </div>
 
         <!-- Main Content -->
         <div class="flex-1 overflow-auto">
-            <!-- Top Navigation -->
             <div class="bg-white shadow-sm">
                 <div class="flex justify-between items-center px-6 py-3">
                     <h1 class="text-2xl font-bold text-gray-800">Physics Topics</h1>
@@ -67,17 +68,104 @@
                         <button class="p-2 hover:bg-gray-100 rounded-full">
                             <i class="fas fa-bell text-gray-600"></i>
                         </button>
-                        <div class="flex items-center space-x-2">
-                            <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
-                            <span class="text-gray-700">Student</span>
+                        <div id="userSection" class="flex items-center space-x-2">
+                            <!-- User profile will be dynamically populated -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Topics Grid -->
-            <div class="p-6">
-                <!-- Mechanics Section -->
+            <div class="p-6" id="topicsContainer">
+                <!-- Content will be dynamically populated based on auth status -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } 
+        from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+            authDomain: "lumenosphys.firebaseapp.com",
+            projectId: "lumenosphys",
+            storageBucket: "lumenosphys.firebasestorage.app",
+            messagingSenderId: "501424803085",
+            appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
+            measurementId: "G-7RTGWQ515B"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const userSection = document.getElementById('userSection');
+        const topicsContainer = document.getElementById('topicsContainer');
+
+        // Authentication state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                updateUIForAuthenticatedUser(user);
+                hideAuthModals();
+                loadTopics(true);
+            } else {
+                updateUIForUnauthenticatedUser();
+                loadTopics(false);
+            }
+        });
+
+        // UI Update Functions
+        function updateUIForAuthenticatedUser(user) {
+            userSection.innerHTML = `
+                <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
+                <span class="text-gray-700">${user.email}</span>
+                <button id="logoutBtn" class="ml-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                    Logout
+                </button>
+            `;
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                signOut(auth);
+            });
+        }
+
+        function updateUIForUnauthenticatedUser() {
+            userSection.innerHTML = `
+                <button id="loginBtn" class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">
+                    Login
+                </button>
+            `;
+            document.getElementById('loginBtn').addEventListener('click', showLoginModal);
+        }
+
+        // Modal Control Functions
+        function showLoginModal() {
+            loginModal.style.display = 'flex';
+            signupModal.style.display = 'none';
+        }
+
+        function showSignupModal() {
+            signupModal.style.display = 'flex';
+            loginModal.style.display = 'none';
+        }
+
+        function hideAuthModals() {
+            loginModal.style.display = 'none';
+            signupModal.style.display = 'none';
+        }
+
+        // Load Topics Based on Auth Status
+        function loadTopics(isAuthenticated) {
+            const basicTopics = `
                 <div class="mb-8">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Mechanics</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -93,104 +181,64 @@
                             <h3 class="font-bold text-blue-800">Newton's Third Law</h3>
                             <p class="text-gray-600 text-sm mt-2">Action-Reaction Pairs</p>
                         </a>
-                        <a href="friction_force.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Friction Force</h3>
-                            <p class="text-gray-600 text-sm mt-2">Surface Interaction Study</p>
-                        </a>
-                        <a href="projectile_motion.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Projectile Motion</h3>
-                            <p class="text-gray-600 text-sm mt-2">2D Motion Analysis</p>
-                        </a>
-                        <a href="work.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Work and Power</h3>
-                            <p class="text-gray-600 text-sm mt-2">Energy Transfer Study</p>
-                        </a>
                     </div>
                 </div>
+            `;
 
-                <!-- Electricity & Magnetism Section -->
+            const premiumTopics = `
                 <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Electricity & Magnetism</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Premium Topics</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="coloumbs_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Coulomb's Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Electric Force Simulation</p>
-                        </a>
-                        <a href="electromagnetic_flux.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Electromagnetic Flux</h3>
-                            <p class="text-gray-600 text-sm mt-2">Magnetic Field Study</p>
-                        </a>
-                        <a href="circuit_simulator.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Circuit Simulator</h3>
-                            <p class="text-gray-600 text-sm mt-2">Electric Circuit Builder</p>
-                        </a>
-                        <a href="induction.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Induction</h3>
-                            <p class="text-gray-600 text-sm mt-2">Electromagnetic Induction</p>
-                        </a>
+                        <!-- Premium topic cards here -->
                     </div>
                 </div>
+            `;
 
-                <!-- Waves & Optics Section -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Waves & Optics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="waves.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Waves</h3>
-                            <p class="text-gray-600 text-sm mt-2">Wave Properties & Behavior</p>
-                        </a>
-                        <a href="optics_simulator.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Optics Simulator</h3>
-                            <p class="text-gray-600 text-sm mt-2">Light & Lenses</p>
-                        </a>
-                        <a href="snells_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Snell's Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Light Refraction</p>
-                        </a>
+            topicsContainer.innerHTML = basicTopics + (isAuthenticated ? premiumTopics : `
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-lock text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                Premium content is locked. Please <a href="#" class="font-medium underline" onclick="showLoginModal()">login</a> or <a href="#" class="font-medium underline" onclick="showSignupModal()">sign up</a> to access all topics.
+                            </p>
+                        </div>
                     </div>
                 </div>
+            `);
+        }
 
-                <!-- Modern Physics Section -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Modern Physics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="multielement_interactive_bohr_model.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Interactive Bohr Model</h3>
-                            <p class="text-gray-600 text-sm mt-2">Atomic Structure</p>
-                        </a>
-                        <a href="photoelectric_emissions.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Photoelectric Emissions</h3>
-                            <p class="text-gray-600 text-sm mt-2">Quantum Physics</p>
-                        </a>
-                        <a href="nuclear_reactor.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Nuclear Reactor</h3>
-                            <p class="text-gray-600 text-sm mt-2">Nuclear Physics</p>
-                        </a>
-                    </div>
-                </div>
+        // Event Listeners
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                hideAuthModals();
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
 
-                <!-- Additional Topics -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Additional Topics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="energy_transformation.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Energy Transformation</h3>
-                            <p class="text-gray-600 text-sm mt-2">Energy Conversion Study</p>
-                        </a>
-                        <a href="gravitational_field.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Gravitational Field</h3>
-                            <p class="text-gray-600 text-sm mt-2">Gravity Simulation</p>
-                        </a>
-                        <a href="heat_transfer.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Heat Transfer</h3>
-                            <p class="text-gray-600 text-sm mt-2">Thermal Physics</p>
-                        </a>
-                        <a href="newtons_law_quiz.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's Laws Quiz</h3>
-                            <p class="text-gray-600 text-sm mt-2">Test Your Knowledge</p>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                hideAuthModals();
+            } catch (error) {
+                alert('Signup failed: ' + error.message);
+            }
+        });
+
+        document.getElementById('showSignup').addEventListener('click', showSignupModal);
+        document.getElementById('showLogin').addEventListener('click', showLoginModal);
+    </script>
+</body>
+</html>
