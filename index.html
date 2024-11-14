@@ -6,7 +6,6 @@
     <title>Physics Simulator Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
     
     <!-- Firebase SDK -->
     <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
@@ -43,6 +42,8 @@
                     Back to options
                 </button>
             </div>
+        </div>
+    </div>
 
     <!-- Main Content (initially hidden) -->
     <div id="mainContent" class="hidden">
@@ -102,6 +103,7 @@
                         </ul>
                     </nav>
                 </div>
+            </div>
 
             <!-- Main Content -->
             <div class="flex-1 overflow-auto">
@@ -121,219 +123,125 @@
                     </div>
                 </div>
 
-    <!-- Topics Grid -->
-    <div class="p-6">
-    <!-- Mechanics Section -->
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Mechanics</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="newtons_first_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                <h3 class="font-bold text-blue-800">Newton's First Law</h3>
-                <p class="text-gray-600 text-sm mt-2">Law of Inertia Simulation</p>
-            </a>
-            <a href="newtons_second_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                <h3 class="font-bold text-blue-800">Newton's Second Law</h3>
-                <p class="text-gray-600 text-sm mt-2">Force and Acceleration</p>
-            </a>
-            <a href="newtons_third_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                <h3 class="font-bold text-blue-800">Newton's Third Law</h3>
-                <p class="text-gray-600 text-sm mt-2">Action-Reaction Pairs</p>
-            </a>
-            <a href="friction_force.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                <h3 class="font-bold text-blue-800">Friction Force</h3>
-                <p class="text-gray-600 text-sm mt-2">Surface Interaction Study</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Projectile Motion</h3>
+                <!-- Topics Grid -->
+            <div class="p-6">
+                <!-- Mechanics Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Mechanics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="newtons_first_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's First Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Law of Inertia Simulation</p>
+                        </a>
+                        <a href="newtons_second_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Second Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Force and Acceleration</p>
+                        </a>
+                        <a href="newtons_third_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Third Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Action-Reaction Pairs</p>
+                        </a>
+                        <a href="friction_force.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Friction Force</h3>
+                            <p class="text-gray-600 text-sm mt-2">Surface Interaction Study</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Projectile Motion</h3>
+                            <p class="text-gray-600 text-sm mt-2">2D Motion Analysis</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Work and Power</h3>
+                            <p class="text-gray-600 text-sm mt-2">Energy Transfer Study</p>
+                        </a>
+                    </div>
                 </div>
-                <p class="text-gray-600 text-sm mt-2">2D Motion Analysis</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Work and Power</h3>
+
+                <!-- Electricity & Magnetism Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Electricity & Magnetism</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="coloumbs_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Coulomb's Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Electric Force Simulation</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Electromagnetic Flux</h3>
+                            <p class="text-gray-600 text-sm mt-2">Magnetic Field Study</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Circuit Simulator</h3>
+                            <p class="text-gray-600 text-sm mt-2">Electric Circuit Builder</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Induction</h3>
+                            <p class="text-gray-600 text-sm mt-2">Electromagnetic Induction</p>
+                        </a>
+                    </div>
                 </div>
-                <p class="text-gray-600 text-sm mt-2">Energy Transfer Study</p>
-            </a>
+
+                <!-- Waves & Optics Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Waves & Optics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Waves</h3>
+                            <p class="text-gray-600 text-sm mt-2">Wave Properties & Behavior</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Optics Simulator</h3>
+                            <p class="text-gray-600 text-sm mt-2">Light & Lenses</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Snell's Law</h3>
+                            <p class="text-gray-600 text-sm mt-2">Light Refraction</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Modern Physics Section -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Modern Physics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Interactive Bohr Model</h3>
+                            <p class="text-gray-600 text-sm mt-2">Atomic Structure</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Photoelectric Emissions</h3>
+                            <p class="text-gray-600 text-sm mt-2">Quantum Physics</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Nuclear Reactor</h3>
+                            <p class="text-gray-600 text-sm mt-2">Nuclear Physics</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Additional Topics -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Additional Topics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Energy Transformation</h3>
+                            <p class="text-gray-600 text-sm mt-2">Energy Conversion Study</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Gravitational Field</h3>
+                            <p class="text-gray-600 text-sm mt-2">Gravity Simulation</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Heat Transfer</h3>
+                            <p class="text-gray-600 text-sm mt-2">Thermal Physics</p>
+                        </a>
+                        <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                            <h3 class="font-bold text-blue-800">Newton's Laws Quiz</h3>
+                            <p class="text-gray-600 text-sm mt-2">Test Your Knowledge</p>
+                        </a>
+                    </div>
+              </div>
         </div>
     </div>
 
-    <!-- Electricity & Magnetism Section -->
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Electricity & Magnetism</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Coulomb's Law</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Electric Force Simulation</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Electromagnetic Flux</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Magnetic Field Study</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Circuit Simulator</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Electric Circuit Builder</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Induction</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Electromagnetic Induction</p>
-            </a>
-        </div>
-    </div>
-
-    <!-- Waves & Optics Section -->
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Waves & Optics</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Waves</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Wave Properties & Behavior</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Optics Simulator</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Light & Lenses</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Snell's Law</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Light Refraction</p>
-            </a>
-        </div>
-    </div>
-
-    <!-- Modern Physics Section -->
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Modern Physics</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Interactive Bohr Model</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Atomic Structure</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Photoelectric Emissions</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Quantum Physics</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Nuclear Reactor</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Nuclear Physics</p>
-            </a>
-        </div>
-    </div>
-
-    <!-- Additional Topics Section -->
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Additional Topics</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Energy Transformation</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Energy Conversion Study</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Gravitational Field</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Gravity Simulation</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Heat Transfer</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Thermal Physics</p>
-            </a>
-            <a href="billing.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition paid-feature">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <h3 class="font-bold text-blue-800">Newton's Laws Quiz</h3>
-                </div>
-                <p class="text-gray-600 text-sm mt-2">Test Your Knowledge</p>
-            </a>
-        </div>
-    </div>
-</div>
     <script type="module">
         // Firebase configuration
         const firebaseConfig = {
