@@ -7,17 +7,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-.paid-feature {
-  display: flex;
-  align-items: center;
-}
-
-.paid-feature .lock-icon {
-  width: 1.25rem; /* 20px */
-  height: 1.25rem;
-  margin-right: 0.5rem; /* 8px */
-  color: text-gray-500;
-}
 
     <script>
     function createPaidFeatureLock() {
@@ -41,7 +30,8 @@
 const paidFeatureElements = document.querySelectorAll('.paid-feature');
 paidFeatureElements.forEach((element) => {
   const lockIcon = createPaidFeatureLock();
-  element.insertAdjacentElement('beforebegin', lockIcon);
+  const titleElement = element.querySelector('h3');
+  titleElement.insertAdjacentElement('beforebegin', lockIcon);
 });
   </script>
     
