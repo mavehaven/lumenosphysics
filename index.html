@@ -9,30 +9,27 @@
 
     <script>
     function createPaidFeatureLock() {
-  const lockIcon = document.createElement('i');
-  lockIcon.classList.add('fas', 'fa-lock', 'mr-2');
+  const lockIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  lockIcon.setAttribute("class", "w-5 h-5 text-gray-500 mr-2");
+  lockIcon.setAttribute("fill", "none");
+  lockIcon.setAttribute("stroke-width", "1.5");
+  lockIcon.setAttribute("stroke", "currentColor");
+  lockIcon.setAttribute("viewBox", "0 0 24 24");
 
-  const lockText = document.createElement('span');
-  lockText.textContent = 'Paid Feature';
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("d", "M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207");
+  lockIcon.appendChild(path);
 
-  const container = document.createElement('div');
-  container.classList.add('flex', 'items-center', 'text-gray-500');
-  container.appendChild(lockIcon);
-  container.appendChild(lockText);
-
-  return container;
+  return lockIcon;
 }
-
-export default createPaidFeatureLock;
-
-import createPaidFeatureLock from './paidFeatureLock';
 
 // Find the elements you want to add the lock icon to
 const paidFeatureElements = document.querySelectorAll('.paid-feature');
-
 paidFeatureElements.forEach((element) => {
   const lockIcon = createPaidFeatureLock();
-  element.appendChild(lockIcon);
+  element.insertAdjacentElement('beforebegin', lockIcon);
 });
   </script>
     
