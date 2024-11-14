@@ -7,33 +7,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-
-    <script>
-    function createPaidFeatureLock() {
-  const lockIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  lockIcon.setAttribute("class", "w-5 h-5 text-gray-500 mr-2");
-  lockIcon.setAttribute("fill", "none");
-  lockIcon.setAttribute("stroke-width", "1.5");
-  lockIcon.setAttribute("stroke", "currentColor");
-  lockIcon.setAttribute("viewBox", "0 0 24 24");
-
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("stroke-linecap", "round");
-  path.setAttribute("stroke-linejoin", "round");
-  path.setAttribute("d", "M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207");
-  lockIcon.appendChild(path);
-
-  return lockIcon;
-}
-
-// Find the elements you want to add the lock icon to
-const paidFeatureElements = document.querySelectorAll('.paid-feature');
-paidFeatureElements.forEach((element) => {
-  const lockIcon = createPaidFeatureLock();
-  const titleElement = element.querySelector('h3');
-  titleElement.insertAdjacentElement('beforebegin', lockIcon);
-});
-  </script>
     
     <!-- Firebase SDK -->
     <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
