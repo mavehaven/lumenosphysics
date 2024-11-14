@@ -24,6 +24,16 @@
 }
 
 export default createPaidFeatureLock;
+
+import createPaidFeatureLock from './paidFeatureLock';
+
+// Find the elements you want to add the lock icon to
+const paidFeatureElements = document.querySelectorAll('.paid-feature');
+
+paidFeatureElements.forEach((element) => {
+  const lockIcon = createPaidFeatureLock();
+  element.appendChild(lockIcon);
+});
   </script>
     
     <!-- Firebase SDK -->
