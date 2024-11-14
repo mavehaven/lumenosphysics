@@ -1,81 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physics Simulator Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js"></script>
 </head>
 <body class="bg-gray-50">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-64 bg-blue-800 text-white">
-            <div class="p-4">
-                <div class="flex items-center mb-6">
-                    <a href="dashboard.html">
-                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
-                             alt="Logo" 
-                             class="h-8 w-8">
-                    </a>
-                    <span class="ml-2 text-lg font-bold">Physics Sim</span>
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome to Physics Sim</h2>
+            <div id="authContent">
+                <p class="text-gray-600 mb-6">Please sign in or create an account to access the physics simulator.</p>
+                <div class="space-y-4">
+                    <button id="googleSignIn" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-50 transition">
+                        <img src="/api/placeholder/24/24" alt="Google" class="w-6 h-6">
+                        Sign in with Google
+                    </button>
+                    <button id="emailSignIn" class="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">
+                        Sign in with Email
+                    </button>
+                    <button id="createAccount" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 hover:bg-gray-900 transition">
+                        Create Account
+                    </button>
                 </div>
-                <nav>
-                    <ul class="space-y-2">
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="dashboard.html" class="flex items-center">
-                                <i class="fas fa-home w-6"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="tabs.html" class="flex items-center">
-                                <i class="fas fa-table w-6"></i>
-                                <span>All Topics</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="progress.html" class="flex items-center">
-                                <i class="fas fa-chart-line w-6"></i>
-                                <span>Progress</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="achievements.html" class="flex items-center">
-                                <i class="fas fa-trophy w-6"></i>
-                                <span>Achievements</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="notes.html" class="flex items-center">
-                                <i class="fas fa-book w-6"></i>
-                                <span>Study Notes</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+            </div>
+            <div id="emailSignInForm" class="hidden space-y-4">
+                <input type="email" id="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg">
+                <input type="password" id="password" placeholder="Password" class="w-full px-4 py-2 border rounded-lg">
+                <button id="signInButton" class="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">
+                    Sign In
+                </button>
+                <button id="backToOptions" class="w-full text-gray-600 hover:text-gray-800 transition">
+                    Back to options
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Main Content -->
-        <div class="flex-1 overflow-auto">
-            <!-- Top Navigation -->
-            <div class="bg-white shadow-sm">
-                <div class="flex justify-between items-center px-6 py-3">
-                    <h1 class="text-2xl font-bold text-gray-800">Physics Topics</h1>
-                    <div class="flex items-center space-x-4">
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-bell text-gray-600"></i>
-                        </button>
-                        <div class="flex items-center space-x-2">
-                            <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
-                            <span class="text-gray-700">Student</span>
+    <!-- Main Content (initially hidden) -->
+    <div id="mainContent" class="hidden">
+        <div class="flex h-screen">
+            <!-- Sidebar -->
+            <div class="w-64 bg-blue-800 text-white">
+                <div class="p-4">
+                    <div class="flex items-center mb-6">
+                        <a href="dashboard.html">
+                            <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                                 alt="Logo" 
+                                 class="h-8 w-8">
+                        </a>
+                        <span class="ml-2 text-lg font-bold">Physics Sim</span>
+                    </div>
+                    <nav>
+                        <ul class="space-y-2">
+                            <li class="hover:bg-blue-700 rounded p-2">
+                                <a href="dashboard.html" class="flex items-center">
+                                    <i class="fas fa-home w-6"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="hover:bg-blue-700 rounded p-2">
+                                <a href="tabs.html" class="flex items-center">
+                                    <i class="fas fa-table w-6"></i>
+                                    <span>All Topics</span>
+                                </a>
+                            </li>
+                            <li class="hover:bg-blue-700 rounded p-2">
+                                <a href="progress.html" class="flex items-center">
+                                    <i class="fas fa-chart-line w-6"></i>
+                                    <span>Progress</span>
+                                </a>
+                            </li>
+                            <li class="hover:bg-blue-700 rounded p-2">
+                                <a href="achievements.html" class="flex items-center">
+                                    <i class="fas fa-trophy w-6"></i>
+                                    <span>Achievements</span>
+                                </a>
+                            </li>
+                            <li class="hover:bg-blue-700 rounded p-2">
+                                <a href="notes.html" class="flex items-center">
+                                    <i class="fas fa-book w-6"></i>
+                                    <span>Study Notes</span>
+                                </a>
+                            </li>
+                            <!-- Added Sign Out Button -->
+                            <li class="hover:bg-blue-700 rounded p-2">
+                                <button id="signOutButton" class="flex items-center w-full">
+                                    <i class="fas fa-sign-out-alt w-6"></i>
+                                    <span>Sign Out</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-auto">
+                <!-- Top Navigation -->
+                <div class="bg-white shadow-sm">
+                    <div class="flex justify-between items-center px-6 py-3">
+                        <h1 class="text-2xl font-bold text-gray-800">Physics Topics</h1>
+                        <div class="flex items-center space-x-4">
+                            <button class="p-2 hover:bg-gray-100 rounded-full">
+                                <i class="fas fa-bell text-gray-600"></i>
+                            </button>
+                            <div class="flex items-center space-x-2">
+                                <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
+                                <span id="userEmail" class="text-gray-700">Student</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Topics Grid -->
+                <!-- Topics Grid -->
             <div class="p-6">
                 <!-- Mechanics Section -->
                 <div class="mb-8">
@@ -190,7 +236,115 @@
                             <p class="text-gray-600 text-sm mt-2">Test Your Knowledge</p>
                         </a>
                     </div>
-                </div>
-            </div>
+              </div>
         </div>
     </div>
+
+    <script type="module">
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+            authDomain: "lumenosphys.firebaseapp.com",
+            projectId: "lumenosphys",
+            storageBucket: "lumenosphys.firebasestorage.app",
+            messagingSenderId: "501424803085",
+            appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
+            measurementId: "G-7RTGWQ515B"
+        };
+
+        // Initialize Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+
+        // DOM Elements
+        const authModal = document.getElementById('authModal');
+        const mainContent = document.getElementById('mainContent');
+        const authContent = document.getElementById('authContent');
+        const emailSignInForm = document.getElementById('emailSignInForm');
+        const userEmailDisplay = document.getElementById('userEmail');
+        
+        // Auth state observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                authModal.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                // Update user email display
+                userEmailDisplay.textContent = user.email;
+            } else {
+                // User is signed out
+                authModal.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            }
+        });
+
+        // Google Sign In
+        document.getElementById('googleSignIn').addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Error during Google sign in:", error);
+                alert("Error signing in with Google. Please try again.");
+            }
+        });
+
+        // Email Sign In Form Toggle
+        document.getElementById('emailSignIn').addEventListener('click', () => {
+            authContent.classList.add('hidden');
+            emailSignInForm.classList.remove('hidden');
+        });
+
+        document.getElementById('backToOptions').addEventListener('click', () => {
+            emailSignInForm.classList.add('hidden');
+            authContent.classList.remove('hidden');
+        });
+
+        // Email Sign In
+        document.getElementById('signInButton').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.error("Error during email sign in:", error);
+                alert("Error signing in. Please check your credentials and try again.");
+            }
+        });
+
+        // Create Account
+        document.getElementById('createAccount').addEventListener('click', async () => {
+            authContent.classList.add('hidden');
+            emailSignInForm.classList.remove('hidden');
+            
+            document.getElementById('signInButton').addEventListener('click', async () => {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    console.error("Error creating account:", error);
+                    alert("Error creating account. Please try again.");
+                }
+            });
+        });
+
+        // Sign Out
+        document.getElementById('signOutButton').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Error signing out:", error);
+                alert("Error signing out. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>
