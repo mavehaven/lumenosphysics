@@ -12,38 +12,159 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js"></script>
 </head>
-<body class="bg-gray-50">
-    <!-- Auth Modal -->
-    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+<div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <!-- Success State -->
+        <div id="successState" class="hidden flex flex-col items-center justify-center py-8">
+            <svg class="w-16 h-16 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path class="opacity-0 transition-opacity duration-300" id="successCheck" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Welcome aboard!</h3>
+            <p class="text-gray-600 text-center mb-6">Successfully signed in. Redirecting you to the dashboard...</p>
+            <div class="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+        </div>
+
+        <!-- Main Auth Content -->
+        <div id="authContent">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome to Physics Sim</h2>
-            <div id="authContent">
-                <p class="text-gray-600 mb-6">Please sign in or create an account to access the physics simulator.</p>
-                <div class="space-y-4">
-                    <button id="googleSignIn" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-50 transition">
-                        <img src="/api/placeholder/24/24" alt="Google" class="w-6 h-6">
-                        Sign in with Google
-                    </button>
-                    <button id="emailSignIn" class="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">
-                        Sign in with Email
-                    </button>
-                    <button id="createAccount" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 hover:bg-gray-900 transition">
-                        Create Account
-                    </button>
-                </div>
-            </div>
-            <div id="emailSignInForm" class="hidden space-y-4">
-                <input type="email" id="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg">
-                <input type="password" id="password" placeholder="Password" class="w-full px-4 py-2 border rounded-lg">
-                <button id="signInButton" class="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">
-                    Sign In
+            <p class="text-gray-600 mb-6">Please sign in or create an account to access the physics simulator.</p>
+            <div class="space-y-4">
+                <button id="googleSignIn" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-50 transition">
+                    <img src="/api/placeholder/24/24" alt="Google" class="w-6 h-6">
+                    Sign in with Google
                 </button>
-                <button id="backToOptions" class="w-full text-gray-600 hover:text-gray-800 transition">
-                    Back to options
+                <button id="emailSignIn" class="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">
+                    Sign in with Email
+                </button>
+                <button id="createAccount" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 hover:bg-gray-900 transition">
+                    Create Account
                 </button>
             </div>
         </div>
+
+        <!-- Email Sign In Form -->
+        <div id="emailSignInForm" class="hidden space-y-4">
+            <input type="email" id="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg">
+            <input type="password" id="password" placeholder="Password" class="w-full px-4 py-2 border rounded-lg">
+            <button id="signInButton" class="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">
+                Sign In
+            </button>
+            <button id="backToOptions" class="w-full text-gray-600 hover:text-gray-800 transition">
+                Back to options
+            </button>
+        </div>
     </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const elements = {
+        authModal: document.getElementById('authModal'),
+        authContent: document.getElementById('authContent'),
+        emailSignInForm: document.getElementById('emailSignInForm'),
+        successState: document.getElementById('successState'),
+        successCheck: document.getElementById('successCheck'),
+        emailSignIn: document.getElementById('emailSignIn'),
+        backToOptions: document.getElementById('backToOptions'),
+        signInButton: document.getElementById('signInButton'),
+        email: document.getElementById('email'),
+        password: document.getElementById('password'),
+        googleSignIn: document.getElementById('googleSignIn'),
+        createAccount: document.getElementById('createAccount')
+    };
+
+    function showEmailForm() {
+        elements.authContent.classList.add('hidden');
+        elements.emailSignInForm.classList.remove('hidden');
+    }
+
+    function showAuthOptions() {
+        elements.emailSignInForm.classList.add('hidden');
+        elements.authContent.classList.remove('hidden');
+    }
+
+    function showSuccessState() {
+        // Hide other content
+        elements.authContent.classList.add('hidden');
+        elements.emailSignInForm.classList.add('hidden');
+        
+        // Show and animate success state
+        elements.successState.classList.remove('hidden');
+        setTimeout(() => {
+            elements.successCheck.classList.remove('opacity-0');
+        }, 100);
+
+        // Redirect after delay
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 2000);
+    }
+
+    async function handleEmailSignIn(e) {
+        e.preventDefault();
+        const email = elements.email.value;
+        const password = elements.password.value;
+
+        try {
+            // Replace with your actual authentication API call
+            const response = await fetch('/api/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Authentication failed');
+            }
+
+            const data = await response.json();
+            
+            // Store auth token
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('userEmail', email);
+
+            // Show success state
+            showSuccessState();
+
+        } catch (error) {
+            alert('Sign in failed: ' + error.message);
+        }
+    }
+
+    // Event Listeners
+    elements.emailSignIn.addEventListener('click', showEmailForm);
+    elements.backToOptions.addEventListener('click', showAuthOptions);
+    elements.signInButton.addEventListener('click', handleEmailSignIn);
+
+    // Prevent form submission on enter key
+    elements.emailSignInForm.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleEmailSignIn(e);
+        }
+    });
+
+    // Google Sign In Handler
+    elements.googleSignIn.addEventListener('click', async () => {
+        // Replace with your Google authentication logic
+        try {
+            // Simulating Google auth success
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            showSuccessState();
+        } catch (error) {
+            alert('Google sign in failed: ' + error.message);
+        }
+    });
+
+    // Create Account Handler
+    elements.createAccount.addEventListener('click', () => {
+        // Replace with your account creation logic
+        window.location.href = '/signup';
+    });
+});
+</script>
 
     <!-- Main Content (initially hidden) -->
     <div id="mainContent" class="hidden">
