@@ -6,7 +6,6 @@
     <title>Physics Simulator - Learn Physics Interactively</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Pendulum animation */
         @keyframes pendulumWave {
             0% { transform: rotate(-15deg); }
             50% { transform: rotate(15deg); }
@@ -22,7 +21,6 @@
         .pendulum-4 { animation-delay: 0.6s; }
         .pendulum-5 { animation-delay: 0.8s; }
 
-        /* Typing animation */
         .typing {
             overflow: hidden;
             white-space: nowrap;
@@ -42,7 +40,6 @@
             50% { border-color: white; }
         }
 
-        /* Fade in animation */
         .fade-in {
             opacity: 0;
             animation: fadeIn 1s ease-in forwards;
@@ -54,7 +51,6 @@
             to { opacity: 1; }
         }
 
-        /* Electron orbit animation */
         @keyframes orbit {
             from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
             to { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
@@ -64,24 +60,12 @@
             animation: orbit 3s linear infinite;
         }
 
-        /* Topic cards hover effects */
-        .topic-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
+        .simulation-link {
+            transition: transform 0.2s;
         }
 
-        .topic-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .subtopic {
-            transition: all 0.2s ease;
-        }
-
-        .subtopic:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-            padding-left: 1.5rem;
+        .simulation-link:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -91,15 +75,15 @@
         <div class="container mx-auto px-6 py-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                    </svg>
-                    <span class="ml-3 text-xl font-bold">Physics Simulator</span>
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Physics Simulator Logo" 
+                         class="h-12">
                 </div>
-                <div class="hidden md:block">
-                    <a href="#about" class="px-3 py-2 hover:text-blue-200">About</a>
-                    <a href="#features" class="px-3 py-2 hover:text-blue-200">Features</a>
-                    <a href="#contact" class="px-3 py-2 hover:text-blue-200">Contact</a>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#about" class="hover:text-blue-200 transition">About</a>
+                    <a href="#simulations" class="hover:text-blue-200 transition">Simulations</a>
+                    <a href="#features" class="hover:text-blue-200 transition">Features</a>
+                    <a href="#contact" class="hover:text-blue-200 transition">Contact</a>
                 </div>
             </div>
         </div>
@@ -148,96 +132,231 @@
         <!-- Hero Content -->
         <div class="container mx-auto px-6 text-center relative z-10">
             <h1 class="text-5xl font-bold mb-4">
-                <span class="typing">Learn Physics By Doing</span>
+                <span class="typing">Learn Physics Interactively</span>
             </h1>
-            <p class="text-xl mb-8 fade-in">Explore physics concepts with our state-of-the-art simulators</p>
-            <button class="bg-yellow-500 text-blue-900 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition fade-in">
-                Start Learning Now
-            </button>
+            <p class="text-xl mb-8 fade-in">Explore physics concepts through hands-on simulations</p>
+            <a href="#simulations" class="bg-yellow-500 text-blue-900 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition fade-in inline-block">
+                Start Exploring
+            </a>
         </div>
     </div>
 
-    <!-- Topic Grid Section -->
-    <div class="container mx-auto px-6 py-12">
+    <!-- Simulation Categories -->
+    <div id="simulations" class="container mx-auto px-6 py-12">
+        <h2 class="text-3xl font-bold text-center text-blue-800 mb-8">Interactive Simulations</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Newtonian Physics -->
-            <div class="topic-card bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-white p-3 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-white">Newtonian Physics</h2>
-                    </div>
-                </div>
-                <div class="p-6 space-y-4">
-                    <a href="#" class="subtopic block">
-                        <h3 class="font-semibold text-blue-900">Newton's First Law</h3>
-                        <p class="text-sm text-gray-600">Explore inertia and motion</p>
-                    </a>
-                    <a href="#" class="subtopic block">
-                        <h3 class="font-semibold text-blue-900">Newton's Second Law</h3>
-                        <p class="text-sm text-gray-600">Force and acceleration</p>
-                    </a>
-                    <a href="#" class="subtopic block">
-                        <h3 class="font-semibold text-blue-900">Newton's Third Law</h3>
-                        <p class="text-sm text-gray-600">Action and reaction</p>
-                    </a>
-                </div>
+            <!-- Classical Mechanics -->
+            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Classical Mechanics</h3>
+                <ul class="space-y-3">
+                    <li><a href="/simulations/newton-first" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Newton's First Law
+                    </a></li>
+                    <li><a href="/simulations/newton-second" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Newton's Second Law
+                    </a></li>
+                    <li><a href="/simulations/newton-third" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Newton's Third Law
+                    </a></li>
+                    <li><a href="/simulations/projectile" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Projectile Motion
+                    </a></li>
+                </ul>
             </div>
 
-            <!-- Forces and Energy -->
-            <div class="topic-card bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-white p-3 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-white">Forces & Energy</h2>
-                    </div>
-                </div>
-                <div class="p-6 space-y-4">
-                    <a href="#" class="subtopic block">
-                        <h3 class="font-semibold text-blue-900">Energy Conservation</h3>
-                        <p class="text-sm text-gray-600">Energy transformations</p>
-                    </a>
-                    <a href="#" class="subtopic block">
-                        <h3 class="font-semibold text-blue-900">Work & Power</h3>
-                        <p class="text-sm text-gray-600">Force and displacement</p>
-                    </a>
-                </div>
+            <!-- Waves and Oscillations -->
+            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Waves & Oscillations</h3>
+                <ul class="space-y-3">
+                    <li><a href="/simulations/simple-harmonic" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Simple Harmonic Motion
+                    </a></li>
+                    <li><a href="/simulations/wave-interference" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Wave Interference
+                    </a></li>
+                    <li><a href="/simulations/standing-waves" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Standing Waves
+                    </a></li>
+                </ul>
             </div>
 
-            <!-- More topic cards... -->
+            <!-- Electromagnetism -->
+            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Electromagnetism</h3>
+                <ul class="space-y-3">
+                    <li><a href="/simulations/electric-fields" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Electric Fields
+                    </a></li>
+                    <li><a href="/simulations/magnetic-fields" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Magnetic Fields
+                    </a></li>
+                    <li><a href="/simulations/electromagnetic-induction" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Electromagnetic Induction
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Thermodynamics -->
+            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Thermodynamics</h3>
+                <ul class="space-y-3">
+                    <li><a href="/simulations/heat-transfer" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Heat Transfer
+                    </a></li>
+                    <li><a href="/simulations/gas-laws" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Gas Laws
+                    </a></li>
+                    <li><a href="/simulations/thermal-expansion" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Thermal Expansion
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Optics -->
+            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Optics</h3>
+                <ul class="space-y-3">
+                    <li><a href="/simulations/reflection" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Reflection
+                    </a></li>
+                    <li><a href="/simulations/refraction" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Refraction
+                    </a></li>
+                    <li><a href="/simulations/interference" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Interference Patterns
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Modern Physics -->
+            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Modern Physics</h3>
+                <ul class="space-y-3">
+                    <li><a href="/simulations/photoelectric" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Photoelectric Effect
+                    </a></li>
+                    <li><a href="/simulations/atomic-models" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Atomic Models
+                    </a></li>
+                    <li><a href="/simulations/nuclear" class="flex items-center text-gray-700 hover:text-blue-600">
+                        <span class="mr-2">•</span> Nuclear Physics
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="bg-blue-50 py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-blue-800 mb-8">Interactive Features</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-blue-700 mb-3">Real-time Interaction</h3>
+                    <p class="text-gray-600">Manipulate variables and see instant results in our interactive simulations.</p>
+                </div>
+                <div class="bg-white rounded-lg p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-blue-700 mb-3">Data Visualization</h3>
+                    <p class="text-gray-600">View graphs and charts that update in real-time as you experiment.</p>
+                </div>
+               <div class="bg-white rounded-lg p-6 shadow-md">
+                    <h3 class="text-xl font-bold text-blue-700 mb-3">Progress Tracking</h3>
+                    <p class="text-gray-600">Track your understanding with built-in quizzes and progress indicators.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div id="about" class="py-12">
+        <div class="container mx-auto px-6">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-center text-blue-800 mb-6">About Our Platform</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold text-blue-700 mb-3">Our Mission</h3>
+                        <p class="text-gray-600 mb-4">
+                            We believe in making physics education accessible and engaging through interactive simulations 
+                            that bring complex concepts to life.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-blue-700 mb-3">For Students & Teachers</h3>
+                        <p class="text-gray-600 mb-4">
+                            Whether you're a student exploring physics concepts or a teacher looking for interactive 
+                            teaching tools, our platform provides valuable resources for your physics journey.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div id="contact" class="bg-blue-50 py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-blue-800 mb-8">Get in Touch</h2>
+            <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+                <form class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-gray-700 mb-2">Name</label>
+                        <input type="text" id="name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-gray-700 mb-2">Email</label>
+                        <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-gray-700 mb-2">Message</label>
+                        <textarea id="message" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                        Send Message
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-blue-800 text-white mt-12">
+    <footer class="bg-blue-800 text-white">
         <div class="container mx-auto px-6 py-8">
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-4 gap-8">
                 <div>
                     <h3 class="text-lg font-bold mb-4">About Us</h3>
-                    <p class="text-blue-200">Making physics education interactive and engaging.</p>
+                    <p class="text-blue-200">Making physics education interactive and engaging for students worldwide.</p>
                 </div>
                 <div>
                     <h3 class="text-lg font-bold mb-4">Quick Links</h3>
                     <ul class="space-y-2 text-blue-200">
-                        <li><a href="#" class="hover:text-white">Home</a></li>
-                        <li><a href="#" class="hover:text-white">Features</a></li>
-                        <li><a href="#" class="hover:text-white">Support</a></li>
+                        <li><a href="#" class="hover:text-white transition">Home</a></li>
+                        <li><a href="#simulations" class="hover:text-white transition">Simulations</a></li>
+                        <li><a href="#features" class="hover:text-white transition">Features</a></li>
+                        <li><a href="#about" class="hover:text-white transition">About</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold mb-4">Contact</h3>
-                    <p class="text-blue-200">Need help? Reach out to our support team.</p>
+                    <h3 class="text-lg font-bold mb-4">Resources</h3>
+                    <ul class="space-y-2 text-blue-200">
+                        <li><a href="#" class="hover:text-white transition">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition">Tutorial Videos</a></li>
+                        <li><a href="#" class="hover:text-white transition">Teacher Resources</a></li>
+                    </ul>
                 </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Connect</h3>
+                    <ul class="space-y-2 text-blue-200">
+                        <li><a href="#contact" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Support</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-blue-700 mt-8 pt-8 text-center text-blue-200">
+                <p>&copy; 2024 Physics Simulator. All rights reserved.</p>
             </div>
         </div>
     </footer>
+
 </body>
 </html>
