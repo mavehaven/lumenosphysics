@@ -4,33 +4,6 @@ import {
   LogOut, Home, BookOpen, LineChart, Book, Crown 
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  onAuthStateChanged
-} from 'firebase/auth';
-
-// Your Firebase configuration
-const firebaseConfig = {
-  // Replace with your Firebase config
-            apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
-            authDomain: "lumenosphys.firebaseapp.com",
-            projectId: "lumenosphys",
-            storageBucket: "lumenosphys.firebasestorage.app",
-            messagingSenderId: "501424803085",
-            appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
-            measurementId: "G-7RTGWQ515B"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
 
 const TopicCard = ({ title, description, isLocked, href, className = "" }) => (
   <a
@@ -72,7 +45,6 @@ const AuthModal = ({ isOpen, onClose, onGoogleSignIn, onEmailSignIn, onCreateAcc
       } else {
         await onEmailSignIn(email, password);
       }
-      onClose();
     } catch (err) {
       setError(err.message);
     }
@@ -81,14 +53,9 @@ const AuthModal = ({ isOpen, onClose, onGoogleSignIn, onEmailSignIn, onCreateAcc
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
-            {isRegistration ? 'Create Account' : 'Welcome Back'}
-          </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          {isRegistration ? 'Create Account' : 'Welcome Back'}
+        </h2>
 
         {error && (
           <Alert variant="destructive" className="mb-4">
@@ -152,21 +119,10 @@ const AuthModal = ({ isOpen, onClose, onGoogleSignIn, onEmailSignIn, onCreateAcc
 
 const PhysicsDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [currentSection, setCurrentSection] = useState('Dashboard');
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Set up authentication state observer
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    // Cleanup subscription
-    return () => unsubscribe();
-  }, []);
+  const [currentSection, setCurrentSection] = useState('Dashboard');
 
   const navItems = [
     { icon: <Home className="w-5 h-5" />, label: 'Dashboard', href: '/' },
@@ -188,45 +144,10 @@ const PhysicsDashboard = () => {
     ]
   };
 
-  const handleEmailSignIn = async (email, password) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      throw new Error(error.message);
-    }
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    setUser(null);
   };
-
-  const handleCreateAccount = async (email, password) => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -278,18 +199,14 @@ const PhysicsDashboard = () => {
               <span className="text-gray-600">Physics Topics</span>
             </div>
             
-            {user ? (
+            {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <button className="p-2 hover:bg-gray-100 rounded-full">
                   <Bell className="w-5 h-5 text-gray-600" />
                 </button>
                 <div className="flex items-center space-x-2">
-                  <img 
-                    src={user.photoURL || "/api/placeholder/32/32"} 
-                    alt="Profile" 
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span className="text-gray-700">{user.email}</span>
+                  <img src="/api/placeholder/32/32" alt="Profile" className="w-8 h-8 rounded-full" />
+                  <span className="text-gray-700">{user?.email || 'Student'}</span>
                 </div>
                 <button
                   onClick={handleSignOut}
@@ -327,9 +244,23 @@ const PhysicsDashboard = () => {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onGoogleSignIn={handleGoogleSignIn}
-        onEmailSignIn={handleEmailSignIn}
-        onCreateAccount={handleCreateAccount}
+        onGoogleSignIn={() => {
+          // Implement Google Sign In
+          setIsAuthenticated(true);
+          setIsAuthModalOpen(false);
+        }}
+        onEmailSignIn={(email, password) => {
+          // Implement Email Sign In
+          setIsAuthenticated(true);
+          setUser({ email });
+          setIsAuthModalOpen(false);
+        }}
+        onCreateAccount={(email, password) => {
+          // Implement Account Creation
+          setIsAuthenticated(true);
+          setUser({ email });
+          setIsAuthModalOpen(false);
+        }}
       />
     </div>
   );
