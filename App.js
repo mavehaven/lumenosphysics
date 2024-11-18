@@ -18,12 +18,13 @@ import {
 // Your Firebase configuration
 const firebaseConfig = {
   // Replace with your Firebase config
-  apiKey: "your-api-key",
-  authDomain: "your-auth-domain",
-  projectId: "your-project-id",
-  storageBucket: "your-storage-bucket",
-  messagingSenderId: "your-messaging-sender-id",
-  appId: "your-app-id"
+            apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+            authDomain: "lumenosphys.firebaseapp.com",
+            projectId: "lumenosphys",
+            storageBucket: "lumenosphys.firebasestorage.app",
+            messagingSenderId: "501424803085",
+            appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
+            measurementId: "G-7RTGWQ515B"
 };
 
 // Initialize Firebase
