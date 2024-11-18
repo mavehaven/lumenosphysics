@@ -4,10 +4,32 @@ import {
   LogOut, Home, BookOpen, LineChart, Book, Crown 
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
 
-// Firebase will be available globally via CDN
-const auth = window.firebase.auth();
-const googleProvider = new window.firebase.auth.GoogleAuthProvider();
+// Your Firebase configuration
+const firebaseConfig = {
+  // Replace with your Firebase config
+  apiKey: "your-api-key",
+  authDomain: "your-auth-domain",
+  projectId: "your-project-id",
+  storageBucket: "your-storage-bucket",
+  messagingSenderId: "your-messaging-sender-id",
+  appId: "your-app-id"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
 const TopicCard = ({ title, description, isLocked, href, className = "" }) => (
   <a
@@ -136,7 +158,7 @@ const PhysicsDashboard = () => {
 
   useEffect(() => {
     // Set up authentication state observer
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
     });
@@ -167,7 +189,7 @@ const PhysicsDashboard = () => {
 
   const handleEmailSignIn = async (email, password) => {
     try {
-      await auth.signInWithEmailAndPassword(email, password);
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -175,7 +197,7 @@ const PhysicsDashboard = () => {
 
   const handleCreateAccount = async (email, password) => {
     try {
-      await auth.createUserWithEmailAndPassword(email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -183,7 +205,7 @@ const PhysicsDashboard = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      await auth.signInWithPopup(googleProvider);
+      await signInWithPopup(auth, googleProvider);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -191,7 +213,7 @@ const PhysicsDashboard = () => {
 
   const handleSignOut = async () => {
     try {
-      await auth.signOut();
+      await signOut(auth);
     } catch (error) {
       console.error('Error signing out:', error);
     }
