@@ -5,141 +5,258 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <style>
         * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: system-ui, -apple-system, sans-serif;
-    margin: 0 auto;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    line-height: 1.6;
-    color: #1a1a1a;
-}
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0 auto;
+            padding: 1rem;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+            color: #1a1a1a;
+        }
 
-.container {
-    max-width: min(95%, 1200px);
-    margin: 0 auto;
-    background-color: white;
-    padding: clamp(1rem, 3vw, 2rem);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    color: #2d3748; /* Darker text for better contrast on white */
-}
+        .container {
+            max-width: min(95%, 1200px);
+            margin: 0 auto;
+            background-color: white;
+            padding: clamp(1rem, 3vw, 2rem);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: #2d3748; /* Darker text for better contrast on white */
+        }
 
-h1 {
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    margin-bottom: 1.5rem;
-    color: #1a365d; /* Darker blue for better contrast */
-}
 
-h2 {
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
-    margin-bottom: 1rem;
-    color: #1a365d; /* Darker blue for better contrast */
-}
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 1.5rem;
+            color: #1a365d; /* Darker blue for better contrast */
+        }
 
-.lesson-section {
-    margin: 2rem 0;
-    padding: clamp(1rem, 2vw, 1.5rem);
-    background-color: #f8fafc;
-    border-radius: 8px;
-    border-left: 4px solid #1d4ed8;
-    color: #2d3748; /* Ensuring good contrast */
-}
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin-bottom: 1rem;
+            color: #1a365d; /* Darker blue for better contrast */
+        }
 
-.example-box {
-    margin: 1rem 0;
-    padding: clamp(0.8rem, 1.5vw, 1.2rem);
-    background-color: #e5edff;
-    border-radius: 8px;
-    transition: transform 0.2s;
-    color: #1a365d; /* Darker text for better contrast */
-}
+        .lesson-section {
+            margin: 2rem 0;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #1d4ed8;
+            color: #2d3748; /* Ensuring good contrast */
+        }
 
-.key-point {
-    background-color: #fef3c7;
-    padding: clamp(0.8rem, 1.5vw, 1.2rem);
-    margin: 1rem 0;
-    border-radius: 8px;
-    border-left: 4px solid #d97706;
-    color: #783c00; /* Darker text for better contrast on yellow bg */
-}
+        .example-box {
+            margin: 1rem 0;
+            padding: clamp(0.8rem, 1.5vw, 1.2rem);
+            background-color: #e5edff;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
 
-.metric {
-    padding: 0.8rem;
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    text-align: center;
-    font-size: clamp(0.8rem, 1.5vw, 1rem);
-    color: #2d3748; /* Darker text for better contrast */
-}
+        .example-box:hover {
+            transform: translateY(-2px);
+        }
 
-.quiz-section {
-    margin: 1.5rem 0;
-    padding: clamp(1rem, 2vw, 1.5rem);
-    background-color: #f0fdf4;
-    border-radius: 8px;
-    border-left: 4px solid #16a34a;
-    color: #166534; /* Darker green text for better contrast */
-}
+        .key-point {
+            background-color: #fef3c7;
+            padding: clamp(0.8rem, 1.5vw, 1.2rem);
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid #d97706;
+        }
 
-.equations {
-    padding: 1rem;
-    background-color: #fff;
-    border-radius: 6px;
-    margin: 1rem 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    color: #2d3748; /* Darker text for better contrast */
-}
+        .simulation-area {
+            width: 100%;
+            height: clamp(150px, 30vw, 250px);
+            background-color: #eef2ff;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+            border: 2px solid #e5e7eb;
+        }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #1a1a1a;
-        color: #e5e5e5;
-    }
-    
-    .container {
-        background-color: #262626;
-        color: #e5e5e5; /* Light text for dark mode */
-    }
-    
-    .lesson-section {
-        background-color: #333;
-        color: #e5e5e5;
-    }
-    
-    .example-box {
-        background-color: #2d3748;
-        color: #e5e5e5;
-    }
-    
-    .key-point {
-        background-color: #4a3618;
-        color: #fde68a; /* Light amber text for dark mode */
-    }
-    
-    .metrics, .slider-container {
-        background-color: #333;
-        color: #e5e5e5;
-    }
-    
-    .metric {
-        background-color: #404040;
-        color: #e5e5e5;
-    }
-    
-    h1, h2 {
-        color: #60a5fa; /* Lighter blue for dark mode */
-    }
-    
-    .quiz-section {
-        color: #86efac; /* Lighter green for dark mode */
-    }
-}
+        .object {
+            width: clamp(30px, 5vw, 50px);
+            height: clamp(30px, 5vw, 50px);
+            background-color: #2563eb;
+            position: absolute;
+            bottom: 20px;
+            border-radius: 5px;
+            transition: transform 0.05s linear;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .surface {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            height: 2px;
+            background-color: #94a3b8;
+        }
+
+        .control-panel {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: clamp(0.5rem, 1vw, 0.8rem) clamp(1rem, 2vw, 1.5rem);
+            border: none;
+            border-radius: 6px;
+            background-color: #2563eb;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .slider-container {
+            margin: 0.8rem 0;
+            padding: 0.5rem;
+            background-color: #f8fafc;
+            border-radius: 6px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .metric {
+            padding: 0.8rem;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            text-align: center;
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+        }
+
+        .quiz-section {
+            margin: 1.5rem 0;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            background-color: #f0fdf4;
+            border-radius: 8px;
+            border-left: 4px solid #16a34a;
+        }
+
+        .quiz-question {
+            margin: 1rem 0;
+        }
+
+        .quiz-options {
+            margin-left: 1.5rem;
+        }
+
+        .quiz-options label {
+            display: block;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .quiz-options label:hover {
+            background-color: #f0f9ff;
+        }
+
+        #quizFeedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .equations {
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 6px;
+            margin: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 640px) {
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #e5e5e5;
+            }
+            
+            .container {
+                background-color: #262626;
+            }
+            
+            .lesson-section {
+                background-color: #333;
+            }
+            
+            .example-box {
+                background-color: #2d3748;
+            }
+            
+            .key-point {
+                background-color: #4a3618;
+            }
+            
+            .metrics, .slider-container {
+                background-color: #333;
+            }
+            
+            .metric {
+                background-color: #404040;
+            }
+            
+            input[type="range"] {
+                background-color: #404040;
+            }
+            
+            .quiz-options label:hover {
+                background-color: #2d3748;
+            }
+        }
     </style>
 </head>
 <body>
