@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumenos - Pricing Plans</title>
+    <title>Lumenos - Interactive Physics Experience</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
         .gradient-text {
             background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD);
             -webkit-background-clip: text;
@@ -15,8 +25,16 @@
             color: transparent;
         }
 
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        }
+
         .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
             transform-style: preserve-3d;
             perspective: 1000px;
         }
@@ -26,406 +44,380 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        .nav-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .nav-menu.active {
-            transform: translateX(0);
-        }
-
-        .menu-btn {
-            width: 30px;
-            height: 20px;
-            position: relative;
-            cursor: pointer;
-            z-index: 50;
-        }
-
-        .menu-btn__bar {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background-color: white;
-            transition: all 0.3s ease;
-        }
-
-        .menu-btn__bar:nth-child(1) { top: 0; }
-        .menu-btn__bar:nth-child(2) { top: 9px; }
-        .menu-btn__bar:nth-child(3) { top: 18px; }
-
-        .menu-btn.active .menu-btn__bar:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
-        }
-
-        .menu-btn.active .menu-btn__bar:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-btn.active .menu-btn__bar:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
+        .parallax-bg {
+            background-image: url('/api/placeholder/1920/1080');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
         }
 
         .glow {
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-            transition: all 0.3s ease;
+            transition: box-shadow 0.3s ease;
         }
 
         .glow:hover {
             box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
-            transform: translateY(-2px);
         }
 
-        .subscribe-btn {
-            background: linear-gradient(45deg, #3B82F6, #60A5FA);
-            transition: all 0.3s ease;
-        }
-
-        .subscribe-btn:hover {
-            background: linear-gradient(45deg, #2563EB, #3B82F6);
-            transform: translateY(-2px);
+        .nav-scrolled {
+            background: rgba(30, 58, 138, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         @media (max-width: 768px) {
-            .desktop-nav {
-                display: none;
-            }
-        }
+    .mobile-menu-btn {
+        display: block;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        z-index: 1001;
+    }
+    .mobile-menu-btn span {
+        display: block;
+        width: 25px;
+        height: 2px;
+        background-color: #fff;
+        margin: 5px 0;
+        transition: all 0.3s ease;
+    }
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        width: 100%;
+        background: rgba(8, 8, 16, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        transition: right 0.3s ease;
+        padding: 2rem;
+        z-index: 1000;
+    }
+    .nav-links.active {
+        right: 0;
+    }
+}
     </style>
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg bg-opacity-90">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="/api/placeholder/48/48" alt="Lumenos Logo" class="h-12">
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="desktop-nav hidden md:flex space-x-8">
-                    <a href="#experiments" class="hover:text-blue-300 transition-colors">Experiments</a>
-                    <a href="#features" class="hover:text-blue-300 transition-colors">Features</a>
-                    <a href="#about" class="hover:text-blue-300 transition-colors">About</a>
-                    <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full">Start Learning</a>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <div class="menu-btn md:hidden">
-                    <span class="menu-btn__bar"></span>
-                    <span class="menu-btn__bar"></span>
-                    <span class="menu-btn__bar"></span>
-                </div>
+<nav class="fixed w-full z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg bg-opacity-90">
+    <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                     alt="Lumenos Logo" 
+                     class="h-12">
             </div>
-        </div>
-
-        <!-- Mobile Navigation -->
-        <div class="nav-menu fixed top-0 right-0 h-full w-full bg-gray-900/95 backdrop-blur-lg md:hidden">
-            <div class="flex flex-col items-center justify-center h-full space-y-8">
-                <a href="#experiments" class="text-2xl hover:text-blue-300 transition-colors">Experiments</a>
-                <a href="#features" class="text-2xl hover:text-blue-300 transition-colors">Features</a>
-                <a href="#about" class="text-2xl hover:text-blue-300 transition-colors">About</a>
-                <a href="#contact" class="glow bg-blue-600 px-8 py-3 rounded-full text-xl">Start Learning</a>
+            <div class="nav-links hidden md:flex space-x-8">
+                <a href="#experiments" class="hover:text-blue-300 transition-colors duration-300">Experiments</a>
+                <a href="#features" class="hover:text-blue-300 transition-colors duration-300">Features</a>
+                <a href="#about" class="hover:text-blue-300 transition-colors duration-300">About</a>
+                <a href="billing.html" class="hover:text-blue-300 transition-colors duration-300">Pricing</a>
+                <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Start Learning</a>
             </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <div class="relative pt-32 pb-20 bg-gradient-to-b from-gray-900 to-blue-900/20">
-        <div class="container mx-auto px-6 text-center">
-            <h1 class="text-5xl md:text-6xl font-bold mb-8 gradient-text">Choose Your Path to Discovery</h1>
-            <p class="text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
-                Select the plan that best fits your journey into the fascinating world of physics
-            </p>
+            <button class="mobile-menu-btn block md:hidden">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </div>
+</nav>
 
-    <!-- Pricing Cards -->
-    <div class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- Photon Plan -->
-                <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden">
-                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-2xl"></div>
-                    
-                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Photon Explorer</h3>
-                    <p class="text-gray-400 mb-4">Begin your quantum journey</p>
-                    <div class="text-3xl font-bold text-white mb-6">
-                        $29.99<span class="text-lg font-normal text-gray-400">/month</span>
-                    </div>
-                    
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Core Physics Simulations</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Quantum Playground Access</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Wave Function Analysis</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Particle Community Access</span>
-                        </li>
-                    </ul>
-                    
-                    <div id="paypal-button-photon" class="mt-6"></div>
-                    </script>
-                </div>
+<!-- Hero Section -->
+<div class="relative min-h-screen flex items-center justify-center parallax-bg overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-blue-900/90 to-gray-900/90"></div>
+    <div class="container mx-auto px-6 relative z-10 text-center">
+        <h1 class="text-6xl md:text-7xl font-bold mb-8 gradient-text">
+            Experience Physics
+        </h1>
+        <p class="text-xl md:text-2xl text-blue-200 mb-12 max-w-2xl mx-auto">
+            Dive into an interactive world of physics simulations. Learn, experiment, and discover the laws that govern our universe.
+        </p>
+        <div class="flex flex-col md:flex-row gap-6 justify-center">
+            <a href="#experiments" class="glow bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300">
+                Explore Simulations
+            </a>
+            <a href="billing.html" class="border-2 border-blue-400 text-blue-400 px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-400 hover:text-white transition-all duration-300">
+                Learn More
+            </a>
+        </div>
+    </div>
+</div>
 
-                <!-- Supernova Plan -->
-                <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden border-2 border-blue-400">
-                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/30 rounded-full blur-2xl"></div>
-                    <div class="absolute top-0 right-0 mt-4 mr-4">
-                        <span class="bg-blue-400 text-white text-sm px-3 py-1 rounded-full">Most Popular</span>
-                    </div>
-                    
-                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Supernova Master</h3>
-                    <p class="text-gray-400 mb-4">Unleash infinite possibilities</p>
-                    <div class="text-3xl font-bold text-white mb-6">
-                        $69.99<span class="text-lg font-normal text-gray-400">/month</span>
-                    </div>
-                    
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>All Photon Explorer Features</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Advanced Quantum Tools</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Quantum Entanglement Sessions</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Spacetime Manipulation Lab</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Dark Matter Priority Support</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Quantum State Downloads</span>
-                        </li>
-                    </ul>
-                    
-                    <div id="paypal-button-supernova" class="mt-6"></div>
-                    </script>
-                </div>
+<!-- Experiment Categories -->
+<div id="experiments" class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
+    <div class="container mx-auto px-6">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Interactive Experiments</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Newtonian Physics -->
+            <div class="card-hover bg-gray-800 rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                <h3 class="text-2xl font-bold text-blue-400 mb-4">Newtonian Physics</h3>
+                <ul class="space-y-3 relative z-10">
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Newton's First Law</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Newton's Second Law</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Newton's Third Law</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Projectile Motion</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Wave Physics -->
+            <div class="card-hover bg-gray-800 rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                <h3 class="text-2xl font-bold text-blue-400 mb-4">Wave Physics</h3>
+                <ul class="space-y-3 relative z-10">
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Wave Motion</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Sound Waves</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Light Waves</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Wave Interference</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quantum Physics -->
+            <div class="card-hover bg-gray-800 rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                <h3 class="text-2xl font-bold text-blue-400 mb-4">Quantum Physics</h3>
+                <ul class="space-y-3 relative z-10">
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Wave Functions</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Quantum States</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Particle Physics</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="billing.html">Quantum Tunneling</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- FAQ Section -->
-    <div class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Frequently Asked Questions</h2>
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Can I switch between plans?</h3>
-                    <p class="text-gray-300">Yes! You can upgrade or downgrade your plan at any time. Changes will take effect at the start of your next billing cycle.</p>
-                </div>
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Is there a trial period?</h3>
-                    <p class="text-gray-300">We offer a 14-day free trial on both plans so you can explore the quantum realm risk-free.</p>
-                </div>
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Are there any hidden fees?</h3>
-                    <p class="text-gray-300">No hidden fees or surprises. The price you see is what you pay, with all features included in your chosen plan.</p>
-                </div>
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Can I cancel anytime?</h3>
-                    <p class="text-gray-300">Absolutely! You can cancel your subscription at any time with no cancellation fees or long-term commitments.</p>
-                </div>
+<!-- Features Section -->
+<div id="features" class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
+    <div class="container mx-auto px-6">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Cutting-Edge Features</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="card-hover bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-blue-400 text-4xl mb-4 float-animation">🔬</div>
+                <h3 class="text-xl font-bold text-blue-400 mb-3">Real-time Physics</h3>
+                <p class="text-gray-400">Experience physics phenomena with accurate, real-time simulations.</p>
+            </div>
+            
+            <div class="card-hover bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-blue-400 text-4xl mb-4 float-animation">📊</div>
+                <h3 class="text-xl font-bold text-blue-400 mb-3">Data Analysis</h3>
+                <p class="text-gray-400">Collect and analyze data with advanced visualization tools.</p>
+            </div>
+
+            <div class="card-hover bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-blue-400 text-4xl mb-4 float-animation">🎯</div>
+                <h3 class="text-xl font-bold text-blue-400 mb-3">Interactive Learning</h3>
+                <p class="text-gray-400">Engage with customizable experiments and hands-on learning.</p>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 border-t border-gray-800">
-        <div class="container mx-auto px-6 py-12">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <img src="/api/placeholder/48/48" alt="Lumenos Logo" class="h-12 mb-4">
-                    <p class="text-gray-400">Revolutionizing physics education through interactive simulations.</p>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-blue-400 mb-4">Quick Links</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Home</a></li>
-                        <li><a href="#pricing" class="hover:text-blue-400 transition-colors">Pricing</a></li>
-                        <li><a href="#features" class="hover:text-blue-400 transition-colors">Features</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-blue-400 mb-4">Resources</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Documentation</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Tutorial Videos</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Support</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-blue-400 mb-4">Contact</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Help Center</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Community</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Get in Touch</a></li>
-                    </ul>
-                </div>
+<!-- Footer -->
+<footer class="bg-gray-900 border-t border-gray-800">
+    <div class="container mx-auto px-6 py-12">
+        <div class="grid md:grid-cols-4 gap-8">
+            <div>
+                <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                     alt="Lumenos Logo" 
+                     class="h-12 mb-4">
+                <p class="text-gray-400">Revolutionizing physics education through interactive simulations.</p>
             </div>
-            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 Lumenos. All rights reserved.</p>
+            <div>
+                <h3 class="text-lg font-bold text-blue-400 mb-4">Quick Links</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Home</a></li>
+                    <li><a href="#experiments" class="hover:text-blue-400 transition-colors">Experiments</a></li>
+                    <li><a href="#features" class="hover:text-blue-400 transition-colors">Features</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-blue-400 mb-4">Resources</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Documentation</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Tutorial Videos</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Support</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-blue-400 mb-4">Connect</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Contact</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Community</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Blog</a></li>
+                </ul>
             </div>
         </div>
-    </footer>
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 LumenOS. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
-    <!-- PayPal Script -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
     <script>
-        // PayPal Button Initialization
-        window.onload = function() {
-            // Photon Plan Button ($29.99)
-            paypal.Buttons({
-                style: {
-                    shape: 'rect',
-                    color: 'gold',
-                    layout: 'vertical',
-                    label: 'subscribe'
-                },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        plan_id: 'P-79G95984L4854274GM5K3XQA' // Photon Plan ID
-                    });
-                },
-                onApprove: function(data, actions) {
-                    alert('You have successfully subscribed to the Photon Explorer plan!');
-                }
-            }).render('#paypal-button-photon');
-
-            // Supernova Plan Button ($69.99)
-            paypal.Buttons({
-                style: {
-                    shape: 'rect',
-                    color: 'gold',
-                    layout: 'vertical',
-                    label: 'subscribe'
-                },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        plan_id: 'P-3NN66623W8844184NM5K3XQA' // Supernova Plan ID
-                    });
-                },
-                onApprove: function(data, actions) {
-                    alert('You have successfully subscribed to the Supernova Master plan!');
-                }
-            }).render('#paypal-button-supernova');
-        };
-
-        // Initialize mobile menu
-        const menuBtn = document.querySelector('.menu-btn');
-        const navMenu = document.querySelector('.nav-menu');
-        const mobileLinks = document.querySelectorAll('.nav-menu a');
-
-        menuBtn.addEventListener('click', () => {
-            menuBtn.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                menuBtn.classList.remove('active');
-                navMenu.classList.remove('active');
-            });
-        });
-
-        // GSAP Animations
+        // Initialize GSAP and ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
 
-        // Animate pricing cards
-        const cards = gsap.utils.toArray('.card-hover');
-        cards.forEach(card => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top bottom-=100",
-                    end: "bottom top",
-                    toggleActions: "play none none reverse"
-                },
-                y: 50,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.out"
-            });
+        // Wait for DOM Content to be loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeParticles();
+            initializeCardAnimations();
+            initializeScrollAnimations();
+            initializeNavigation();
         });
 
-        // Animate gradient texts
-        const gradientTexts = gsap.utils.toArray('.gradient-text');
-        gradientTexts.forEach(text => {
-            gsap.from(text, {
-                scrollTrigger: {
-                    trigger: text,
-                    start: "top bottom-=100",
-                    end: "bottom top",
-                    toggleActions: "play none none reverse"
-                },
-                y: 30,
-                opacity: 0,
-                duration: 1,
-                ease: "power2.out"
+        // Particle effect
+        function initializeParticles() {
+            document.addEventListener('mousemove', (e) => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                particle.style.width = Math.random() * 10 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                
+                document.body.appendChild(particle);
+                
+                gsap.to(particle, {
+                    duration: 1,
+                    opacity: 1,
+                    y: -100,
+                    ease: "power2.out",
+                    onComplete: () => particle.remove()
+                });
             });
-        });
+        }
 
-        // Handle subscription buttons
-        const subscribeButtons = document.querySelectorAll('.subscribe-btn');
-        subscribeButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const plan = e.target.dataset.plan;
-                // Here you would typically integrate with your payment provider
-                console.log(`Subscribing to ${plan} plan`);
+        // Card Animations
+        function initializeCardAnimations() {
+            const cards = document.querySelectorAll('.card-hover');
+            
+            cards.forEach((card, index) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8,
+                    delay: index * 0.2
+                });
             });
-        });
+        }
 
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+        // Scroll Animations
+        function initializeScrollAnimations() {
+            // Animate section titles
+            gsap.utils.toArray('.gradient-text').forEach(title => {
+                gsap.from(title, {
+                    scrollTrigger: {
+                        trigger: title,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 0,
+                    y: 30,
+                    duration: 1,
+                    ease: "power3.out"
+                });
+            });
+
+            // Animate feature icons
+            gsap.utils.toArray('.float-animation').forEach(icon => {
+                gsap.to(icon, {
+                    y: -20,
+                    duration: 2,
+                    ease: "power1.inOut",
+                    repeat: -1,
+                    yoyo: true
+                });
+            });
+
+            // Navbar effect on scroll
+            const navbar = document.querySelector('nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('nav-scrolled');
+                } else {
+                    navbar.classList.remove('nav-scrolled');
                 }
             });
-        });
+        }
+
+        // Navigation
+        function initializeNavigation() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuBtn.addEventListener('click', () => {
+        menuBtn.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+});
     </script>
+</body>
+</html>
