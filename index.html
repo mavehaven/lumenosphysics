@@ -66,6 +66,56 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+        
+        .mobile-menu {
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+        
+        .hamburger {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            transition: all 0.25s;
+            position: relative;
+        }
+        
+        .hamburger-top,
+        .hamburger-middle,
+        .hamburger-bottom {
+            position: absolute;
+            width: 24px;
+            height: 2px;
+            top: 0;
+            left: 0;
+            background: #fff;
+            transform: rotate(0);
+            transition: all 0.5s;
+        }
+        
+        .hamburger-middle {
+            transform: translateY(7px);
+        }
+        
+        .hamburger-bottom {
+            transform: translateY(14px);
+        }
+        
+        .open .hamburger-top {
+            transform: rotate(45deg) translateY(6px) translateX(6px);
+        }
+        
+        .open .hamburger-middle {
+            display: none;
+        }
+        
+        .open .hamburger-bottom {
+            transform: rotate(-45deg) translateY(6px) translateX(-6px);
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -83,6 +133,12 @@
                 <a href="#features" class="hover:text-blue-300 transition-colors duration-300">Features</a>
                 <a href="#about" class="hover:text-blue-300 transition-colors duration-300">About</a>
                 <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Start Learning</a>
+                <!-- Hamburger Button -->
+              <button id="menu-btn" class="hamburger block md:hidden focus:outline-none">
+                  <span class="hamburger-top"></span>
+                  <span class="hamburger-middle"></span>
+                  <span class="hamburger-bottom"></span>
+              </button>
             </div>
         </div>
     </div>
@@ -266,6 +322,7 @@
             initializeCardAnimations();
             initializeScrollAnimations();
             initializeNavigation();
+            initializeMobileMenu();
         });
 
         // Particle effect
@@ -365,6 +422,33 @@
                 });
             });
         }
+        
+        function initializeMobileMenu() {
+    const btn = document.getElementById('menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    const mobileLinks = menu.querySelectorAll('a');
+
+    btn.addEventListener('click', () => {
+        btn.classList.toggle('open');
+        menu.classList.toggle('active');
+    });
+
+    // Close menu when clicking mobile links
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            btn.classList.remove('open');
+            menu.classList.remove('active');
+        });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            btn.classList.remove('open');
+            menu.classList.remove('active');
+        }
+    });
+}
     </script>
 </body>
 </html>
