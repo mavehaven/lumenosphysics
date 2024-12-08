@@ -3,344 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physics Simulator - Learn Physics Interactively</title>
+    <title>Lumenos - Interactive Physics Experience</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
-        @keyframes pendulumWave {
-            0% { transform: rotate(-15deg); }
-            50% { transform: rotate(15deg); }
-            100% { transform: rotate(-15deg); }
-        }
-        .pendulum {
-            transform-origin: top center;
-            animation: pendulumWave 2s infinite ease-in-out;
-        }
-        .pendulum-1 { animation-delay: 0s; }
-        .pendulum-2 { animation-delay: 0.2s; }
-        .pendulum-3 { animation-delay: 0.4s; }
-        .pendulum-4 { animation-delay: 0.6s; }
-        .pendulum-5 { animation-delay: 0.8s; }
-
-        .typing {
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 3px solid white;
-            animation: typing 3.5s steps(40, end),
-                       blink-caret .75s step-end infinite;
-            display: inline-block;
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
         }
 
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 50% }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: white; }
+        .gradient-text {
+            background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        .fade-in {
+        .particle {
+            position: absolute;
+            pointer-events: none;
             opacity: 0;
-            animation: fadeIn 1s ease-in forwards;
-            animation-delay: 3.5s;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .card-hover {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            perspective: 1000px;
         }
 
-        @keyframes orbit {
-            from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
-            to { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+        .card-hover:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        .electron {
-            animation: orbit 3s linear infinite;
+        .parallax-bg {
+            background-image: url('/api/placeholder/1920/1080');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
         }
 
-        .simulation-link {
-            transition: transform 0.2s;
+        .glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            transition: box-shadow 0.3s ease;
         }
 
-        .simulation-link:hover {
-            transform: translateY(-2px);
+        .glow:hover {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        }
+
+        .nav-scrolled {
+            background: rgba(30, 58, 138, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-900 text-white">
     <!-- Navigation -->
-    <nav class="bg-blue-600 text-white shadow-lg">
-        <div class="container mx-auto px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
-                         alt="Physics Simulator Logo" 
-                         class="h-12">
-                </div>
-                <div class="hidden md:flex space-x-6">
-                    <a href="#about" class="hover:text-blue-200 transition">About</a>
-                    <a href="#simulations" class="hover:text-blue-200 transition">Simulations</a>
-                    <a href="#features" class="hover:text-blue-200 transition">Features</a>
-                    <a href="#contact" class="hover:text-blue-200 transition">Contact</a>
-                </div>
+<nav class="fixed w-full z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg bg-opacity-90">
+    <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                     alt="Lumenos Logo" 
+                     class="h-12">
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#experiments" class="hover:text-blue-300 transition-colors duration-300">Experiments</a>
+                <a href="#features" class="hover:text-blue-300 transition-colors duration-300">Features</a>
+                <a href="#about" class="hover:text-blue-300 transition-colors duration-300">About</a>
+                <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Start Learning</a>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Hero Section with Physics Animations -->
-    <div class="bg-blue-700 text-white py-20 relative overflow-hidden">
-        <!-- Animated Physics Elements -->
-        <div class="absolute inset-0 opacity-20">
-            <!-- Pendulum Wave -->
-            <svg width="100%" height="120" viewBox="0 0 800 120" class="absolute top-0">
-                <g transform="translate(250,5)">
-                    <line x1="0" y1="0" x2="300" y2="0" stroke="white" stroke-width="2"/>
-                    <g class="pendulum pendulum-1" transform="translate(30,0)">
-                        <line x1="0" y1="0" x2="0" y2="60" stroke="white" stroke-width="1"/>
-                        <circle cx="0" cy="60" r="8" fill="white"/>
-                    </g>
-                    <g class="pendulum pendulum-2" transform="translate(90,0)">
-                        <line x1="0" y1="0" x2="0" y2="60" stroke="white" stroke-width="1"/>
-                        <circle cx="0" cy="60" r="8" fill="white"/>
-                    </g>
-                    <g class="pendulum pendulum-3" transform="translate(150,0)">
-                        <line x1="0" y1="0" x2="0" y2="60" stroke="white" stroke-width="1"/>
-                        <circle cx="0" cy="60" r="8" fill="white"/>
-                    </g>
-                    <g class="pendulum pendulum-4" transform="translate(210,0)">
-                        <line x1="0" y1="0" x2="0" y2="60" stroke="white" stroke-width="1"/>
-                        <circle cx="0" cy="60" r="8" fill="white"/>
-                    </g>
-                    <g class="pendulum pendulum-5" transform="translate(270,0)">
-                        <line x1="0" y1="0" x2="0" y2="60" stroke="white" stroke-width="1"/>
-                        <circle cx="0" cy="60" r="8" fill="white"/>
-                    </g>
-                </g>
-            </svg>
-
-            <!-- Atom Model -->
-            <svg viewBox="0 0 200 200" class="absolute right-0 top-0" width="200" height="200">
-                <circle cx="100" cy="100" r="3" fill="white"/>
-                <circle class="electron" cx="100" cy="100" r="2" fill="white"/>
-                <circle class="electron" cx="100" cy="100" r="2" fill="white" style="animation-delay: -1s"/>
-                <circle class="electron" cx="100" cy="100" r="2" fill="white" style="animation-delay: -2s"/>
-            </svg>
-        </div>
-
-        <!-- Hero Content -->
-        <div class="container mx-auto px-6 text-center relative z-10">
-            <h1 class="text-5xl font-bold mb-4">
-                <span class="typing">Learn Physics Interactively</span>
-            </h1>
-            <p class="text-xl mb-8 fade-in">Explore physics concepts through hands-on simulations</p>
-            <a href="#simulations" class="bg-yellow-500 text-blue-900 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition fade-in inline-block">
-                Start Exploring
+<!-- Hero Section -->
+<div class="relative min-h-screen flex items-center justify-center parallax-bg overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-blue-900/90 to-gray-900/90"></div>
+    <div class="container mx-auto px-6 relative z-10 text-center">
+        <h1 class="text-6xl md:text-7xl font-bold mb-8 gradient-text">
+            Experience Physics
+        </h1>
+        <p class="text-xl md:text-2xl text-blue-200 mb-12 max-w-2xl mx-auto">
+            Dive into an interactive world of physics simulations. Learn, experiment, and discover the laws that govern our universe.
+        </p>
+        <div class="flex flex-col md:flex-row gap-6 justify-center">
+            <a href="#experiments" class="glow bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300">
+                Explore Simulations
+            </a>
+            <a href="#about" class="border-2 border-blue-400 text-blue-400 px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-400 hover:text-white transition-all duration-300">
+                Learn More
             </a>
         </div>
     </div>
+</div>
 
-    <!-- Simulation Categories -->
-    <div id="simulations" class="container mx-auto px-6 py-12">
+<!-- Experiment Categories -->
+<div id="experiments" class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
+    <div class="container mx-auto px-6">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Interactive Experiments</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Newtonian Physics -->
-            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                <h3 class="text-2xl font-bold text-blue-800 mb-4">Newtonian Physics Group</h3>
-                <ul class="space-y-3">
-                    <li><a href="newtons_first_law.html" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Newton's First Law
-                    </a></li>
-                    <li><a href="/simulations/newton-second" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Newton's Second Law
-                    </a></li>
-                    <li><a href="/simulations/newton-third" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Newton's Third Law
-                    </a></li>
-                    <li><a href="/simulations/projectile" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Projectile Motion
-                    </a></li>
+            <div class="card-hover bg-gray-800 rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                <h3 class="text-2xl font-bold text-blue-400 mb-4">Newtonian Physics</h3>
+                <ul class="space-y-3 relative z-10">
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Newton's First Law</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Newton's Second Law</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Newton's Third Law</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Projectile Motion</a>
+                    </li>
                 </ul>
             </div>
 
-            <!-- Forces and Energy -->
-            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                <h3 class="text-2xl font-bold text-blue-800 mb-4">Forces and Energy</h3>
-                <ul class="space-y-3">
-                    <li><a href="/simulations/friction" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Friction Force
-                    </a></li>
-                    <li><a href="/simulations/energy" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Energy Transformation
-                    </a></li>
-                    <li><a href="/simulations/work-power" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Work, Power & Momentum
-                    </a></li>
+            <!-- Wave Physics -->
+            <div class="card-hover bg-gray-800 rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                <h3 class="text-2xl font-bold text-blue-400 mb-4">Wave Physics</h3>
+                <ul class="space-y-3 relative z-10">
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Wave Motion</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Sound Waves</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Light Waves</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Wave Interference</a>
+                    </li>
                 </ul>
             </div>
 
-            <!-- Electromagnetism & Optics -->
-            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                <h3 class="text-2xl font-bold text-blue-800 mb-4">Electromagnetism & Optics</h3>
-                <ul class="space-y-3">
-                    <li><a href="/simulations/em-flux" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Electromagnetic Flux
-                    </a></li>
-                    <li><a href="/simulations/optics" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Optical Physics Simulator
-                    </a></li>
-                </ul>
-            </div>
-
-            <!-- Circuitry and Electronics -->
-            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                <h3 class="text-2xl font-bold text-blue-800 mb-4">Circuitry and Electronics</h3>
-                <ul class="space-y-3">
-                    <li><a href="/simulations/circuit-3d" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> 3D Circuit Simulator
-                    </a></li>
-                </ul>
-            </div>
-
-            <!-- Thermodynamics & Nuclear Physics -->
-            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                <h3 class="text-2xl font-bold text-blue-800 mb-4">Thermodynamics & Nuclear Physics</h3>
-                <ul class="space-y-3">
-                    <li><a href="/simulations/heat-transfer" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Heat Transfer Simulator
-                    </a></li>
-                    <li><a href="/simulations/nuclear" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Nuclear Fission Fusion
-                    </a></li>
-                </ul>
-            </div>
-
-            <!-- Atomic & Wave Physics -->
-            <div class="simulation-link bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                <h3 class="text-2xl font-bold text-blue-800 mb-4">Atomic & Wave Physics</h3>
-                <ul class="space-y-3">
-                    <li><a href="/simulations/bohr" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Bohr Model
-                    </a></li>
-                    <li><a href="/simulations/wave" class="flex items-center text-gray-700 hover:text-blue-600">
-                        <span class="mr-2">•</span> Wave Simulator
-                    </a></li>
+            <!-- Quantum Physics -->
+            <div class="card-hover bg-gray-800 rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                <h3 class="text-2xl font-bold text-blue-400 mb-4">Quantum Physics</h3>
+                <ul class="space-y-3 relative z-10">
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Wave Functions</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Quantum States</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Particle Physics</a>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors">
+                        <span>•</span>
+                        <a href="#">Quantum Tunneling</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Features Section -->
-    <div id="features" class="bg-blue-50 py-12">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-blue-800 mb-8">Interactive Features</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-lg p-6 shadow-md">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">Real-time Interaction</h3>
-                    <p class="text-gray-600">Manipulate variables and see instant results in our interactive simulations.</p>
-                </div>
-                <div class="bg-white rounded-lg p-6 shadow-md">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">Data Visualization</h3>
-                    <p class="text-gray-600">View graphs and charts that update in real-time as you experiment.</p>
-                </div>
-               <div class="bg-white rounded-lg p-6 shadow-md">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">Progress Tracking</h3>
-                    <p class="text-gray-600">Track your understanding with built-in quizzes and progress indicators.</p>
-                </div>
+<!-- Features Section -->
+<div id="features" class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
+    <div class="container mx-auto px-6">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Cutting-Edge Features</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="card-hover bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-blue-400 text-4xl mb-4 float-animation">🔬</div>
+                <h3 class="text-xl font-bold text-blue-400 mb-3">Real-time Physics</h3>
+                <p class="text-gray-400">Experience physics phenomena with accurate, real-time simulations.</p>
+            </div>
+            
+            <div class="card-hover bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-blue-400 text-4xl mb-4 float-animation">📊</div>
+                <h3 class="text-xl font-bold text-blue-400 mb-3">Data Analysis</h3>
+                <p class="text-gray-400">Collect and analyze data with advanced visualization tools.</p>
+            </div>
+
+            <div class="card-hover bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-blue-400 text-4xl mb-4 float-animation">🎯</div>
+                <h3 class="text-xl font-bold text-blue-400 mb-3">Interactive Learning</h3>
+                <p class="text-gray-400">Engage with customizable experiments and hands-on learning.</p>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- About Section -->
-    <div id="about" class="py-12">
-        <div class="container mx-auto px-6">
-            <div class="bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-3xl font-bold text-center text-blue-800 mb-6">About Our Platform</h2>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-bold text-blue-700 mb-3">Our Mission</h3>
-                        <p class="text-gray-600 mb-4">
-                            We believe in making physics education accessible and engaging through interactive simulations 
-                            that bring complex concepts to life.
-                        </p>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-blue-700 mb-3">For Students & Teachers</h3>
-                        <p class="text-gray-600 mb-4">
-                            Whether you're a student exploring physics concepts or a teacher looking for interactive 
-                            teaching tools, our platform provides valuable resources for your physics journey.
-                        </p>
-                    </div>
-                </div>
+<!-- Footer -->
+<footer class="bg-gray-900 border-t border-gray-800">
+    <div class="container mx-auto px-6 py-12">
+        <div class="grid md:grid-cols-4 gap-8">
+            <div>
+                <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                     alt="Lumenos Logo" 
+                     class="h-12 mb-4">
+                <p class="text-gray-400">Revolutionizing physics education through interactive simulations.</p>
             </div>
+            <div>
+                <h3 class="text-lg font-bold text-blue-400 mb-4">Quick Links</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Home</a></li>
+                    <li><a href="#experiments" class="hover:text-blue-400 transition-colors">Experiments</a></li>
+                    <li><a href="#features" class="hover:text-blue-400 transition-colors">Features</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-blue-400 mb-4">Resources</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Documentation</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Tutorial Videos</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Support</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-blue-400 mb-4">Connect</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Contact</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Community</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 LumenOS. All rights reserved.</p>
         </div>
     </div>
+</footer>
 
-    <!-- Contact Section -->
-    <div id="contact" class="bg-blue-50 py-12">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-blue-800 mb-8">Get in Touch</h2>
-            <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
-                <form class="space-y-4">
-                    <div>
-                        <label for="name" class="block text-gray-700 mb-2">Name</label>
-                        <input type="text" id="name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-gray-700 mb-2">Email</label>
-                        <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="message" class="block text-gray-700 mb-2">Message</label>
-                        <textarea id="message" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
-                        Send Message
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    <script>
+        // Initialize GSAP and ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
 
-    <!-- Footer -->
-    <footer class="bg-blue-800 text-white">
-        <div class="container mx-auto px-6 py-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-lg font-bold mb-4">About Us</h3>
-                    <p class="text-blue-200">Making physics education interactive and engaging for students worldwide.</p>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
-                    <ul class="space-y-2 text-blue-200">
-                        <li><a href="#" class="hover:text-white transition">Home</a></li>
-                        <li><a href="#simulations" class="hover:text-white transition">Simulations</a></li>
-                        <li><a href="#features" class="hover:text-white transition">Features</a></li>
-                        <li><a href="#about" class="hover:text-white transition">About</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Resources</h3>
-                    <ul class="space-y-2 text-blue-200">
-                        <li><a href="#" class="hover:text-white transition">Documentation</a></li>
-                        <li><a href="#" class="hover:text-white transition">Tutorial Videos</a></li>
-                        <li><a href="#" class="hover:text-white transition">Teacher Resources</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Connect</h3>
-                    <ul class="space-y-2 text-blue-200">
-                        <li><a href="#contact" class="hover:text-white transition">Contact Us</a></li>
-                        <li><a href="#" class="hover:text-white transition">Support</a></li>
-                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-blue-700 mt-8 pt-8 text-center text-blue-200">
-                <p>&copy; 2024 Physics Simulator. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+        // Wait for DOM Content to be loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeParticles();
+            initializeCardAnimations();
+            initializeScrollAnimations();
+            initializeNavigation();
+        });
 
+        // Particle effect
+        function initializeParticles() {
+            document.addEventListener('mousemove', (e) => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                particle.style.width = Math.random() * 10 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                
+                document.body.appendChild(particle);
+                
+                gsap.to(particle, {
+                    duration: 1,
+                    opacity: 1,
+                    y: -100,
+                    ease: "power2.out",
+                    onComplete: () => particle.remove()
+                });
+            });
+        }
+
+        // Card Animations
+        function initializeCardAnimations() {
+            const cards = document.querySelectorAll('.card-hover');
+            
+            cards.forEach((card, index) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8,
+                    delay: index * 0.2
+                });
+            });
+        }
+
+        // Scroll Animations
+        function initializeScrollAnimations() {
+            // Animate section titles
+            gsap.utils.toArray('.gradient-text').forEach(title => {
+                gsap.from(title, {
+                    scrollTrigger: {
+                        trigger: title,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 0,
+                    y: 30,
+                    duration: 1,
+                    ease: "power3.out"
+                });
+            });
+
+            // Animate feature icons
+            gsap.utils.toArray('.float-animation').forEach(icon => {
+                gsap.to(icon, {
+                    y: -20,
+                    duration: 2,
+                    ease: "power1.inOut",
+                    repeat: -1,
+                    yoyo: true
+                });
+            });
+
+            // Navbar effect on scroll
+            const navbar = document.querySelector('nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('nav-scrolled');
+                } else {
+                    navbar.classList.remove('nav-scrolled');
+                }
+            });
+        }
+
+        // Navigation
+        function initializeNavigation() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+    </script>
 </body>
 </html>
