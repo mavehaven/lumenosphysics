@@ -183,8 +183,7 @@
                         </li>
                     </ul>
                     
-                    <div id="paypal-button-container-P-79G95984L4854274GM5K3XQA"></div>
-                    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+                    <div id="paypal-button-photon"></div>
                     <script>
                       paypal.Buttons({
                           style: {
@@ -202,7 +201,8 @@
                           onApprove: function(data, actions) {
                             alert('You have successfully created subscription ' + data.subscriptionID);
                           }
-                      }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA');
+                      }).render('#paypal-button-photon');
+                    </script>
                     </script>
                 </div>
 
@@ -258,8 +258,7 @@
                         </li>
                     </ul>
                     
-                    <div id="paypal-button-container-P-5YX14737G97958014M5K3XQY"></div>
-                    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+                    <div id="paypal-button-supernova"></div>
                     <script>
                       paypal.Buttons({
                           style: {
@@ -277,7 +276,8 @@
                           onApprove: function(data, actions) {
                             alert('You have successfully created subscription ' + data.subscriptionID);
                           }
-                      }).render('#paypal-button-container-P-5YX14737G97958014M5K3XQY');
+                      }).render('#paypal-button-supernova');
+                    </script>
                     </script>
                 </div>
             </div>
