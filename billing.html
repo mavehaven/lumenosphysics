@@ -3,399 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LumenosPhys Premium Subscription</title>
+    <title>Lumenos - Pricing Plans</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Yoco SDK -->
-    <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
-</head>
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- Navigation -->
-        <nav class="bg-blue-800 shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex">
-                        <a href="/" class="flex items-center">
-                            <span class="text-white text-xl font-bold">LumenosPhys</span>
-                        </a>
-                    </div>
-                    <div class="flex items-center">
-                        <span id="userEmail" class="text-white mr-4"></span>
-                        <button id="logoutBtn" class="text-white hover:text-gray-200">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </nav>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
 
-        <!-- Main Content -->
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <!-- Current Plan Status -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">Your Current Plan</h2>
-                        <p id="currentPlanStatus" class="mt-1 text-sm text-gray-500">Loading...</p>
-                    </div>
-                    <div class="flex items-center">
-                        <span id="trialBadge" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full hidden">
-                            Trial Active
-                        </span>
-                    </div>
-                </div>
-            </div>
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
 
-            <!-- Subscription Plans -->
-            <div class="space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
-                <!-- Basic Plan -->
-                <div class="relative p-8 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col">
-                    <div class="flex-1">
-                        <h3 class="text-xl font-semibold text-gray-900">Basic</h3>
-                        <p class="mt-4 flex items-baseline text-gray-900">
-                            <span class="text-5xl font-bold tracking-tight">Free</span>
-                            <span class="ml-1 text-xl font-semibold">/forever</span>
-                        </p>
-                        <p class="mt-6 text-gray-500">Basic physics simulations for everyone.</p>
+        .gradient-text {
+            background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-                        <ul role="list" class="mt-6 space-y-6">
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Newton's Laws Simulations</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Basic Tutorial Content</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Community Support</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <button class="mt-8 block w-full bg-gray-200 text-gray-600 rounded-md py-2 text-sm font-semibold text-center" disabled>
-                        Current Plan
-                    </button>
-                </div>
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        }
 
-                <!-- Premium Monthly Plan -->
-                <div class="relative p-8 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col">
-                    <div class="flex-1">
-                        <h3 class="text-xl font-semibold text-gray-900">Premium Monthly</h3>
-                        <p class="mt-4 flex items-baseline text-gray-900">
-                            <span class="text-5xl font-bold tracking-tight">R399</span>
-                            <span class="ml-1 text-xl font-semibold">/month</span>
-                        </p>
-                        <p class="mt-6 text-gray-500">Advanced simulations and premium features.</p>
+        .card-hover {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
 
-                        <ul role="list" class="mt-6 space-y-6">
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">All Basic Features</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Advanced Simulations</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Priority Support</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Interactive Exercises</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <button id="monthlySubscribeBtn" class="mt-8 block w-full bg-blue-800 text-white rounded-md py-2 text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
-                        Subscribe Monthly
-                    </button>
-                </div>
+        .card-hover:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
 
-                <!-- Premium Annual Plan -->
-                <div class="relative p-8 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col">
-                    <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2">
-                        <span class="inline-flex rounded-full bg-green-100 px-4 py-1 text-xs font-semibold text-green-600">
-                            Save 20%
-                        </span>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-semibold text-gray-900">Premium Annual</h3>
-                        <p class="mt-4 flex items-baseline text-gray-900">
-                            <span class="text-5xl font-bold tracking-tight">R3,828</span>
-                            <span class="ml-1 text-xl font-semibold">/year</span>
-                        </p>
-                        <p class="mt-6 text-gray-500">Best value for committed learners.</p>
+        .glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            transition: box-shadow 0.3s ease;
+        }
 
-                        <ul role="list" class="mt-6 space-y-6">
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">All Premium Monthly Features</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">20% Annual Discount</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Offline Access</span>
-                            </li>
-                            <li class="flex">
-                                <i class="fas fa-check flex-shrink-0 text-green-500"></i>
-                                <span class="ml-3 text-gray-500">Premium Support</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <button id="annualSubscribeBtn" class="mt-8 block w-full bg-blue-800 text-white rounded-md py-2 text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
-                        Subscribe Annually
-                    </button>
-                </div>
-            </div>
+        .glow:hover {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        }
 
-            <!-- Payment Processing Modal -->
-            <div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-                <div class="bg-white p-8 rounded-lg shadow-lg w-96 max-w-md">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold">Complete Payment</h3>
-                        <button id="closePaymentModal" class="text-gray-400 hover:text-gray-500">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div id="payment-form" class="space-y-4">
-                        <!-- Yoco Inline Form will be inserted here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="bg-gray-50 mt-12">
-            <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <div class="mt-8 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between">
-                    <div class="flex space-x-6 md:order-2">
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Terms</span>
-                            Terms of Service
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">Privacy</span>
-                            Privacy Policy
-                        </a>
-                    </div>
-                    <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
-                        &copy; 2024 LumenosPhys. All rights reserved.
-                    </p>
-                </div>
-            </div>
-        </footer>
-    </div>
-    <script>
-      // Initialize Yoco
-const yoco = new window.Yoco({
-    publicKey: 'pk_test_464a83a4rr5mqEM5dc44'  // Replace with your actual public key
-});
-
-// DOM Elements
-const elements = {
-    userEmail: document.getElementById('userEmail'),
-    logoutBtn: document.getElementById('logoutBtn'),
-    currentPlanStatus: document.getElementById('currentPlanStatus'),
-    trialBadge: document.getElementById('trialBadge'),
-    monthlySubscribeBtn: document.getElementById('monthlySubscribeBtn'),
-    annualSubscribeBtn: document.getElementById('annualSubscribeBtn'),
-    paymentModal: document.getElementById('paymentModal'),
-    closePaymentModal: document.getElementById('closePaymentModal'),
-    paymentForm: document.getElementById('payment-form')
-};
-
-// Subscription Plans Configuration
-const SUBSCRIPTION_PLANS = {
-    MONTHLY: {
-        id: 'premium-monthly',
-        price: 39900, // In cents (R399.00)
-        name: 'Premium Monthly'
-    },
-    ANNUAL: {
-        id: 'premium-annual',
-        price: 382800, // In cents (R3,828.00)
-        name: 'Premium Annual'
-    }
-};
-
-// Current user and subscription state
-let currentUser = null;
-let currentSubscription = null;
-
-// Authentication state observer
-function initializeAuth() {
-    // Simulated auth state change listener
-    // Replace with your actual auth implementation
-    const user = localStorage.getItem('user');
-    if (user) {
-        currentUser = JSON.parse(user);
-        updateUIWithUser(currentUser);
-        fetchSubscriptionStatus();
-    } else {
-        window.location.href = '/login';
-    }
-}
-
-// Update UI with user information
-function updateUIWithUser(user) {
-    elements.userEmail.textContent = user.email;
-}
-
-// Fetch current subscription status
-async function fetchSubscriptionStatus() {
-    try {
-        // Simulate API call - replace with actual endpoint
-        const response = await fetch('/api/subscription-status', {
-            headers: {
-                'Authorization': `Bearer ${currentUser.token}`
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                padding: 0.5rem;
+                z-index: 1001;
             }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch subscription status');
-        
-        const subscription = await response.json();
-        currentSubscription = subscription;
-        updateSubscriptionUI(subscription);
-    } catch (error) {
-        console.error('Error fetching subscription:', error);
-        elements.currentPlanStatus.textContent = 'Error loading subscription status';
-    }
-}
-
-// Update UI based on subscription status
-function updateSubscriptionUI(subscription) {
-    if (!subscription || subscription.status === 'inactive') {
-        elements.currentPlanStatus.textContent = 'Free Plan';
-        elements.trialBadge.classList.add('hidden');
-    } else {
-        elements.currentPlanStatus.textContent = `${subscription.plan} (${subscription.status})`;
-        if (subscription.trial) {
-            elements.trialBadge.classList.remove('hidden');
+            .mobile-menu-btn span {
+                display: block;
+                width: 25px;
+                height: 2px;
+                background-color: #fff;
+                margin: 5px 0;
+                transition: all 0.3s ease;
+            }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 100%;
+                background: rgba(8, 8, 16, 0.95);
+                backdrop-filter: blur(10px);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                transition: right 0.3s ease;
+                padding: 2rem;
+                z-index: 1000;
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .mobile-menu-btn.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 6px);
+            }
+            .mobile-menu-btn.active span:nth-child(2) {
+                opacity: 0;
+            }
+            .mobile-menu-btn.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -6px);
+            }
         }
-    }
-}
-
-// Handle subscription button clicks
-async function handleSubscription(planType) {
-    const plan = SUBSCRIPTION_PLANS[planType];
-    showPaymentModal();
-    await initializePaymentForm(plan);
-}
-
-// Show payment modal
-function showPaymentModal() {
-    elements.paymentModal.classList.remove('hidden');
-    elements.paymentModal.classList.add('flex');
-}
-
-// Hide payment modal
-function hidePaymentModal() {
-    elements.paymentModal.classList.remove('flex');
-    elements.paymentModal.classList.add('hidden');
-    elements.paymentForm.innerHTML = ''; // Clear the form
-}
-
-// Initialize Yoco payment form
-async function initializePaymentForm(plan) {
-    elements.paymentForm.innerHTML = `
-        <div class="mb-4">
-            <h4 class="text-lg font-medium text-gray-900">${plan.name}</h4>
-            <p class="text-gray-500">R${(plan.price / 100).toFixed(2)}</p>
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg bg-opacity-90">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Lumenos Logo" 
+                         class="h-12">
+                </div>
+                <div class="nav-links hidden md:flex space-x-8">
+                    <a href="#experiments" class="hover:text-blue-300 transition-colors duration-300">Experiments</a>
+                    <a href="#features" class="hover:text-blue-300 transition-colors duration-300">Features</a>
+                    <a href="#about" class="hover:text-blue-300 transition-colors duration-300">About</a>
+                    <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Start Learning</a>
+                </div>
+                <button class="mobile-menu-btn block md:hidden">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
-        <div id="card-frame"></div>
-        <button id="pay-button" class="mt-4 w-full bg-blue-800 text-white rounded-md py-2 text-sm font-semibold hover:bg-blue-700">
-            Pay Now
-        </button>
-    `;
+    </nav>
 
-    const cardFrame = yoco.inline({
-        layout: 'basic',
-        amountInCents: plan.price,
-        currency: 'ZAR'
-    });
-    cardFrame.mount('#card-frame');
+    <!-- Hero Section -->
+    <div class="relative pt-32 pb-20 bg-gradient-to-b from-gray-900 to-blue-900/20">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-8 gradient-text">Choose Your Path to Discovery</h1>
+            <p class="text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
+                Select the plan that best fits your journey into the fascinating world of physics
+            </p>
+        </div>
+    </div>
 
-    document.getElementById('pay-button').addEventListener('click', async () => {
-        try {
-            const result = await cardFrame.createToken();
-            await processPayment(result.token, plan);
-        } catch (error) {
-            console.error('Payment error:', error);
-            alert(error.message);
-        }
-    });
-}
+    <!-- Pricing Section -->
+    <div id="pricing" class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Unlock the Universe</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                
+                <!-- Photon Plan -->
+                <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-2xl"></div>
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                    
+                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Photon Explorer</h3>
+                    <p class="text-gray-400 mb-4">Begin your quantum journey</p>
+                    <div class="text-3xl font-bold text-white mb-6">
+                        $29.99<span class="text-lg font-normal text-gray-400">/month</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8 relative z-10">
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Core Physics Simulations</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Quantum Playground Access</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Wave Function Analysis</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Particle Community Access</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="#" class="block text-center bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-all duration-300">
+                        Begin Your Journey
+                    </a>
+                </div>
+                
+                <!-- Supernova Plan -->
+                <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden border-2 border-blue-400">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/30 rounded-full blur-2xl"></div>
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                    
+                    <div class="absolute top-0 right-0 mt-4 mr-4">
+                        <span class="bg-blue-400 text-white text-sm px-3 py-1 rounded-full">Most Popular</span>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Supernova Master</h3>
+                    <p class="text-gray-400 mb-4">Unleash infinite possibilities</p>
+                    <div class="text-3xl font-bold text-white mb-6">
+                        $69.99<span class="text-lg font-normal text-gray-400">/month</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8 relative z-10">
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>All Photon Explorer Features</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Advanced Quantum Tools</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Quantum Entanglement Sessions</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                 </svg>
+                            <span>Spacetime Manipulation Lab</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Dark Matter Priority Support</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Quantum State Downloads</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="#" class="block text-center bg-blue-400 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-500 transition-all duration-300 glow">
+                        Ascend to Mastery
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// Process payment and create subscription
-async function processPayment(token, plan) {
-    try {
-        // Simulate API call - replace with actual endpoint
-        const response = await fetch('/api/create-subscription', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentUser.token}`
-            },
-            body: JSON.stringify({
-                token,
-                planId: plan.id,
-                amount: plan.price
-            })
+    <!-- FAQ Section -->
+    <div class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Frequently Asked Questions</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="card-hover bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold text-blue-400 mb-4">Can I switch between plans?</h3>
+                    <p class="text-gray-300">Yes! You can upgrade or downgrade your plan at any time. Changes will take effect at the start of your next billing cycle.</p>
+                </div>
+                <div class="card-hover bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold text-blue-400 mb-4">Is there a trial period?</h3>
+                    <p class="text-gray-300">We offer a 14-day free trial on both plans so you can explore the quantum realm risk-free.</p>
+                </div>
+                <div class="card-hover bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold text-blue-400 mb-4">Are there any hidden fees?</h3>
+                    <p class="text-gray-300">No hidden fees or surprises. The price you see is what you pay, with all features included in your chosen plan.</p>
+                </div>
+                <div class="card-hover bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold text-blue-400 mb-4">Can I cancel anytime?</h3>
+                    <p class="text-gray-300">Absolutely! You can cancel your subscription at any time with no cancellation fees or long-term commitments.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Lumenos Logo" 
+                         class="h-12 mb-4">
+                    <p class="text-gray-400">Revolutionizing physics education through interactive simulations.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Home</a></li>
+                        <li><a href="#pricing" class="hover:text-blue-400 transition-colors">Pricing</a></li>
+                        <li><a href="#features" class="hover:text-blue-400 transition-colors">Features</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-4">Resources</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Tutorial Videos</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-4">Contact</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Community</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Get in Touch</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Lumenos. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize mobile menu
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+
+            menuBtn.addEventListener('click', () => {
+                menuBtn.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            // Initialize GSAP animations
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Animate cards on scroll
+            gsap.utils.toArray('.card-hover').forEach(card => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8
+                });
+            });
+
+            // Animate gradient text
+            gsap.utils.toArray('.gradient-text').forEach(text => {
+                gsap.from(text, {
+                    scrollTrigger: {
+                        trigger: text,
+                        start: "top bottom-=100"
+                    },
+                    opacity: 0,
+                    y: 30,
+                    duration: 1
+                });
+            });
         });
-
-        if (!response.ok) throw new Error('Payment failed');
-
-        const result = await response.json();
-        hidePaymentModal();
-        alert('Subscription successful!');
-        await fetchSubscriptionStatus(); // Refresh subscription status
-    } catch (error) {
-        console.error('Payment processing error:', error);
-        alert('Payment failed: ' + error.message);
-    }
-}
-
-// Handle logout
-function handleLogout() {
-    // Simulate logout - replace with actual logout logic
-    localStorage.removeItem('user');
-    window.location.href = '/login';
-}
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    initializeAuth();
-    
-    elements.monthlySubscribeBtn.addEventListener('click', () => 
-        handleSubscription('MONTHLY')
-    );
-    
-    elements.annualSubscribeBtn.addEventListener('click', () => 
-        handleSubscription('ANNUAL')
-    );
-    
-    elements.closePaymentModal.addEventListener('click', hidePaymentModal);
-    
-    elements.logoutBtn.addEventListener('click', handleLogout);
-    
-    // Close modal when clicking outside
-    elements.paymentModal.addEventListener('click', (e) => {
-        if (e.target === elements.paymentModal) {
-            hidePaymentModal();
-        }
-    });
-});
-
-// Handle errors gracefully
-window.addEventListener('error', (event) => {
-    console.error('Global error:', event.error);
-    alert('An unexpected error occurred. Please try again.');
-});
     </script>
 </body>
 </html>
