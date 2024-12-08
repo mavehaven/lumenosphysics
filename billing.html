@@ -180,9 +180,27 @@
                         </li>
                     </ul>
                     
-                    <a href="#" class="block text-center bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-all duration-300">
-                        Begin Your Journey
-                    </a>
+                    <div id="paypal-button-container-P-79G95984L4854274GM5K3XQA"></div>
+<script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+<script>
+  paypal.Buttons({
+      style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'subscribe'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          /* Creates the subscription */
+          plan_id: 'P-79G95984L4854274GM5K3XQA'
+        });
+      },
+      onApprove: function(data, actions) {
+        alert(data.subscriptionID); // You can add optional success message for the subscriber here
+      }
+  }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA'); // Renders the PayPal button
+</script>
                 </div>
                 
                 <!-- Supernova Plan -->
@@ -239,9 +257,27 @@
                         </li>
                     </ul>
                     
-                    <a href="#" class="block text-center bg-blue-400 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-500 transition-all duration-300 glow">
-                        Ascend to Mastery
-                    </a>
+                    <div id="paypal-button-container-P-79G95984L4854274GM5K3XQA"></div>
+<script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+<script>
+  paypal.Buttons({
+      style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'subscribe'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          /* Creates the subscription */
+          plan_id: 'P-79G95984L4854274GM5K3XQA'
+        });
+      },
+      onApprove: function(data, actions) {
+        alert(data.subscriptionID); // You can add optional success message for the subscriber here
+      }
+  }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA'); // Renders the PayPal button
+</script>
                 </div>
             </div>
         </div>
