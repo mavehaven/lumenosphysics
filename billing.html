@@ -314,7 +314,7 @@
     <script>
         // PayPal Button Initialization
         window.onload = function() {
-            // Photon Plan Button
+            // Photon Plan Button ($29.99)
             paypal.Buttons({
                 style: {
                     shape: 'rect',
@@ -324,15 +324,15 @@
                 },
                 createSubscription: function(data, actions) {
                     return actions.subscription.create({
-                        plan_id: 'P-79G95984L4854274GM5K3XQA'
+                        plan_id: 'P-79G95984L4854274GM5K3XQA' // Photon Plan ID
                     });
                 },
                 onApprove: function(data, actions) {
-                    alert('You have successfully created subscription ' + data.subscriptionID);
+                    alert('You have successfully subscribed to the Photon Explorer plan!');
                 }
             }).render('#paypal-button-photon');
 
-            // Supernova Plan Button
+            // Supernova Plan Button ($69.99)
             paypal.Buttons({
                 style: {
                     shape: 'rect',
@@ -342,11 +342,11 @@
                 },
                 createSubscription: function(data, actions) {
                     return actions.subscription.create({
-                        plan_id: 'P-5YX14737G97958014M5K3XQY'
+                        plan_id: 'P-3NN66623W8844184NM5K3XQA' // Supernova Plan ID
                     });
                 },
                 onApprove: function(data, actions) {
-                    alert('You have successfully created subscription ' + data.subscriptionID);
+                    alert('You have successfully subscribed to the Supernova Master plan!');
                 }
             }).render('#paypal-button-supernova');
         };
