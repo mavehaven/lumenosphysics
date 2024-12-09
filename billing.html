@@ -8,6 +8,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
         .gradient-text {
             background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD);
             -webkit-background-clip: text;
@@ -15,8 +25,16 @@
             color: transparent;
         }
 
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        }
+
         .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
             transform-style: preserve-3d;
             perspective: 1000px;
         }
@@ -26,70 +44,59 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        .nav-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .nav-menu.active {
-            transform: translateX(0);
-        }
-
-        .menu-btn {
-            width: 30px;
-            height: 20px;
-            position: relative;
-            cursor: pointer;
-            z-index: 50;
-        }
-
-        .menu-btn__bar {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background-color: white;
-            transition: all 0.3s ease;
-        }
-
-        .menu-btn__bar:nth-child(1) { top: 0; }
-        .menu-btn__bar:nth-child(2) { top: 9px; }
-        .menu-btn__bar:nth-child(3) { top: 18px; }
-
-        .menu-btn.active .menu-btn__bar:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
-        }
-
-        .menu-btn.active .menu-btn__bar:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-btn.active .menu-btn__bar:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
         .glow {
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-            transition: all 0.3s ease;
+            transition: box-shadow 0.3s ease;
         }
 
         .glow:hover {
             box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
-            transform: translateY(-2px);
-        }
-
-        .subscribe-btn {
-            background: linear-gradient(45deg, #3B82F6, #60A5FA);
-            transition: all 0.3s ease;
-        }
-
-        .subscribe-btn:hover {
-            background: linear-gradient(45deg, #2563EB, #3B82F6);
-            transform: translateY(-2px);
         }
 
         @media (max-width: 768px) {
-            .desktop-nav {
-                display: none;
+            .mobile-menu-btn {
+                display: block;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                padding: 0.5rem;
+                z-index: 1001;
+            }
+            .mobile-menu-btn span {
+                display: block;
+                width: 25px;
+                height: 2px;
+                background-color: #fff;
+                margin: 5px 0;
+                transition: all 0.3s ease;
+            }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 100%;
+                background: rgba(8, 8, 16, 0.95);
+                backdrop-filter: blur(10px);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                transition: right 0.3s ease;
+                padding: 2rem;
+                z-index: 1000;
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .mobile-menu-btn.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 6px);
+            }
+            .mobile-menu-btn.active span:nth-child(2) {
+                opacity: 0;
+            }
+            .mobile-menu-btn.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -6px);
             }
         }
     </style>
@@ -100,33 +107,21 @@
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <img src="/api/placeholder/48/48" alt="Lumenos Logo" class="h-12">
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Lumenos Logo" 
+                         class="h-12">
                 </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="desktop-nav hidden md:flex space-x-8">
-                    <a href="#experiments" class="hover:text-blue-300 transition-colors">Experiments</a>
-                    <a href="#features" class="hover:text-blue-300 transition-colors">Features</a>
-                    <a href="#about" class="hover:text-blue-300 transition-colors">About</a>
-                    <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full">Start Learning</a>
+                <div class="nav-links hidden md:flex space-x-8">
+                    <a href="#experiments" class="hover:text-blue-300 transition-colors duration-300">Experiments</a>
+                    <a href="#features" class="hover:text-blue-300 transition-colors duration-300">Features</a>
+                    <a href="#about" class="hover:text-blue-300 transition-colors duration-300">About</a>
+                    <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Start Learning</a>
                 </div>
-
-                <!-- Mobile Menu Button -->
-                <div class="menu-btn md:hidden">
-                    <span class="menu-btn__bar"></span>
-                    <span class="menu-btn__bar"></span>
-                    <span class="menu-btn__bar"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile Navigation -->
-        <div class="nav-menu fixed top-0 right-0 h-full w-full bg-gray-900/95 backdrop-blur-lg md:hidden">
-            <div class="flex flex-col items-center justify-center h-full space-y-8">
-                <a href="#experiments" class="text-2xl hover:text-blue-300 transition-colors">Experiments</a>
-                <a href="#features" class="text-2xl hover:text-blue-300 transition-colors">Features</a>
-                <a href="#about" class="text-2xl hover:text-blue-300 transition-colors">About</a>
-                <a href="#contact" class="glow bg-blue-600 px-8 py-3 rounded-full text-xl">Start Learning</a>
+                <button class="mobile-menu-btn block md:hidden">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </nav>
@@ -141,13 +136,16 @@
         </div>
     </div>
 
-    <!-- Pricing Cards -->
-    <div class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
+    <!-- Pricing Section -->
+    <div id="pricing" class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
         <div class="container mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Unlock the Universe</h2>
             <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                
                 <!-- Photon Plan -->
                 <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden">
                     <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-2xl"></div>
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
                     
                     <h3 class="text-2xl font-bold text-blue-400 mb-2">Photon Explorer</h3>
                     <p class="text-gray-400 mb-4">Begin your quantum journey</p>
@@ -155,7 +153,7 @@
                         $29.99<span class="text-lg font-normal text-gray-400">/month</span>
                     </div>
                     
-                    <ul class="space-y-4 mb-8">
+                    <ul class="space-y-4 mb-8 relative z-10">
                         <li class="flex items-center space-x-3 text-gray-300">
                             <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -182,14 +180,16 @@
                         </li>
                     </ul>
                     
-                    <button class="subscribe-btn w-full py-3 rounded-lg text-white font-semibold" data-plan="photon">
-                        Subscribe Now
-                    </button>
+                    <a href="#" class="block text-center bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-all duration-300">
+                        Begin Your Journey
+                    </a>
                 </div>
-
+                
                 <!-- Supernova Plan -->
                 <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden border-2 border-blue-400">
                     <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/30 rounded-full blur-2xl"></div>
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
+                    
                     <div class="absolute top-0 right-0 mt-4 mr-4">
                         <span class="bg-blue-400 text-white text-sm px-3 py-1 rounded-full">Most Popular</span>
                     </div>
@@ -200,7 +200,7 @@
                         $69.99<span class="text-lg font-normal text-gray-400">/month</span>
                     </div>
                     
-                    <ul class="space-y-4 mb-8">
+                    <ul class="space-y-4 mb-8 relative z-10">
                         <li class="flex items-center space-x-3 text-gray-300">
                             <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -222,7 +222,7 @@
                         <li class="flex items-center space-x-3 text-gray-300">
                             <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
+                                 </svg>
                             <span>Spacetime Manipulation Lab</span>
                         </li>
                         <li class="flex items-center space-x-3 text-gray-300">
@@ -239,9 +239,9 @@
                         </li>
                     </ul>
                     
-                    <button class="subscribe-btn w-full py-3 rounded-lg text-white font-semibold" data-plan="supernova">
-                        Subscribe Now
-                    </button>
+                    <a href="#" class="block text-center bg-blue-400 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-500 transition-all duration-300 glow">
+                        Ascend to Mastery
+                    </a>
                 </div>
             </div>
         </div>
@@ -277,7 +277,9 @@
         <div class="container mx-auto px-6 py-12">
             <div class="grid md:grid-cols-4 gap-8">
                 <div>
-                    <img src="/api/placeholder/48/48" alt="Lumenos Logo" class="h-12 mb-4">
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Lumenos Logo" 
+                         class="h-12 mb-4">
                     <p class="text-gray-400">Revolutionizing physics education through interactive simulations.</p>
                 </div>
                 <div>
@@ -313,80 +315,45 @@
 
     <script>
         // Initialize mobile menu
-        const menuBtn = document.querySelector('.menu-btn');
-        const navMenu = document.querySelector('.nav-menu');
-        const mobileLinks = document.querySelectorAll('.nav-menu a');
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
 
-        menuBtn.addEventListener('click', () => {
-            menuBtn.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                menuBtn.classList.remove('active');
-                navMenu.classList.remove('active');
+            menuBtn.addEventListener('click', () => {
+                menuBtn.classList.toggle('active');
+                navLinks.classList.toggle('active');
             });
-        });
 
-        // GSAP Animations
-        gsap.registerPlugin(ScrollTrigger);
+            // Initialize GSAP animations
+            gsap.registerPlugin(ScrollTrigger);
 
-        // Animate pricing cards
-        const cards = gsap.utils.toArray('.card-hover');
-        cards.forEach(card => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top bottom-=100",
-                    end: "bottom top",
-                    toggleActions: "play none none reverse"
-                },
-                y: 50,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.out"
+            // Animate cards on scroll
+            gsap.utils.toArray('.card-hover').forEach(card => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top bottom-=100",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8
+                });
             });
-        });
 
-        // Animate gradient texts
-        const gradientTexts = gsap.utils.toArray('.gradient-text');
-        gradientTexts.forEach(text => {
-            gsap.from(text, {
-                scrollTrigger: {
-                    trigger: text,
-                    start: "top bottom-=100",
-                    end: "bottom top",
-                    toggleActions: "play none none reverse"
-                },
-                y: 30,
-                opacity: 0,
-                duration: 1,
-                ease: "power2.out"
-            });
-        });
-
-        // Handle subscription buttons
-        const subscribeButtons = document.querySelectorAll('.subscribe-btn');
-        subscribeButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const plan = e.target.dataset.plan;
-                // Here you would typically integrate with your payment provider
-                console.log(`Subscribing to ${plan} plan`);
-            });
-        });
-
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+            // Animate gradient text
+            gsap.utils.toArray('.gradient-text').forEach(text => {
+                gsap.from(text, {
+                    scrollTrigger: {
+                        trigger: text,
+                        start: "top bottom-=100"
+                    },
+                    opacity: 0,
+                    y: 30,
+                    duration: 1
+                });
             });
         });
     </script>
+</body>
+</html>
