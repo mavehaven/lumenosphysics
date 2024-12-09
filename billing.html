@@ -182,8 +182,9 @@
                         </li>
                     </ul>
                     
-                    <div id="paypal-button-photon" class="mt-6"></div>
-                    </script>
+                    <button class="subscribe-btn w-full py-3 rounded-lg text-white font-semibold" data-plan="photon">
+                        Subscribe Now
+                    </button>
                 </div>
 
                 <!-- Supernova Plan -->
@@ -238,8 +239,9 @@
                         </li>
                     </ul>
                     
-                    <div id="paypal-button-supernova" class="mt-6"></div>
-                    </script>
+                    <button class="subscribe-btn w-full py-3 rounded-lg text-white font-semibold" data-plan="supernova">
+                        Subscribe Now
+                    </button>
                 </div>
             </div>
         </div>
@@ -309,48 +311,7 @@
         </div>
     </footer>
 
-    <!-- PayPal Script -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
     <script>
-        // PayPal Button Initialization
-        window.onload = function() {
-            // Photon Plan Button ($29.99)
-            paypal.Buttons({
-                style: {
-                    shape: 'rect',
-                    color: 'gold',
-                    layout: 'vertical',
-                    label: 'subscribe'
-                },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        plan_id: 'P-79G95984L4854274GM5K3XQA' // Photon Plan ID
-                    });
-                },
-                onApprove: function(data, actions) {
-                    alert('You have successfully subscribed to the Photon Explorer plan!');
-                }
-            }).render('#paypal-button-photon');
-
-            // Supernova Plan Button ($69.99)
-            paypal.Buttons({
-                style: {
-                    shape: 'rect',
-                    color: 'gold',
-                    layout: 'vertical',
-                    label: 'subscribe'
-                },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        plan_id: 'P-3NN66623W8844184NM5K3XQA' // Supernova Plan ID
-                    });
-                },
-                onApprove: function(data, actions) {
-                    alert('You have successfully subscribed to the Supernova Master plan!');
-                }
-            }).render('#paypal-button-supernova');
-        };
-
         // Initialize mobile menu
         const menuBtn = document.querySelector('.menu-btn');
         const navMenu = document.querySelector('.nav-menu');
