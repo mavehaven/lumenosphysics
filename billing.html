@@ -195,8 +195,27 @@
           plan_id: 'P-68W77385P64884615M5K3SEI'
         });
       },
-      onApprove: function(data, actions) {
-        alert('You have successfully subscribed to the Photon Explorer plan! Your subscription ID is: ' + data.subscriptionID);
+      onApprove: async function(data, actions) {
+        try {
+          // You can send subscription data to your backend here
+          await fetch('/api/subscriptions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              subscriptionId: data.subscriptionID,
+              planType: 'photon',
+              planId: 'P-68W77385P64884615M5K3SEI'
+            })
+          });
+          
+          // Redirect to success page with plan info
+          window.location.href = '/subscription-confirmed.html?plan=photon&id=' + data.subscriptionID;
+        } catch (error) {
+          console.error('Error processing subscription:', error);
+          alert('There was an error processing your subscription. Our team has been notified.');
+        }
       }
   }).render('#paypal-button-container-P-68W77385P64884615M5K3SEI');
 </script>
@@ -267,14 +286,32 @@
       },
       createSubscription: function(data, actions) {
         return actions.subscription.create({
-          /* Creates the subscription */
           plan_id: 'P-79G95984L4854274GM5K3XQA'
         });
       },
-      onApprove: function(data, actions) {
-        alert(data.subscriptionID); // You can add optional success message for the subscriber here
+      onApprove: async function(data, actions) {
+        try {
+          // You can send subscription data to your backend here
+          await fetch('/api/subscriptions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              subscriptionId: data.subscriptionID,
+              planType: 'supernova',
+              planId: 'P-79G95984L4854274GM5K3XQA'
+            })
+          });
+          
+          // Redirect to success page with plan info
+          window.location.href = '/subscription-confirmed.html?plan=supernova&id=' + data.subscriptionID;
+        } catch (error) {
+          console.error('Error processing subscription:', error);
+          alert('There was an error processing your subscription. Our team has been notified.');
+        }
       }
-  }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA'); // Renders the PayPal button
+  }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA');
 </script>
                 </div>
             </div>
