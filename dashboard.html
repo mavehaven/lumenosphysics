@@ -3,196 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physics Simulator Dashboard</title>
+    <title>Physics Hub</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-64 bg-blue-800 text-white">
-            <div class="p-4">
-                <div class="flex items-center mb-6">
-                    <a href="dashboard.html">
-                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
-                             alt="Logo" 
-                             class="h-8 w-8">
-                    </a>
-                    <span class="ml-2 text-lg font-bold">Physics Sim</span>
-                </div>
-                <nav>
-                    <ul class="space-y-2">
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="dashboard.html" class="flex items-center">
-                                <i class="fas fa-home w-6"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="tabs.html" class="flex items-center">
-                                <i class="fas fa-table w-6"></i>
-                                <span>All Topics</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="progress.html" class="flex items-center">
-                                <i class="fas fa-chart-line w-6"></i>
-                                <span>Progress</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="achievements.html" class="flex items-center">
-                                <i class="fas fa-trophy w-6"></i>
-                                <span>Achievements</span>
-                            </a>
-                        </li>
-                        <li class="hover:bg-blue-700 rounded p-2">
-                            <a href="notes.html" class="flex items-center">
-                                <i class="fas fa-book w-6"></i>
-                                <span>Study Notes</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        /* Dark mode styles */
+        .dark {
+            background-color: #111827;
+            color: #fff;
+        }
+        
+        .dark .bg-white\/90 {
+            background-color: rgba(17, 24, 39, 0.9);
+        }
+        
+        .dark .bg-gray-50 {
+            background-color: #1f2937;
+        }
+        
+        .dark .text-gray-900 {
+            color: #fff;
+        }
+        
+        .dark .text-gray-500 {
+            color: #9ca3af;
+        }
+        
+        .dark .bg-gray-200 {
+            background-color: #374151;
+        }
+        
+        .dark .bg-white {
+            background-color: #111827;
+        }
+        
+        /* Search results styles */
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+            backdrop-filter: blur(8px);
+        }
+        
+        .search-results::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .search-results::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .search-results::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 4px;
+        }
+        
+        /* Smooth theme transition */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
 
-        <!-- Main Content -->
-        <div class="flex-1 overflow-auto">
-            <!-- Top Navigation -->
-            <div class="bg-white shadow-sm">
-                <div class="flex justify-between items-center px-6 py-3">
-                    <h1 class="text-2xl font-bold text-gray-800">Physics Topics</h1>
-                    <div class="flex items-center space-x-4">
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-bell text-gray-600"></i>
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: currentColor;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .sim-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sim-card:hover {
+            transform: scale(1.02);
+        }
+
+        .section-title {
+            font-size: 48px;
+            line-height: 1.1;
+            letter-spacing: -0.015em;
+        }
+
+        .parallax-section {
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(-100%);
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+        }
+
+        /* Dark mode styles */
+        .dark {
+            background-color: #111827;
+            color: #e5e7eb;
+        }
+        
+        .dark .bg-white {
+            background-color: #111827;
+        }
+        
+        .dark .bg-gray-100 {
+            background-color: #1f2937;
+        }
+        
+        .dark .border-gray-200 {
+            border-color: #374151;
+        }
+        
+        .dark .text-gray-600 {
+            color: #d1d5db;
+        }
+    </style>
+</head>
+                  <body class="bg-white text-gray-900">
+                      <!-- Navigation -->
+                     <body class="bg-white text-gray-900">
+    <!-- Navigation -->
+    <header class="fixed w-full bg-white border-b border-gray-200 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Left side - Logo -->
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-3">
+                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                             alt="Physics Hub Logo" 
+                             class="h-8 w-8">
+                        <span class="text-xl font-semibold text-gray-900">PhysicsHub</span>
+                    </a>
+                </div>
+
+                <!-- Right side - Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <!-- Search Bar -->
+                    <div class="relative">
+                        <input type="text" 
+                               id="search" 
+                               placeholder="Search..." 
+                               class="w-48 px-4 py-2 rounded-lg text-sm bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div id="searchResults" class="search-results hidden absolute top-full left-0 right-0 mt-2 bg-white/90 dark:bg-gray-800/90 rounded-lg shadow-lg z-50"></div>
+                    </div>
+
+                    <!-- Simulations Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link text-sm flex items-center">
+                            Simulations
+                            <svg class="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </button>
-                        <div class="flex items-center space-x-2">
-                            <img src="/api/placeholder/32/32" alt="Profile" class="w-8 h-8 rounded-full">
-                            <span class="text-gray-700">Student</span>
+                        <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50">
+                            <!-- [Your existing dropdown content stays the same] -->
                         </div>
                     </div>
+
+                    <!-- Dark Mode Toggle -->
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <svg id="moonIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- Topics Grid -->
-            <div class="p-6">
-                <!-- Mechanics Section -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Mechanics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="newtons_first_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's First Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Law of Inertia Simulation</p>
-                        </a>
-                        <a href="newtons_second_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's Second Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Force and Acceleration</p>
-                        </a>
-                        <a href="newtons_third_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's Third Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Action-Reaction Pairs</p>
-                        </a>
-                        <a href="friction_force.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Friction Force</h3>
-                            <p class="text-gray-600 text-sm mt-2">Surface Interaction Study</p>
-                        </a>
-                        <a href="projectile_motion.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Projectile Motion</h3>
-                            <p class="text-gray-600 text-sm mt-2">2D Motion Analysis</p>
-                        </a>
-                        <a href="work.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Work and Power</h3>
-                            <p class="text-gray-600 text-sm mt-2">Energy Transfer Study</p>
-                        </a>
+            <!-- Mobile menu panel -->
+            <div id="mobile-menu" class="hidden md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <div class="p-2">
+                        <input type="text" 
+                               id="mobile-search"
+                               placeholder="Search..." 
+                               class="w-full px-4 py-2 rounded-lg text-sm bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Classical Mechanics</a>
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Electromagnetism</a>
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Waves & Optics</a>
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Modern Physics</a>
                 </div>
+            </div>
+        </nav>
+    </header>
 
-                <!-- Electricity & Magnetism Section -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Electricity & Magnetism</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="coulombs_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Coulomb's Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Electric Force Simulation</p>
-                        </a>
-                        <a href="electromagnetic_flux.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Electromagnetic Flux</h3>
-                            <p class="text-gray-600 text-sm mt-2">Magnetic Field Study</p>
-                        </a>
-                        <a href="circuit_simulator.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Circuit Simulator</h3>
-                            <p class="text-gray-600 text-sm mt-2">Electric Circuit Builder</p>
-                        </a>
-                        <a href="induction.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Induction</h3>
-                            <p class="text-gray-600 text-sm mt-2">Electromagnetic Induction</p>
-                        </a>
-                    </div>
-                </div>
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="section-title font-semibold mb-6">
+                Experience Physics.<br>
+                Like Never Before.
+            </h1>
+            <p class="text-xl text-gray-500 max-w-2xl">
+                Immersive simulations that make complex physics concepts simple and intuitive.
+            </p>
+        </div>
+    </section>
 
-                <!-- Waves & Optics Section -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Waves & Optics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="waves.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Waves</h3>
-                            <p class="text-gray-600 text-sm mt-2">Wave Properties & Behavior</p>
-                        </a>
-                        <a href="optics_simulator.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Optics Simulator</h3>
-                            <p class="text-gray-600 text-sm mt-2">Light & Lenses</p>
-                        </a>
-                        <a href="snells_law.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Snell's Law</h3>
-                            <p class="text-gray-600 text-sm mt-2">Light Refraction</p>
-                        </a>
+    <!-- Mechanics Section -->
+    <section id="mechanics" class="py-20 px-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Classical Mechanics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="newtons_laws.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Newton's Laws" class="w-full h-full object-cover">
+                        </div>
                     </div>
-                </div>
+                    <h3 class="text-lg font-medium mb-2">Newton's Laws</h3>
+                    <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
+                </a>
 
-                <!-- Modern Physics Section -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Modern Physics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="bohr_model.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Interactive Bohr Model</h3>
-                            <p class="text-gray-600 text-sm mt-2">Atomic Structure</p>
-                        </a>
-                        <a href="photoelectric.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Photoelectric Emissions</h3>
-                            <p class="text-gray-600 text-sm mt-2">Quantum Physics</p>
-                        </a>
-                        <a href="nuclear_reactor.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Nuclear Reactor</h3>
-                            <p class="text-gray-600 text-sm mt-2">Nuclear Physics</p>
-                        </a>
+                <a href="projectile_motion.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Projectile Motion" class="w-full h-full object-cover">
+                        </div>
                     </div>
-                </div>
+                    <h3 class="text-lg font-medium mb-2">Projectile Motion</h3>
+                    <p class="text-sm text-gray-500">Explore the physics of moving objects</p>
+                </a>
 
-                <!-- Additional Topics -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Additional Topics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <a href="energy_transformation.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Energy Transformation</h3>
-                            <p class="text-gray-600 text-sm mt-2">Energy Conversion Study</p>
-                        </a>
-                        <a href="gravitational_field.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Gravitational Field</h3>
-                            <p class="text-gray-600 text-sm mt-2">Gravity Simulation</p>
-                        </a>
-                        <a href="heat_transfer.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Heat Transfer</h3>
-                            <p class="text-gray-600 text-sm mt-2">Thermal Physics</p>
-                        </a>
-                        <a href="newtons_law_quiz.html" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
-                            <h3 class="font-bold text-blue-800">Newton's Laws Quiz</h3>
-                            <p class="text-gray-600 text-sm mt-2">Test Your Knowledge</p>
-                        </a>
+                <a href="work_energy.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Work and Energy" class="w-full h-full object-cover">
+                        </div>
                     </div>
-                </div>
+                    <h3 class="text-lg font-medium mb-2">Work and Energy</h3>
+                    <p class="text-sm text-gray-500">Discover energy transformation principles</p>
+                </a>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- E&M Section -->
+    <section id="em" class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Electromagnetism</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="circuits.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Circuit Lab" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Circuit Lab</h3>
+                    <p class="text-sm text-gray-500">Build and analyze electrical circuits</p>
+                </a>
+
+                <a href="em_waves.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="EM Waves" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Electromagnetic Waves</h3>
+                    <p class="text-sm text-gray-500">Visualize electromagnetic wave propagation</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Waves Section -->
+    <section id="waves" class="py-20 px-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Waves & Optics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="wave_motion.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Wave Motion" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Wave Motion</h3>
+                    <p class="text-sm text-gray-500">Study wave properties and behavior</p>
+                </a>
+
+                <a href="optics.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Optics Lab" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Optics Lab</h3>
+                    <p class="text-sm text-gray-500">Explore light behavior and lenses</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modern Physics Section -->
+    <section id="modern" class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Modern Physics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="quantum.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Quantum Mechanics" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Quantum Mechanics</h3>
+                    <p class="text-sm text-gray-500">Discover the quantum world</p>
+                </a>
+
+                <a href="nuclear.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="/api/placeholder/600/400" alt="Nuclear Physics" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Nuclear Physics</h3>
+                    <p class="text-sm text-gray-500">Explore atomic nuclei and radiation</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Simulation data for search functionality
+        const simulations = [
+            { title: "Newton's Laws", category: "Mechanics", url: "newtons_laws.html", description: "Understand the fundamental principles of motion" },
+            { title: "Projectile Motion", category: "Mechanics", url: "projectile_motion.html", description: "Explore the physics of moving objects" },
+            { title: "Work and Energy", category: "Mechanics", url: "work_energy.html", description: "Discover energy transformation principles" },
+            { title: "Circuit Lab", category: "Electromagnetism", url: "circuits.html", description: "Build and analyze electrical circuits" },
+            { title: "Electromagnetic Waves", category: "Electromagnetism", url: "em_waves.html", description: "Visualize electromagnetic wave propagation" },
+            { title: "Wave Motion", category: "Waves & Optics", url: "wave_motion.html", description: "Study wave properties and behavior" },
+            { title: "Optics Lab", category: "Waves & Optics", url: "optics.html", description: "Explore light behavior and lenses" },
+            { title: "Quantum Mechanics", category: "Modern Physics", url: "quantum.html", description: "Discover the quantum world" },
+            { title: "Nuclear Physics", category: "Modern Physics", url: "nuclear.html", description: "Explore atomic nuclei and radiation" }
+        ];
+
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            const filteredResults = simulations.filter(sim => 
+                sim.title.toLowerCase().includes(query) || 
+                sim.description.toLowerCase().includes(query) ||
+                sim.category.toLowerCase().includes(query)
+            );
+
+            if (filteredResults.length > 0) {
+                searchResults.innerHTML = filteredResults.map(sim => `
+                    <a href="${sim.url}" class="block p-4 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <div class="font-medium">${sim.title}</div>
+                        <div class="text-sm text-gray-500">${sim.category} - ${sim.description}</div>
+                    </a>
+                `).join('');
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.innerHTML = `
+                    <div class="p-4 text-gray-500">
+                        No simulations found for "${e.target.value}"
+                    </div>
+                `;
+                searchResults.classList.remove('hidden');
+            }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        // Dark mode toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        // Check for saved theme preference or default to system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+            
+            // Save preference
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const parallaxSections = document.querySelectorAll('.parallax-section');
+            parallaxSections.forEach(section => {
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * -0.3;
+                section.style.transform = `translate3d(0, ${rate}px, 0)`;
+            });
+        });
+        
+        // Mobile menu toggle
+const mobileMenuButton = document.getElementById('mobile-menu-button');
+const mobileMenu = document.getElementById('mobile-menu');
+
+mobileMenuButton.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+});
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.add('hidden');
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) {
+        mobileMenu.classList.add('hidden');
+    }
+});
+    </script>
 </body>
 </html>
