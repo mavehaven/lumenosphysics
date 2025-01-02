@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About LumenOS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-text {
+            background: linear-gradient(45deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="bg-gray-900 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                             alt="LumenOS Logo" 
+                             class="h-8">
+                        <span class="ml-2 text-xl font-semibold">LumenOS</span>
+                    </a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="text-gray-300 hover:text-white">Home</a>
+                    <a href="/pricing" class="text-gray-300 hover:text-white">Pricing</a>
+                    <a href="/login" class="text-gray-300 hover:text-white">Login</a>
+                    <a href="/signup" class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
+                        Get Started
+                    </a>
+                </div>
+
+                <button id="menuButton" class="md:hidden text-gray-300 hover:text-white">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile menu -->
+            <div id="mobileMenu" class="hidden md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="/" class="block px-3 py-2 text-gray-300 hover:text-white">Home</a>
+                    <a href="/pricing" class="block px-3 py-2 text-gray-300 hover:text-white">Pricing</a>
+                    <a href="/login" class="block px-3 py-2 text-gray-300 hover:text-white">Login</a>
+                    <a href="/signup" class="block px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Rest of the content remains the same -->
+    <!-- Hero Section -->
+    <div class="py-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-8 gradient-text">
+                Our Story
+            </h1>
+            <p class="text-xl text-blue-200 mb-8">
+                Making physics accessible and understandable for everyone
+            </p>
+        </div>
+    </div>
+
+    <!-- Story Section -->
+    <div class="max-w-4xl mx-auto px-6 pb-20">
+        <div class="bg-gray-800 rounded-xl p-8 mb-12">
+            <h2 class="text-2xl font-bold mb-6">The Beginning</h2>
+            <p class="text-gray-300 mb-6">
+                LumenOS began with a simple yet relatable challenge: studying for a physics exam. 
+                Founded by Kimber Khoza, the platform emerged from his personal struggle to grasp 
+                complex physics concepts while preparing for exams.
+            </p>
+            <p class="text-gray-300">
+                Frustrated by the lack of intuitive learning tools, Kimber envisioned a platform 
+                that would break down physics concepts in a way that made them not just understandable, 
+                but profoundly clear through interactive visualization and hands-on experimentation.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-3xl font-bold text-blue-400 mb-2">500K+</div>
+                <div class="text-gray-300">Active Students</div>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-3xl font-bold text-blue-400 mb-2">98%</div>
+                <div class="text-gray-300">Student Satisfaction</div>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-6 text-center">
+                <div class="text-3xl font-bold text-blue-400 mb-2">200+</div>
+                <div class="text-gray-300">Partner Universities</div>
+            </div>
+        </div>
+
+        <div class="mt-12 space-y-12">
+            <div>
+                <h2 class="text-2xl font-bold mb-6">Our Mission</h2>
+                <p class="text-gray-300">
+                    At LumenOS, we're committed to making physics education accessible and engaging 
+                    for everyone. Through interactive visualizations and hands-on simulations, we 
+                    break down complex concepts into understandable pieces, helping students build 
+                    confidence and mastery in physics.
+                </p>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold mb-6">Looking Forward</h2>
+                <p class="text-gray-300">
+                    What started as a personal solution has grown into a platform that helps hundreds 
+                    of thousands of students worldwide. We continue to innovate and expand our 
+                    offerings, always staying true to our core mission of making physics education 
+                    more accessible and engaging for everyone.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center text-gray-400">
+                <p>&copy; 2024 LumenOS. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Simple JavaScript for mobile menu toggle -->
+    <script>
+        const menuButton = document.getElementById('menuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        menuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!menuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
