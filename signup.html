@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Lumenos</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+    <!-- Update Firebase SDK versions to latest 9.x -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
 
@@ -63,7 +64,7 @@
     </div>
 
     <script>
-        // Firebase config
+        // Initialize Firebase immediately
         const firebaseConfig = {
             apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
             authDomain: "lumenos-749a1.firebaseapp.com",
@@ -74,7 +75,10 @@
             measurementId: "G-CEZ4PHV9GE"
         };
         
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
 
         // Get subscription info from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -85,19 +89,20 @@
         const planDisplay = planType === 'supernova' ? 'Supernova Master' : 'Photon Explorer';
         document.getElementById('planInfo').textContent = `Selected Plan: ${planDisplay}`;
 
-        // Hide loading overlay
-        document.getElementById('loadingOverlay').classList.add('hidden');
-
         // Handle signup
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const errorMessage = document.getElementById('errorMessage');
             
             try {
-                document.getElementById('loadingOverlay').classList.remove('hidden');
+                loadingOverlay.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+                
+                const fullName = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
                 
                 // Create user
                 const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
@@ -108,28 +113,33 @@
                     email,
                     subscriptionId,
                     planType,
-                    createdAt: new Date(),
-                    subscriptionCreatedAt: new Date()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    subscriptionCreatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 // Redirect to dashboard
                 window.location.href = 'dashboard.html';
                 
             } catch (error) {
-                document.getElementById('loadingOverlay').classList.add('hidden');
-                const errorMessage = document.getElementById('errorMessage');
+                loadingOverlay.classList.add('hidden');
                 errorMessage.textContent = error.message;
                 errorMessage.classList.remove('hidden');
+                console.error('Signup error:', error);
             }
         });
 
         // Check if user is already logged in
-        firebase.auth().onAuthStateChanged(async (user) => {
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                if (userDoc.exists && userDoc.data().subscriptionId) {
-                    window.location.href = 'dashboard.html';
-                }
+                firebase.firestore().collection('users').doc(user.uid).get()
+                    .then((userDoc) => {
+                        if (userDoc.exists && userDoc.data().subscriptionId) {
+                            window.location.href = 'dashboard.html';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Auth state check error:', error);
+                    });
             }
         });
     </script>
