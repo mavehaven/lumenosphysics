@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Lumenos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-xl">
+            <div>
+                <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                     alt="Lumenos Logo" 
+                     class="mx-auto h-12">
+                <h2 class="mt-6 text-center text-3xl font-extrabold">Create your account</h2>
+                <p class="mt-2 text-center text-sm text-gray-400" id="planInfo">
+                    Loading plan information...
+                </p>
+            </div>
+
+            <form id="signupForm" class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm space-y-4">
+                    <div>
+                        <label for="fullName" class="sr-only">Full Name</label>
+                        <input id="fullName" name="fullName" type="text" required
+                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                               placeholder="Full Name">
+                    </div>
+                    <div>
+                        <label for="email" class="sr-only">Email address</label>
+                        <input id="email" name="email" type="email" required
+                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                               placeholder="Email address">
+                    </div>
+                    <div>
+                        <label for="password" class="sr-only">Password</label>
+                        <input id="password" name="password" type="password" required
+                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                               placeholder="Password">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <!-- Error message -->
+            <div id="errorMessage" class="hidden text-red-500 text-sm text-center mt-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            // Your config here
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Get subscription info from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const subscriptionId = urlParams.get('id');
+        const planType = urlParams.get('plan');
+
+        // Show plan info
+        const planDisplay = planType === 'supernova' ? 'Supernova Master' : 'Photon Explorer';
+        document.getElementById('planInfo').textContent = `Selected Plan: ${planDisplay}`;
+
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').classList.add('hidden');
+
+        // Handle signup
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+                
+                // Create user
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                
+                // Save user data
+                await firebase.firestore().collection('users').doc(userCredential.user.uid).set({
+                    fullName,
+                    email,
+                    subscriptionId,
+                    planType,
+                    createdAt: new Date(),
+                    subscriptionCreatedAt: new Date()
+                });
+
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+                
+            } catch (error) {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = error.message;
+                errorMessage.classList.remove('hidden');
+            }
+        });
+
+        // Check if user is already logged in
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().subscriptionId) {
+                    window.location.href = 'dashboard.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
