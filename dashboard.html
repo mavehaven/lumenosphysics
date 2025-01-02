@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physics Hub</title>
+    <title>Physics Hub - Interactive Learning</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription"></script>
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
         
         /* Dark mode styles */
@@ -147,9 +154,73 @@
         .dark .text-gray-600 {
             color: #d1d5db;
         }
+
+        /* Add paywall styles */
+        .content-blur {
+            filter: blur(5px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.3s ease;
+        }
+
+        .paywall-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .paywall-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Auth state styles */
+        .auth-loading {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.9);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
-                  <body class="bg-white text-gray-900">
+<body class="bg-white text-gray-900">
+    <!-- Auth Loading State -->
+    <div id="authLoading" class="auth-loading">
+        <div class="text-center text-white">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <p class="mt-4">Verifying access...</p>
+        </div>
+    </div>
+
+    <!-- Paywall Overlay -->
+    <div id="paywallOverlay" class="paywall-overlay">
+        <div class="max-w-2xl mx-auto px-4 py-16 text-center text-white">
+            <h2 class="text-4xl font-bold mb-8">Unlock Full Access</h2>
+            <p class="text-xl mb-8">Experience interactive physics simulations that make learning intuitive</p>
+            <div class="space-y-6">
+                <button onclick="window.location.href='pricing.html'" 
+                        class="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors">
+                    View Plans
+                </button>
+                <div class="text-sm">
+                    Already subscribed? 
+                    <button onclick="showLogin()" class="text-blue-400 hover:text-blue-300">Sign in</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="opacity-0 transition-opacity duration-300">
+        <body class="bg-white text-gray-900">
                       <!-- Navigation -->
                      <body class="bg-white text-gray-900">
     <!-- Navigation -->
@@ -363,9 +434,89 @@
                 </a>
             </div>
         </div>
-    </section>
+    </div>
 
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            // Your Firebase config
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Auth state observer
+        firebase.auth().onAuthStateChanged(async (user) => {
+            try {
+                if (user) {
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    const userData = userDoc.data();
+
+                    if (userData?.subscriptionId) {
+                        // User has active subscription
+                        showContent();
+                    } else {
+                        // No subscription
+                        showPaywall();
+                    }
+                } else {
+                    // Not logged in
+                    showPaywall();
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                showPaywall();
+            } finally {
+                document.getElementById('authLoading').style.display = 'none';
+            }
+        });
+
+        function showContent() {
+            document.getElementById('paywallOverlay').classList.remove('visible');
+            document.getElementById('mainContent').classList.remove('content-blur');
+            document.getElementById('mainContent').style.opacity = '1';
+            updateAuthButtons(true);
+        }
+
+        function showPaywall() {
+            document.getElementById('paywallOverlay').classList.add('visible');
+            document.getElementById('mainContent').classList.add('content-blur');
+            updateAuthButtons(false);
+        }
+
+        function updateAuthButtons(isSubscribed) {
+            const authSection = document.createElement('div');
+            authSection.className = 'absolute right-4 top-4';
+            authSection.innerHTML = isSubscribed ? `
+                <button onclick="handleSignOut()" 
+                        class="text-sm text-gray-600 hover:text-gray-900">
+                    Sign Out
+                </button>
+            ` : `
+                <button onclick="window.location.href='login.html'" 
+                        class="text-sm text-gray-600 hover:text-gray-900 mr-4">
+                    Sign In
+                </button>
+                <button onclick="window.location.href='pricing.html'"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700">
+                    Subscribe
+                </button>
+            `;
+            
+            // Update navigation
+            const nav = document.querySelector('nav');
+            const existingAuth = nav.querySelector('.auth-buttons');
+            if (existingAuth) existingAuth.remove();
+            nav.appendChild(authSection);
+        }
+
+        async function handleSignOut() {
+            try {
+                await firebase.auth().signOut();
+                window.location.reload();
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
         // Simulation data for search functionality
         const simulations = [
             { title: "Newton's Laws", category: "Mechanics", url: "newtons_laws.html", description: "Understand the fundamental principles of motion" },
