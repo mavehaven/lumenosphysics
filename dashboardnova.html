@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supernova Dashboard - Advanced Physics Hub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        .premium-indicator {
+            background: linear-gradient(45deg, #3B82F6, #60A5FA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .premium-card {
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            background: linear-gradient(45deg, rgba(30, 58, 138, 0.1), rgba(59, 130, 246, 0.1));
+        }
+
+        .premium-glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .advanced-feature {
+            position: relative;
+        }
+
+        .advanced-feature::after {
+            content: '⚡ PRO';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            background: linear-gradient(45deg, #3B82F6, #60A5FA);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <header class="fixed w-full bg-gray-900/95 border-b border-gray-800 backdrop-blur-lg z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Physics Hub Logo" 
+                         class="h-8 w-8">
+                    <span class="ml-2 text-xl font-semibold">Supernova Dashboard</span>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+                    <div id="userProfile" class="flex items-center space-x-3">
+                        <span id="userName" class="text-sm"></span>
+                        <button onclick="handleSignOut()" class="text-sm text-gray-400 hover:text-white">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-12">
+        <!-- Welcome Section -->
+        <section class="px-6 py-12 bg-gradient-to-b from-blue-900/20 to-transparent">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-4xl font-bold mb-2">Welcome to Supernova</h1>
+                        <p class="text-gray-400">Access advanced quantum simulations and experiments</p>
+                    </div>
+                    <div class="premium-indicator text-lg font-semibold">
+                        ⚡ Supernova Access
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Features Grid -->
+        <section class="px-6 py-12">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-2xl font-bold mb-8">Advanced Quantum Tools</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Quantum Entanglement Simulator -->
+                    <div class="premium-card rounded-xl p-6 advanced-feature">
+                        <h3 class="text-xl font-semibold mb-3">Quantum Entanglement Lab</h3>
+                        <p class="text-gray-400 mb-4">Simulate and visualize quantum entanglement phenomena</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Launch Simulator
+                        </button>
+                    </div>
+
+                    <!-- Wave Function Analysis -->
+                    <div class="premium-card rounded-xl p-6 advanced-feature">
+                        <h3 class="text-xl font-semibold mb-3">Wave Function Analyzer</h3>
+                        <p class="text-gray-400 mb-4">Advanced quantum state visualization and analysis</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Open Analyzer
+                        </button>
+                    </div>
+
+                    <!-- Quantum Circuit Designer -->
+                    <div class="premium-card rounded-xl p-6 advanced-feature">
+                        <h3 class="text-xl font-semibold mb-3">Quantum Circuit Designer</h3>
+                        <p class="text-gray-400 mb-4">Build and simulate quantum circuits</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Start Design
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Experiments -->
+        <section class="px-6 py-12 bg-gray-800/50">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-2xl font-bold mb-8">Premium Experiments</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Advanced experiments here -->
+                    <div class="premium-card rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-3">Double Slit Experiment</h3>
+                        <p class="text-gray-400 mb-4">Interactive quantum mechanics demonstration</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Start Experiment
+                        </button>
+                    </div>
+
+                    <div class="premium-card rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-3">Quantum Tunneling</h3>
+                        <p class="text-gray-400 mb-4">Visualize quantum tunneling effects</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Explore
+                        </button>
+                    </div>
+
+                    <div class="premium-card rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-3">Quantum Teleportation</h3>
+                        <p class="text-gray-400 mb-4">Advanced quantum information transfer</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Begin Simulation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Analysis Tools -->
+        <section class="px-6 py-12">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-2xl font-bold mb-8">Advanced Analysis Tools</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="premium-card rounded-xl p-6 advanced-feature">
+                        <h3 class="text-xl font-semibold mb-3">Quantum Data Analyzer</h3>
+                        <p class="text-gray-400 mb-4">Advanced data analysis and visualization tools</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Open Analyzer
+                        </button>
+                    </div>
+
+                    <div class="premium-card rounded-xl p-6 advanced-feature">
+                        <h3 class="text-xl font-semibold mb-3">Export & Share</h3>
+                        <p class="text-gray-400 mb-4">Export results and share with colleagues</p>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                            Export Options
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+            authDomain: "lumenos-749a1.firebaseapp.com",
+            projectId: "lumenos-749a1",
+            storageBucket: "lumenos-749a1.firebasestorage.app",
+            messagingSenderId: "857410556058",
+            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+            measurementId: "G-CEZ4PHV9GE"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Auth state observer
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    const userData = userDoc.data();
+
+                    if (!userData?.subscriptionId || userData?.planType !== 'supernova') {
+                        // Not a Supernova subscriber - redirect to appropriate dashboard
+                        window.location.href = userData?.planType === 'photon' ? 'dashboard.html' : 'pricing.html';
+                    }
+
+                    // Update UI with user info
+                    document.getElementById('userName').textContent = userData.fullName || user.email;
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                    window.location.href = 'pricing.html';
+                }
+            } else {
+                // Not logged in - redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function handleSignOut() {
+            try {
+                await firebase.auth().signOut();
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // Check saved theme preference
+        if (localStorage.theme === 'dark' || 
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+    </script>
+</body>
+</html>
