@@ -3,399 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LumenOS - Pricing Plans</title>
-    <!-- Keep existing CDN links -->
+    <title>LumenOS - Plans & Billing</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
-    
-    <!-- Add Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
-    
-    <!-- Keep all existing styles -->
-    <style>
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
 
-        .float-animation {
-            animation: float 6s ease-in-out infinite;
-        }
+    <!-- Modern Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            signOut 
+        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+        import { 
+            getFirestore,
+            doc,
+            setDoc,
+            getDoc,
+            serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
-        .gradient-text {
-            background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            opacity: 0;
-            border-radius: 50%;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-        }
-
-        .card-hover {
-            transition: all 0.3s ease;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .glow {
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-            transition: box-shadow 0.3s ease;
-        }
-
-        .glow:hover {
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
-        }
-
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-                background: transparent;
-                border: none;
-                cursor: pointer;
-                padding: 0.5rem;
-                z-index: 1001;
-            }
-            .mobile-menu-btn span {
-                display: block;
-                width: 25px;
-                height: 2px;
-                background-color: #fff;
-                margin: 5px 0;
-                transition: all 0.3s ease;
-            }
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                height: 100vh;
-                width: 100%;
-                background: rgba(8, 8, 16, 0.95);
-                backdrop-filter: blur(10px);
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: flex-start;
-                transition: right 0.3s ease;
-                padding: 2rem;
-                z-index: 1000;
-            }
-            .nav-links.active {
-                right: 0;
-            }
-            .mobile-menu-btn.active span:nth-child(1) {
-                transform: rotate(45deg) translate(5px, 6px);
-            }
-            .mobile-menu-btn.active span:nth-child(2) {
-                opacity: 0;
-            }
-            .mobile-menu-btn.active span:nth-child(3) {
-                transform: rotate(-45deg) translate(5px, -6px);
-            }
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-white">
-    <!-- Keep existing navigation -->
-    <nav class="fixed w-full z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg bg-opacity-90">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
-                         alt="Lumenos Logo" 
-                         class="h-12">
-                </div>
-                <div class="nav-links hidden md:flex space-x-8">
-                    <a href="#experiments" class="hover:text-blue-300 transition-colors duration-300">Experiments</a>
-                    <a href="#features" class="hover:text-blue-300 transition-colors duration-300">Features</a>
-                    <a href="#about" class="hover:text-blue-300 transition-colors duration-300">About</a>
-                    <a href="#contact" class="glow bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Start Learning</a>
-                </div>
-                <button class="mobile-menu-btn block md:hidden">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Keep existing hero section -->
-    <div class="relative pt-32 pb-20 bg-gradient-to-b from-gray-900 to-blue-900/20">
-        <div class="container mx-auto px-6 text-center">
-            <h1 class="text-5xl md:text-6xl font-bold mb-8 gradient-text">Choose Your Path to Discovery</h1>
-            <p class="text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
-                Select the plan that best fits your journey into the fascinating world of physics
-            </p>
-        </div>
-    </div>
-
-    <!-- Keep existing pricing section with modified PayPal buttons -->
-    <div id="pricing" class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Unlock the Universe</h2>
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- Photon Plan -->
-                <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden">
-                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-2xl"></div>
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
-                    
-                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Photon Explorer</h3>
-                    <p class="text-gray-400 mb-4">Begin your quantum journey</p>
-                    <div class="text-3xl font-bold text-white mb-6">
-                        $29.99<span class="text-lg font-normal text-gray-400">/month</span>
-                    </div>
-                    
-                    <ul class="space-y-4 mb-8 relative z-10">
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Core Physics Simulations</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Quantum Playground Access</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Wave Function Analysis</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Particle Community Access</span>
-                        </li>
-                    </ul>
-                    
-<div id="paypal-button-container-P-68W77385P64884615M5K3SEI"></div>
-<script>
-  paypal.Buttons({
-      style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'subscribe'
-      },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({
-          plan_id: 'P-68W77385P64884615M5K3SEI'
-        });
-      },
-      onApprove: async function(data, actions) {
-        try {
-          // You can send subscription data to your backend here
-          await fetch('/api/subscriptions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              subscriptionId: data.subscriptionID,
-              planType: 'photon',
-              planId: 'P-68W77385P64884615M5K3SEI'
-            })
-          });
-          
-          // Redirect to success page with plan info
-          window.location.href = '/A.R.E.html?plan=photon&id=' + data.subscriptionID;
-        } catch (error) {
-          console.error('Error processing subscription:', error);
-          alert('There was an error processing your subscription. Our team has been notified.');
-        }
-      }
-  }).render('#paypal-button-container-P-68W77385P64884615M5K3SEI');
-</script>
-</div>
-                
-                <!-- Supernova Plan -->
-                <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden border-2 border-blue-400">
-                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/30 rounded-full blur-2xl"></div>
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full -mr-16 -mt-16"></div>
-                    
-                    <div class="absolute top-0 right-0 mt-4 mr-4">
-                        <span class="bg-blue-400 text-white text-sm px-3 py-1 rounded-full">Most Popular</span>
-                    </div>
-                    
-                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Supernova Master</h3>
-                    <p class="text-gray-400 mb-4">Unleash infinite possibilities</p>
-                    <div class="text-3xl font-bold text-white mb-6">
-                        $69.99<span class="text-lg font-normal text-gray-400">/month</span>
-                    </div>
-                    
-                    <ul class="space-y-4 mb-8 relative z-10">
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>All Photon Explorer Features</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Advanced Quantum Tools</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Quantum Entanglement Sessions</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                 </svg>
-                            <span>Spacetime Manipulation Lab</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Dark Matter Priority Support</span>
-                        </li>
-                        <li class="flex items-center space-x-3 text-gray-300">
-                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Quantum State Downloads</span>
-                        </li>
-                    </ul>
-                    
-                    <div id="paypal-button-container-P-79G95984L4854274GM5K3XQA"></div>
-<script>
-  paypal.Buttons({
-      style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'subscribe'
-      },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({
-          plan_id: 'P-79G95984L4854274GM5K3XQA'
-        });
-      },
-      onApprove: async function(data, actions) {
-        try {
-          // You can send subscription data to your backend here
-          await fetch('/api/subscriptions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              subscriptionId: data.subscriptionID,
-              planType: 'supernova',
-              planId: 'P-79G95984L4854274GM5K3XQA'
-            })
-          });
-          
-          // Redirect to success page with plan info
-          window.location.href = '/A.R.E.html?plan=supernova&id=' + data.subscriptionID;
-        } catch (error) {
-          console.error('Error processing subscription:', error);
-          alert('There was an error processing your subscription. Our team has been notified.');
-        }
-      }
-  }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA');
-</script>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Keep existing FAQ section -->
-    <div class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
-        <div class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Frequently Asked Questions</h2>
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Can I switch between plans?</h3>
-                    <p class="text-gray-300">Yes! You can upgrade or downgrade your plan at any time. Changes will take effect at the start of your next billing cycle.</p>
-                </div>
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Is there a trial period?</h3>
-                    <p class="text-gray-300">We offer a 14-day free trial on both plans so you can explore the quantum realm risk-free.</p>
-                </div>
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Are there any hidden fees?</h3>
-                    <p class="text-gray-300">No hidden fees or surprises. The price you see is what you pay, with all features included in your chosen plan.</p>
-                </div>
-                <div class="card-hover bg-gray-800 rounded-xl p-6">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">Can I cancel anytime?</h3>
-                    <p class="text-gray-300">Absolutely! You can cancel your subscription at any time with no cancellation fees or long-term commitments.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-
-    <!-- Keep existing footer -->
-    <footer class="bg-gray-900 border-t border-gray-800">
-        <footer class="bg-gray-900 border-t border-gray-800">
-        <div class="container mx-auto px-6 py-12">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
-                         alt="Lumenos Logo" 
-                         class="h-12 mb-4">
-                    <p class="text-gray-400">Revolutionizing physics education through interactive simulations.</p>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-blue-400 mb-4">Quick Links</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Home</a></li>
-                        <li><a href="#pricing" class="hover:text-blue-400 transition-colors">Pricing</a></li>
-                        <li><a href="#features" class="hover:text-blue-400 transition-colors">Features</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-blue-400 mb-4">Resources</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Documentation</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Tutorial Videos</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Support</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-blue-400 mb-4">Contact</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Help Center</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Community</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition-colors">Get in Touch</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 LumenOS. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Initialize Firebase with your config
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
             authDomain: "lumenos-749a1.firebaseapp.com",
@@ -406,127 +33,385 @@
             measurementId: "G-CEZ4PHV9GE"
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Modified PayPal button configuration for Photon plan
-        paypal.Buttons({
-            style: {
-                shape: 'rect',
-                color: 'gold',
-                layout: 'vertical',
-                label: 'subscribe'
+        // Subscription configuration
+        const SUBSCRIPTION_CONFIG = {
+            PHOTON: {
+                planId: 'P-68W77385P64884615M5K3SEI',
+                name: 'photon',
+                displayName: 'Photon Explorer',
+                price: '29.99',
+                features: [
+                    'Core Physics Simulations',
+                    'Basic Quantum Tools',
+                    'Community Access',
+                    'Email Support'
+                ]
             },
-            createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                    plan_id: 'P-68W77385P64884615M5K3SEI'
-                });
-            },
-            onApprove: async function(data, actions) {
+            SUPERNOVA: {
+                planId: 'P-79G95984L4854274GM5K3XQA',
+                name: 'supernova',
+                displayName: 'Supernova Master',
+                price: '69.99',
+                features: [
+                    'All Photon Features',
+                    'Advanced Quantum Tools',
+                    'Priority Support',
+                    'Custom Experiments',
+                    'Data Export',
+                    'API Access'
+                ]
+            }
+        };
+
+        // Subscription handler class
+        class SubscriptionHandler {
+            static async handleSubscriptionApprove(plan, data) {
                 try {
                     const user = auth.currentUser;
                     
                     if (user) {
-                        // Existing user - update subscription in Firestore
-                        await db.collection('users').doc(user.uid).set({
+                        // Update existing user's subscription
+                        await setDoc(doc(db, 'users', user.uid), {
                             subscriptionId: data.subscriptionID,
-                            planType: 'photon',
-                            planId: 'P-68W77385P64884615M5K3SEI',
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            planType: plan.name,
+                            planId: plan.planId,
+                            subscriptionUpdatedAt: serverTimestamp(),
+                            subscriptionStatus: 'active'
                         }, { merge: true });
                         
-                        window.location.href = '/dashboard.html';
+                        // Redirect to appropriate dashboard
+                        window.location.href = plan.name === 'supernova' ? 'dashboardnova.html' : 'dashboard.html';
                     } else {
-                        // New user - redirect to signup with subscription info
-                        window.location.href = `/signup.html?plan=photon&id=${data.subscriptionID}`;
+                        // New user - store subscription info and redirect to signup
+                        localStorage.setItem('pendingSubscription', JSON.stringify({
+                            subscriptionId: data.subscriptionID,
+                            planType: plan.name,
+                            planId: plan.planId
+                        }));
+                        
+                        window.location.href = 'signup.html';
                     }
                 } catch (error) {
-                    console.error('Error processing subscription:', error);
+                    console.error('Subscription error:', error);
                     alert('There was an error processing your subscription. Please try again.');
                 }
             }
-        }).render('#paypal-button-container-P-68W77385P64884615M5K3SEI');
 
-        // Modified PayPal button configuration for Supernova plan
-        paypal.Buttons({
-            style: {
-                shape: 'rect',
-                color: 'gold',
-                layout: 'vertical',
-                label: 'subscribe'
-            },
-            createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                    plan_id: 'P-79G95984L4854274GM5K3XQA'
-                });
-            },
-            onApprove: async function(data, actions) {
+            static setupPayPalButtons() {
+                // Setup Photon plan button
+                paypal.Buttons({
+                    style: {
+                        shape: 'rect',
+                        color: 'gold',
+                        layout: 'vertical',
+                        label: 'subscribe'
+                    },
+                    createSubscription: (data, actions) => {
+                        return actions.subscription.create({
+                            plan_id: SUBSCRIPTION_CONFIG.PHOTON.planId
+                        });
+                    },
+                    onApprove: (data) => this.handleSubscriptionApprove(SUBSCRIPTION_CONFIG.PHOTON, data)
+                }).render('#paypal-button-container-photon');
+
+                // Setup Supernova plan button
+                paypal.Buttons({
+                    style: {
+                        shape: 'rect',
+                        color: 'gold',
+                        layout: 'vertical',
+                        label: 'subscribe'
+                    },
+                    createSubscription: (data, actions) => {
+                        return actions.subscription.create({
+                            plan_id: SUBSCRIPTION_CONFIG.SUPERNOVA.planId
+                        });
+                    },
+                    onApprove: (data) => this.handleSubscriptionApprove(SUBSCRIPTION_CONFIG.SUPERNOVA, data)
+                }).render('#paypal-button-container-supernova');
+            }
+
+            static async checkExistingSubscription() {
+                const user = auth.currentUser;
+                
+                if (!user) return false;
+
                 try {
-                    const user = auth.currentUser;
-                    
-                    if (user) {
-                        // Existing user - update subscription in Firestore
-                        await db.collection('users').doc(user.uid).set({
-                            subscriptionId: data.subscriptionID,
-                            planType: 'supernova',
-                            planId: 'P-79G95984L4854274GM5K3XQA',
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true });
-                        
-                        window.location.href = '/dashboard.html';
-                    } else {
-                        // New user - redirect to signup with subscription info
-                        window.location.href = `/signup.html?plan=supernova&id=${data.subscriptionID}`;
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    const userData = userDoc.data();
+
+                    if (userData?.subscriptionId && userData?.subscriptionStatus === 'active') {
+                        // Redirect to appropriate dashboard
+                        window.location.href = userData.planType === 'supernova' ? 
+                            'dashboardnova.html' : 'dashboard.html';
+                        return true;
                     }
+
+                    return false;
                 } catch (error) {
-                    console.error('Error processing subscription:', error);
-                    alert('There was an error processing your subscription. Please try again.');
+                    console.error('Error checking subscription:', error);
+                    return false;
                 }
             }
-        }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA');
+        }
 
-        // Keep existing GSAP animations and mobile menu functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuBtn = document.querySelector('.mobile-menu-btn');
-            const navLinks = document.querySelector('.nav-links');
-
-            menuBtn?.addEventListener('click', () => {
-                menuBtn.classList.toggle('active');
-                navLinks?.classList.toggle('active');
-            });
-
-            // Initialize GSAP animations
-            gsap.registerPlugin(ScrollTrigger);
-
-            // Animate cards on scroll
-            gsap.utils.toArray('.card-hover').forEach(card => {
-                gsap.from(card, {
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top bottom-=100",
-                        toggleActions: "play none none reverse"
-                    },
-                    opacity: 0,
-                    y: 50,
-                    duration: 0.8
-                });
-            });
-
-            // Animate gradient text
-            gsap.utils.toArray('.gradient-text').forEach(text => {
-                gsap.from(text, {
-                    scrollTrigger: {
-                        trigger: text,
-                        start: "top bottom-=100"
-                    },
-                    opacity: 0,
-                    y: 30,
-                    duration: 1
-                });
-            });
+        // Initialize page
+        onAuthStateChanged(auth, async (user) => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            try {
+                // Check for existing subscription
+                await SubscriptionHandler.checkExistingSubscription();
+                
+                // Update UI based on auth state
+                updateUIForUser(user);
+            } catch (error) {
+                console.error('Auth error:', error);
+            } finally {
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
         });
+
+        // Update UI based on auth state
+        function updateUIForUser(user) {
+            const authSection = document.querySelector('.auth-buttons');
+            if (!authSection) return;
+
+            if (user) {
+                authSection.innerHTML = `
+                    <button onclick="handleSignOut()" 
+                            class="text-sm text-gray-400 hover:text-white">
+                        Sign Out
+                    </button>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <button onclick="window.location.href='login.html'" 
+                            class="text-sm text-gray-400 hover:text-white mr-4">
+                        Sign In
+                    </button>
+                    <button onclick="window.location.href='signup.html'"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700">
+                        Get Started
+                    </button>
+                `;
+            }
+        }
+
+        // Initialize subscription handling
+        window.addEventListener('DOMContentLoaded', () => {
+            SubscriptionHandler.setupPayPalButtons();
+        });
+
+        // Make functions available to HTML
+        window.handleSignOut = async () => {
+            try {
+                await signOut(auth);
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        };
     </script>
+
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription"></script>
+
+    <style>
+        .premium-card {
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            background: linear-gradient(45deg, rgba(30, 58, 138, 0.1), rgba(59, 130, 246, 0.1));
+        }
+
+        .premium-glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-gray-900/95 border-b border-gray-800 backdrop-blur-lg z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                             alt="LumenOS Logo" 
+                             class="h-8">
+                    </a>
+                </div>
+
+                <div class="auth-buttons flex items-center space-x-4">
+                    <!-- Auth buttons inserted by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-8 gradient-text">
+                Choose Your Path to Discovery
+            </h1>
+            <p class="text-xl text-blue-200 mb-12">
+                Select the plan that best fits your journey into the fascinating world of physics
+            </p>
+        </div>
+    </section>
+
+    <!-- Pricing Grid -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Photon Plan -->
+                <div class="rounded-xl p-8 bg-gray-800 relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-2xl"></div>
+                    
+                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Photon Explorer</h3>
+                    <p class="text-gray-400 mb-4">Begin your quantum journey</p>
+                    <div class="text-3xl font-bold text-white mb-6">
+                        $29.99<span class="text-lg font-normal text-gray-400">/month</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>Core Physics Simulations</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>Basic Quantum Tools</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>Community Access</span>
+                        </li>
+                    </ul>
+
+                    <div id="paypal-button-container-photon"></div>
+                </div>
+
+                <!-- Supernova Plan -->
+                <div class="rounded-xl p-8 bg-gray-800 relative overflow-hidden premium-card premium-glow">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/30 rounded-full blur-2xl"></div>
+                    
+                    <div class="absolute top-4 right-4">
+                        <span class="bg-blue-600 text-white text-sm px-3 py-1 rounded-full">Most Popular</span>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-blue-400 mb
+                    <h3 class="text-2xl font-bold text-blue-400 mb-2">Supernova Master</h3>
+                    <p class="text-gray-400 mb-4">Unleash infinite possibilities</p>
+                    <div class="text-3xl font-bold text-white mb-6">
+                        $69.99<span class="text-lg font-normal text-gray-400">/month</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>All Photon Features</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>Advanced Quantum Tools</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>Priority Support</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>Custom Experiments</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>Data Export</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-gray-300">
+                            <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                            </svg>
+                            <span>API Access</span>
+                        </li>
+                    </ul>
+
+                    <div id="paypal-button-container-supernova"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-6 bg-gray-800/50">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            
+            <div class="space-y-6">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Can I switch between plans?</h3>
+                    <p class="text-gray-400">Yes! You can upgrade or downgrade your plan at any time. Changes will take effect at the start of your next billing cycle.</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Is there a trial period?</h3>
+                    <p class="text-gray-400">We offer a 14-day free trial on both plans so you can explore the quantum realm risk-free.</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">What payment methods do you accept?</h3>
+                    <p class="text-gray-400">We accept all major credit cards and PayPal. Your payment information is securely processed through PayPal's platform.</p>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Can I cancel anytime?</h3>
+                    <p class="text-gray-400">Absolutely! You can cancel your subscription at any time with no cancellation fees or long-term commitments.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="text-center text-gray-400">
+                <p>&copy; 2024 LumenOS. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
