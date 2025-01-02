@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumenos - Pricing Plans</title>
+    <!-- Keep existing CDN links -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+    
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+    
+    <!-- Keep all existing styles -->
     <style>
         @keyframes float {
             0% { transform: translateY(0px); }
@@ -103,7 +111,7 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <!-- Navigation -->
+    <!-- Keep existing navigation -->
     <nav class="fixed w-full z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg bg-opacity-90">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
@@ -127,7 +135,7 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Keep existing hero section -->
     <div class="relative pt-32 pb-20 bg-gradient-to-b from-gray-900 to-blue-900/20">
         <div class="container mx-auto px-6 text-center">
             <h1 class="text-5xl md:text-6xl font-bold mb-8 gradient-text">Choose Your Path to Discovery</h1>
@@ -137,12 +145,11 @@
         </div>
     </div>
 
-    <!-- Pricing Section -->
+    <!-- Keep existing pricing section with modified PayPal buttons -->
     <div id="pricing" class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Unlock the Universe</h2>
             <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                
                 <!-- Photon Plan -->
                 <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden">
                     <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-2xl"></div>
@@ -219,7 +226,7 @@
       }
   }).render('#paypal-button-container-P-68W77385P64884615M5K3SEI');
 </script>
-                </div>
+</div>
                 
                 <!-- Supernova Plan -->
                 <div class="card-hover bg-gray-800 rounded-xl p-8 relative overflow-hidden border-2 border-blue-400">
@@ -318,8 +325,9 @@
         </div>
     </div>
 
-    <!-- FAQ Section -->
+    <!-- Keep existing FAQ section -->
     <div class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
+        <div class="py-20 bg-gradient-to-b from-blue-900 to-gray-900">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Frequently Asked Questions</h2>
             <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -342,9 +350,11 @@
             </div>
         </div>
     </div>
+    </div>
 
-    <!-- Footer -->
+    <!-- Keep existing footer -->
     <footer class="bg-gray-900 border-t border-gray-800">
+        <footer class="bg-gray-900 border-t border-gray-800">
         <div class="container mx-auto px-6 py-12">
             <div class="grid md:grid-cols-4 gap-8">
                 <div>
@@ -385,14 +395,106 @@
     </footer>
 
     <script>
-        // Initialize mobile menu
+        // Initialize Firebase with your config
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+            authDomain: "lumenos-749a1.firebaseapp.com",
+            projectId: "lumenos-749a1",
+            storageBucket: "lumenos-749a1.firebasestorage.app",
+            messagingSenderId: "857410556058",
+            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+            measurementId: "G-CEZ4PHV9GE"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Modified PayPal button configuration for Photon plan
+        paypal.Buttons({
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'subscribe'
+            },
+            createSubscription: function(data, actions) {
+                return actions.subscription.create({
+                    plan_id: 'P-68W77385P64884615M5K3SEI'
+                });
+            },
+            onApprove: async function(data, actions) {
+                try {
+                    const user = auth.currentUser;
+                    
+                    if (user) {
+                        // Existing user - update subscription in Firestore
+                        await db.collection('users').doc(user.uid).set({
+                            subscriptionId: data.subscriptionID,
+                            planType: 'photon',
+                            planId: 'P-68W77385P64884615M5K3SEI',
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        
+                        window.location.href = '/dashboard.html';
+                    } else {
+                        // New user - redirect to signup with subscription info
+                        window.location.href = `/signup.html?plan=photon&id=${data.subscriptionID}`;
+                    }
+                } catch (error) {
+                    console.error('Error processing subscription:', error);
+                    alert('There was an error processing your subscription. Please try again.');
+                }
+            }
+        }).render('#paypal-button-container-P-68W77385P64884615M5K3SEI');
+
+        // Modified PayPal button configuration for Supernova plan
+        paypal.Buttons({
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'subscribe'
+            },
+            createSubscription: function(data, actions) {
+                return actions.subscription.create({
+                    plan_id: 'P-79G95984L4854274GM5K3XQA'
+                });
+            },
+            onApprove: async function(data, actions) {
+                try {
+                    const user = auth.currentUser;
+                    
+                    if (user) {
+                        // Existing user - update subscription in Firestore
+                        await db.collection('users').doc(user.uid).set({
+                            subscriptionId: data.subscriptionID,
+                            planType: 'supernova',
+                            planId: 'P-79G95984L4854274GM5K3XQA',
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        
+                        window.location.href = '/dashboard.html';
+                    } else {
+                        // New user - redirect to signup with subscription info
+                        window.location.href = `/signup.html?plan=supernova&id=${data.subscriptionID}`;
+                    }
+                } catch (error) {
+                    console.error('Error processing subscription:', error);
+                    alert('There was an error processing your subscription. Please try again.');
+                }
+            }
+        }).render('#paypal-button-container-P-79G95984L4854274GM5K3XQA');
+
+        // Keep existing GSAP animations and mobile menu functionality
         document.addEventListener('DOMContentLoaded', () => {
             const menuBtn = document.querySelector('.mobile-menu-btn');
             const navLinks = document.querySelector('.nav-links');
 
-            menuBtn.addEventListener('click', () => {
+            menuBtn?.addEventListener('click', () => {
                 menuBtn.classList.toggle('active');
-                navLinks.classList.toggle('active');
+                navLinks?.classList.toggle('active');
             });
 
             // Initialize GSAP animations
