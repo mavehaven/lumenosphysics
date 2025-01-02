@@ -5,17 +5,185 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Lumenos</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <!-- Update Firebase SDK versions to latest 9.x -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Modern Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword,
+            onAuthStateChanged,
+            sendEmailVerification 
+        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc,
+            getDoc,
+            serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+
+        // Firebase config should be in environment variables in production
+        const firebaseConfig = {
+            apiKey: process.env.FIREBASE_API_KEY,
+            authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+            appId: process.env.FIREBASE_APP_ID,
+            measurementId: process.env.FIREBASE_MEASUREMENT_ID
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Password validation
+        const validatePassword = (password) => {
+            const minLength = 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumbers = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            
+            return {
+                isValid: password.length >= minLength && hasUpperCase && hasLowerCase && 
+                        hasNumbers && hasSpecialChar,
+                errors: {
+                    length: password.length < minLength,
+                    upperCase: !hasUpperCase,
+                    lowerCase: !hasLowerCase,
+                    number: !hasNumbers,
+                    specialChar: !hasSpecialChar
+                }
+            };
+        };
+
+        // Update password strength indicators
+        const updatePasswordStrength = () => {
+            const password = document.getElementById('password').value;
+            const validation = validatePassword(password);
+            const indicators = document.querySelectorAll('.password-requirement');
+            
+            indicators.forEach(indicator => {
+                const requirement = indicator.dataset.requirement;
+                if (validation.errors[requirement]) {
+                    indicator.classList.remove('text-green-500');
+                    indicator.classList.add('text-red-500');
+                } else {
+                    indicator.classList.remove('text-red-500');
+                    indicator.classList.add('text-green-500');
+                }
+            });
+
+            return validation.isValid;
+        };
+
+        // Handle signup
+        const handleSignup = async (e) => {
+            e.preventDefault();
+            
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate inputs
+            if (!fullName || !email || !password || !confirmPassword) {
+                showError('All fields are required');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            if (!validatePassword(password).isValid) {
+                showError('Password does not meet requirements');
+                return;
+            }
+
+            try {
+                loadingOverlay.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+
+                // Create user
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                
+                // Send verification email
+                await sendEmailVerification(userCredential.user);
+
+                // Get subscription info from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const subscriptionId = urlParams.get('id');
+                const planType = urlParams.get('plan');
+
+                // Save user data
+                await setDoc(doc(db, 'users', userCredential.user.uid), {
+                    fullName,
+                    email,
+                    subscriptionId,
+                    planType,
+                    emailVerified: false,
+                    createdAt: serverTimestamp(),
+                    subscriptionCreatedAt: serverTimestamp()
+                });
+
+                // Show verification message
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('verificationMessage').classList.remove('hidden');
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        };
+
+        const showError = (message) => {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        };
+
+        // Check if user is already logged in
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists() && userDoc.data().subscriptionId) {
+                        window.location.href = 'dashboard.html';
+                    }
+                } catch (error) {
+                    console.error('Auth state check error:', error);
+                }
+            }
+        });
+
+        // Add event listeners
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('signupForm').addEventListener('submit', handleSignup);
+            document.getElementById('password').addEventListener('input', updatePasswordStrength);
+            
+            // Update plan info
+            const urlParams = new URLSearchParams(window.location.search);
+            const planType = urlParams.get('plan');
+            const planDisplay = planType === 'supernova' ? 'Supernova Master' : 'Photon Explorer';
+            document.getElementById('planInfo').textContent = `Selected Plan: ${planDisplay}`;
+        });
+    </script>
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
-
+    
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-xl">
             <div>
@@ -28,6 +196,7 @@
                 </p>
             </div>
 
+            <!-- Signup Form -->
             <form id="signupForm" class="mt-8 space-y-6">
                 <div class="rounded-md shadow-sm space-y-4">
                     <div>
@@ -48,6 +217,32 @@
                                class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
                                placeholder="Password">
                     </div>
+                    <div>
+                        <label for="confirmPassword" class="sr-only">Confirm Password</label>
+                        <input id="confirmPassword" name="confirmPassword" type="password" required
+                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                               placeholder="Confirm Password">
+                    </div>
+
+                    <!-- Password Requirements -->
+                    <div class="text-sm space-y-2">
+                        <p class="text-gray-400">Password requirements:</p>
+                        <p class="password-requirement text-red-500" data-requirement="length">
+                            ● Minimum 8 characters
+                        </p>
+                        <p class="password-requirement text-red-500" data-requirement="upperCase">
+                            ● At least one uppercase letter
+                        </p>
+                        <p class="password-requirement text-red-500" data-requirement="lowerCase">
+                            ● At least one lowercase letter
+                        </p>
+                        <p class="password-requirement text-red-500" data-requirement="number">
+                            ● At least one number
+                        </p>
+                        <p class="password-requirement text-red-500" data-requirement="specialChar">
+                            ● At least one special character
+                        </p>
+                    </div>
                 </div>
 
                 <div>
@@ -58,90 +253,21 @@
                 </div>
             </form>
 
+            <!-- Verification Message -->
+            <div id="verificationMessage" class="hidden text-center space-y-4">
+                <h3 class="text-xl font-bold">Verify Your Email</h3>
+                <p class="text-gray-400">
+                    We've sent a verification link to your email address. 
+                    Please verify your email to continue.
+                </p>
+                <p class="text-sm text-gray-500">
+                    Once verified, you can proceed to the dashboard.
+                </p>
+            </div>
+
             <!-- Error message -->
             <div id="errorMessage" class="hidden text-red-500 text-sm text-center mt-4"></div>
         </div>
     </div>
-
-    <script>
-        // Initialize Firebase immediately
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-            authDomain: "lumenos-749a1.firebaseapp.com",
-            projectId: "lumenos-749a1",
-            storageBucket: "lumenos-749a1.firebasestorage.app",
-            messagingSenderId: "857410556058",
-            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-            measurementId: "G-CEZ4PHV9GE"
-        };
-        
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
-        // Get subscription info from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const subscriptionId = urlParams.get('id');
-        const planType = urlParams.get('plan');
-
-        // Show plan info
-        const planDisplay = planType === 'supernova' ? 'Supernova Master' : 'Photon Explorer';
-        document.getElementById('planInfo').textContent = `Selected Plan: ${planDisplay}`;
-
-        // Handle signup
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            try {
-                loadingOverlay.classList.remove('hidden');
-                errorMessage.classList.add('hidden');
-                
-                const fullName = document.getElementById('fullName').value;
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                
-                // Create user
-                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                
-                // Save user data
-                await firebase.firestore().collection('users').doc(userCredential.user.uid).set({
-                    fullName,
-                    email,
-                    subscriptionId,
-                    planType,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    subscriptionCreatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
-                
-            } catch (error) {
-                loadingOverlay.classList.add('hidden');
-                errorMessage.textContent = error.message;
-                errorMessage.classList.remove('hidden');
-                console.error('Signup error:', error);
-            }
-        });
-
-        // Check if user is already logged in
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                firebase.firestore().collection('users').doc(user.uid).get()
-                    .then((userDoc) => {
-                        if (userDoc.exists && userDoc.data().subscriptionId) {
-                            window.location.href = 'dashboard.html';
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Auth state check error:', error);
-                    });
-            }
-        });
-    </script>
 </body>
 </html>
