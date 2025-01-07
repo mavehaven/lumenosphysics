@@ -316,18 +316,38 @@
 
     <!-- Mechanics Section -->
     <section id="mechanics" class="py-20 px-6 bg-gray-50">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl font-semibold mb-12">Classical Mechanics</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <a href="newtons_laws.html" class="sim-card group">
-                    <div class="aspect-w-16 aspect-h-9 mb-4">
-                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.sciencebuddies.org%2Fblog%2Fnewton-laws-science-lessons&psig=AOvVaw26nj_y5rOHZWeZsm7tsgRh&ust=1735175656097000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDQlqHfwYoDFQAAAAAdAAAAABAE" alt="Newton's Laws" class="w-full h-full object-cover">
+        <div class="sim-card group relative">
+                    <div class="cursor-pointer" onclick="toggleNewtonDropdown()">
+                        <div class="aspect-w-16 aspect-h-9 mb-4">
+                            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                                <img src="/api/placeholder/600/400" alt="Newton's Laws" class="w-full h-full object-cover">
+                            </div>
                         </div>
+                        <h3 class="text-lg font-medium mb-2 flex items-center justify-between">
+                            Newton's Laws
+                            <svg class="w-5 h-5 transition-transform duration-200" id="newton-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </h3>
+                        <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
                     </div>
-                    <h3 class="text-lg font-medium mb-2">Newton's Laws</h3>
-                    <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
-                </a>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="newton-dropdown" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+                        <a href="newtons_laws.html#first" class="block px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
+                            <div class="font-medium text-gray-900">First Law - Inertia</div>
+                            <div class="text-sm text-gray-500">Objects in motion stay in motion</div>
+                        </a>
+                        <a href="newtons_laws.html#second" class="block px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
+                            <div class="font-medium text-gray-900">Second Law - Force & Acceleration</div>
+                            <div class="text-sm text-gray-500">F = ma in action</div>
+                        </a>
+                        <a href="newtons_laws.html#third" class="block px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
+                            <div class="font-medium text-gray-900">Third Law - Action & Reaction</div>
+                            <div class="text-sm text-gray-500">For every action, there's an equal and opposite reaction</div>
+                        </a>
+                    </div>
+                </div>
 
                 <a href="projectile_motion.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
@@ -639,6 +659,25 @@ document.addEventListener('click', (e) => {
 window.addEventListener('resize', () => {
     if (window.innerWidth >= 768) {
         mobileMenu.classList.add('hidden');
+    }
+});
+        // Newton's Laws Dropdown
+function toggleNewtonDropdown() {
+    const dropdown = document.getElementById('newton-dropdown');
+    const arrow = document.getElementById('newton-arrow');
+    
+    dropdown.classList.toggle('hidden');
+    arrow.style.transform = dropdown.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+// Close Newton's dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('newton-dropdown');
+    const card = e.target.closest('.sim-card');
+    
+    if (!card && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+        document.getElementById('newton-arrow').style.transform = 'rotate(0deg)';
     }
 });
     </script>
