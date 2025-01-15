@@ -3,16 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physics Hub - Interactive Learning</title>
+    <title>Physics Hub</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AZllIyLc516tf0cbPYsAP7STd9UG1lXvKZOSqodlghwKpm4oRN0F6EMVNiKoOUzfs91AaeagLtg55geR&vault=true&intent=subscription"></script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-        
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
         
         /* Dark mode styles */
@@ -154,73 +147,9 @@
         .dark .text-gray-600 {
             color: #d1d5db;
         }
-
-        /* Add paywall styles */
-        .content-blur {
-            filter: blur(5px);
-            pointer-events: none;
-            user-select: none;
-            transition: filter 0.3s ease;
-        }
-
-        .paywall-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .paywall-overlay.visible {
-            display: flex;
-            opacity: 1;
-        }
-
-        /* Auth state styles */
-        .auth-loading {
-            position: fixed;
-            inset: 0;
-            background: rgba(17, 24, 39, 0.9);
-            z-index: 1100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
     </style>
 </head>
-<body class="bg-white text-gray-900">
-    <!-- Auth Loading State -->
-    <div id="authLoading" class="auth-loading">
-        <div class="text-center text-white">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            <p class="mt-4">Verifying access...</p>
-        </div>
-    </div>
-
-    <!-- Paywall Overlay -->
-    <div id="paywallOverlay" class="paywall-overlay">
-        <div class="max-w-2xl mx-auto px-4 py-16 text-center text-white">
-            <h2 class="text-4xl font-bold mb-8">Unlock Full Access</h2>
-            <p class="text-xl mb-8">Experience interactive physics simulations that make learning intuitive</p>
-            <div class="space-y-6">
-                <button onclick="window.location.href='pricing.html'" 
-                        class="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors">
-                    View Plans
-                </button>
-                <div class="text-sm">
-                    Already subscribed? 
-                    <button onclick="showLogin()" class="text-blue-400 hover:text-blue-300">Sign in</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div id="mainContent" class="opacity-0 transition-opacity duration-300">
-        <body class="bg-white text-gray-900">
+                  <body class="bg-white text-gray-900">
                       <!-- Navigation -->
                      <body class="bg-white text-gray-900">
     <!-- Navigation -->
@@ -233,8 +162,7 @@
                         <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
                              alt="Physics Hub Logo" 
                              class="h-8 w-8">
-                        <span class="text-xl font-semibold text-gray-900">PhysicsHub</span>
-                    </a>
+                             </a>
                 </div>
 
                 <!-- Right side - Desktop Navigation -->
@@ -316,43 +244,118 @@
 
     <!-- Mechanics Section -->
     <section id="mechanics" class="py-20 px-6 bg-gray-50">
-        <div class="sim-card group relative">
-                    <div class="cursor-pointer" onclick="toggleNewtonDropdown()">
-                        <div class="aspect-w-16 aspect-h-9 mb-4">
-                            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                                <img src="/api/placeholder/600/400" alt="Newton's Laws" class="w-full h-full object-cover">
-                            </div>
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Classical Mechanics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="newtons_laws.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1736967875762x778426384917021200/Screenshot%202025-01-15%20at%2021.04.15.png" alt="Newton's Laws" class="w-full h-full object-cover">
                         </div>
-                        <h3 class="text-lg font-medium mb-2 flex items-center justify-between">
-                            Newton's Laws
-                            <svg class="w-5 h-5 transition-transform duration-200" id="newton-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </h3>
-                        <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
                     </div>
-                    
-                    <!-- Dropdown Menu -->
-                    <div id="newton-dropdown" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-lg overflow-hidden z-50">
-                        <a href="newtons_laws.html#first" class="block px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
-                            <div class="font-medium text-gray-900">First Law - Inertia</div>
-                            <div class="text-sm text-gray-500">Objects in motion stay in motion</div>
-                        </a>
-                        <a href="newtons_laws.html#second" class="block px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
-                            <div class="font-medium text-gray-900">Second Law - Force & Acceleration</div>
-                            <div class="text-sm text-gray-500">F = ma in action</div>
-                        </a>
-                        <a href="newtons_laws.html#third" class="block px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
-                            <div class="font-medium text-gray-900">Third Law - Action & Reaction</div>
-                            <div class="text-sm text-gray-500">For every action, there's an equal and opposite reaction</div>
-                        </a>
-                    </div>
-                </div>
+                    <h3 class="text-lg font-medium mb-2">Newton's Laws</h3>
+                    <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
+                </a>
 
                 <a href="projectile_motion.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="Projectile Motion" class="w-full h-full object-cover">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Grid lines -->
+  <g stroke="#e2e8f0" stroke-width="1">
+    <!-- Vertical grid lines -->
+    <line x1="100" y1="50" x2="100" y2="500"/>
+    <line x1="200" y1="50" x2="200" y2="500"/>
+    <line x1="300" y1="50" x2="300" y2="500"/>
+    <line x1="400" y1="50" x2="400" y2="500"/>
+    <line x1="500" y1="50" x2="500" y2="500"/>
+    <line x1="600" y1="50" x2="600" y2="500"/>
+    <line x1="700" y1="50" x2="700" y2="500"/>
+    
+    <!-- Horizontal grid lines -->
+    <line x1="50" y1="100" x2="750" y2="100"/>
+    <line x1="50" y1="200" x2="750" y2="200"/>
+    <line x1="50" y1="300" x2="750" y2="300"/>
+    <line x1="50" y1="400" x2="750" y2="400"/>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Projectile Motion
+  </text>
+
+  <!-- Axes -->
+  <g stroke="#334155" stroke-width="2">
+    <line x1="50" y1="500" x2="750" y2="500"/> <!-- x-axis -->
+    <line x1="50" y1="50" x2="50" y2="500"/>   <!-- y-axis -->
+  </g>
+
+  <!-- Axis labels -->
+  <text x="750" y="530" font-family="Arial" font-size="16" fill="#334155">Distance (x)</text>
+  <text x="20" y="50" font-family="Arial" font-size="16" fill="#334155">Height (y)</text>
+
+  <!-- Parabolic path -->
+  <path d="M 50,450 Q 400,100 750,450" stroke="#3b82f6" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+
+  <!-- Projectile -->
+  <circle r="10" fill="#ef4444">
+    <animateMotion
+      dur="3s"
+      repeatCount="indefinite"
+      path="M 50,450 Q 400,100 750,450"
+    />
+  </circle>
+
+  <!-- Initial velocity components -->
+  <g transform="translate(50,450)">
+    <!-- Initial velocity vector -->
+    <line x1="0" y1="0" x2="40" y2="-40" stroke="#dc2626" stroke-width="2">
+      <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+    </line>
+    <!-- V0x component -->
+    <line x1="0" y1="0" x2="40" y2="0" stroke="#16a34a" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="20" y="20" text-anchor="middle" font-family="Arial" font-size="14" fill="#16a34a">v₀ₓ</text>
+    <!-- V0y component -->
+    <line x1="0" y1="0" x2="0" y2="-40" stroke="#16a34a" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="-15" y="-20" text-anchor="middle" font-family="Arial" font-size="14" fill="#16a34a">v₀ᵧ</text>
+  </g>
+
+  <!-- Gravity vector -->
+  <g>
+    <line x1="400" y1="250" x2="400" y2="290" stroke="#7c3aed" stroke-width="2">
+      <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+    </line>
+    <text x="420" y="270" font-family="Arial" font-size="16" fill="#7c3aed">g</text>
+  </g>
+
+  <!-- Key points -->
+  <g font-family="Arial" font-size="14" fill="#475569">
+    <text x="50" y="480">Launch point</text>
+    <text x="400" y="80">Maximum height</text>
+    <text x="700" y="480">Landing point</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(600,100)">
+    <rect width="140" height="120" fill="white" stroke="#cbd5e1"/>
+    <text x="10" y="30" font-family="Arial" font-size="14" fill="#334155">Legend:</text>
+    <line x1="10" y1="50" x2="40" y2="50" stroke="#dc2626" stroke-width="2"/>
+    <text x="50" y="55" font-family="Arial" font-size="12" fill="#334155">Initial velocity</text>
+    <line x1="10" y1="70" x2="40" y2="70" stroke="#16a34a" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="50" y="75" font-family="Arial" font-size="12" fill="#334155">Components</text>
+    <line x1="10" y1="90" x2="40" y2="90" stroke="#7c3aed" stroke-width="2"/>
+    <text x="50" y="95" font-family="Arial" font-size="12" fill="#334155">Gravity</text>
+  </g>
+
+  <!-- Motion equations -->
+  <g transform="translate(100,100)" font-family="Arial" font-size="14" fill="#1e3a8a">
+    <text x="0" y="0">x = v₀ₓt</text>
+    <text x="0" y="20">y = v₀ᵧt - ½gt²</text>
+  </g>
+</svg>
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Projectile Motion</h3>
@@ -362,7 +365,141 @@
                 <a href="work_energy.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="Work and Energy" class="w-full h-full object-cover">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Work and Energy Transformations
+  </text>
+
+  <!-- Inclined plane system -->
+  <g transform="translate(50,150)">
+    <!-- Title for this section -->
+    <text x="150" y="-20" font-family="Arial" font-size="18" fill="#1e3a8a">Work Against Gravity</text>
+    
+    <!-- Inclined plane -->
+    <path d="M 50,300 L 300,100 L 300,300 Z" fill="#e2e8f0"/>
+    
+    <!-- Block -->
+    <rect width="40" height="40" fill="#3b82f6">
+      <animateMotion
+        dur="4s"
+        repeatCount="indefinite"
+        path="M 70,260 L 280,100"
+        rotate="auto"
+      />
+    </rect>
+    
+    <!-- Force arrows -->
+    <g>
+      <!-- Applied force -->
+      <path d="M 100,200 L 150,170 L 145,165 M 150,170 L 145,175" 
+            stroke="#dc2626" stroke-width="3">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+      </path>
+      <text x="160" y="165" font-family="Arial" font-size="14" fill="#dc2626">Applied Force</text>
+      
+      <!-- Weight -->
+      <path d="M 100,200 L 100,240 L 95,235 M 100,240 L 105,235" 
+            stroke="#0284c7" stroke-width="3"/>
+      <text x="110" y="220" font-family="Arial" font-size="14" fill="#0284c7">Weight</text>
+    </g>
+    
+    <!-- Energy bars -->
+    <g transform="translate(350,0)">
+      <text x="0" y="50" font-family="Arial" font-size="14" fill="#334155">Potential Energy</text>
+      <rect x="0" y="60" width="30" height="200" fill="#e2e8f0"/>
+      <rect x="0" y="60" width="30" height="0" fill="#22c55e">
+        <animate attributeName="height"
+                 values="0;200;0"
+                 dur="4s"
+                 repeatCount="indefinite"/>
+      </rect>
+      
+      <text x="50" y="50" font-family="Arial" font-size="14" fill="#334155">Kinetic Energy</text>
+      <rect x="50" y="60" width="30" height="200" fill="#e2e8f0"/>
+      <rect x="50" y="60" width="30" height="0" fill="#f97316">
+        <animate attributeName="height"
+                 values="0;100;0"
+                 dur="4s"
+                 repeatCount="indefinite"/>
+      </rect>
+    </g>
+  </g>
+
+  <!-- Spring system -->
+  <g transform="translate(50,400)">
+    <!-- Title for this section -->
+    <text x="150" y="-20" font-family="Arial" font-size="18" fill="#1e3a8a">Elastic Potential Energy</text>
+    
+    <!-- Fixed wall -->
+    <rect x="50" y="0" width="20" height="100" fill="#64748b"/>
+    
+    <!-- Spring -->
+    <path d="M 70,50 Q 80,50 85,40 Q 90,30 95,50 Q 100,70 105,40 Q 110,30 115,50" 
+          stroke="#475569" stroke-width="3" fill="none">
+      <animate attributeName="d"
+               values="M 70,50 Q 80,50 85,40 Q 90,30 95,50 Q 100,70 105,40 Q 110,30 115,50;
+                       M 70,50 Q 90,50 100,40 Q 110,30 120,50 Q 130,70 140,40 Q 150,30 160,50;
+                       M 70,50 Q 80,50 85,40 Q 90,30 95,50 Q 100,70 105,40 Q 110,30 115,50"
+               dur="2s"
+               repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Mass -->
+    <rect x="115" y="25" width="50" height="50" fill="#3b82f6">
+      <animate attributeName="x"
+               values="115;160;115"
+               dur="2s"
+               repeatCount="indefinite"/>
+    </rect>
+    
+    <!-- Energy bars -->
+    <g transform="translate(350,0)">
+      <text x="0" y="30" font-family="Arial" font-size="14" fill="#334155">Elastic Energy</text>
+      <rect x="0" y="40" width="30" height="100" fill="#e2e8f0"/>
+      <rect x="0" y="40" width="30" height="0" fill="#8b5cf6">
+        <animate attributeName="height"
+                 values="0;100;0"
+                 dur="2s"
+                 repeatCount="indefinite"/>
+      </rect>
+      
+      <text x="50" y="30" font-family="Arial" font-size="14" fill="#334155">Kinetic Energy</text>
+      <rect x="50" y="40" width="30" height="100" fill="#e2e8f0"/>
+      <rect x="50" y="40" width="30" height="0" fill="#f97316">
+        <animate attributeName="height"
+                 values="100;0;100"
+                 dur="2s"
+                 repeatCount="indefinite"/>
+      </rect>
+    </g>
+  </g>
+
+  <!-- Equations -->
+  <g transform="translate(550,150)" font-family="Arial" font-size="16" fill="#1e3a8a">
+    <text x="0" y="0">Work = Force × Distance</text>
+    <text x="0" y="30">W = F·d·cos(θ)</text>
+    <text x="0" y="60">ΔE = Wnet</text>
+    <text x="0" y="90" font-size="14" fill="#475569">Work-Energy Theorem:</text>
+    <text x="0" y="110" font-size="14" fill="#475569">Work done equals change</text>
+    <text x="0" y="130" font-size="14" fill="#475569">in energy of the system</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(550,300)">
+    <rect width="200" height="150" fill="white" stroke="#cbd5e1"/>
+    <text x="10" y="30" font-family="Arial" font-size="14" fill="#334155">Energy Types:</text>
+    <rect x="10" y="45" width="20" height="20" fill="#22c55e"/>
+    <text x="40" y="60" font-family="Arial" font-size="12" fill="#334155">Gravitational Potential</text>
+    <rect x="10" y="75" width="20" height="20" fill="#8b5cf6"/>
+    <text x="40" y="90" font-family="Arial" font-size="12" fill="#334155">Elastic Potential</text>
+    <rect x="10" y="105" width="20" height="20" fill="#f97316"/>
+    <text x="40" y="120" font-family="Arial" font-size="12" fill="#334155">Kinetic Energy</text>
+  </g>
+</svg>
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Work and Energy</h3>
@@ -380,7 +517,124 @@
                 <a href="circuits.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="Circuit Lab" class="w-full h-full object-cover">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Circuit Laboratory
+  </text>
+
+  <!-- Breadboard -->
+  <g transform="translate(50,80)">
+    <rect width="700" height="150" fill="#e2e8f0" stroke="#94a3b8"/>
+    <g stroke="#94a3b8" stroke-width="1">
+      <!-- Power rails -->
+      <line x1="0" y1="30" x2="700" y2="30" stroke-width="2" stroke="#dc2626"/>
+      <line x1="0" y1="120" x2="700" y2="120" stroke-width="2" stroke="#3b82f6"/>
+      <!-- Terminal holes -->
+      <g id="holes" fill="#94a3b8">
+        <circle cx="50" cy="30" r="2"/>
+        <circle cx="50" cy="60" r="2"/>
+        <circle cx="50" cy="90" r="2"/>
+        <circle cx="50" cy="120" r="2"/>
+      </g>
+      <use href="#holes" x="50"/>
+      <use href="#holes" x="100"/>
+      <use href="#holes" x="150"/>
+      <use href="#holes" x="200"/>
+      <use href="#holes" x="250"/>
+    </g>
+  </g>
+
+  <!-- Multimeter -->
+  <g transform="translate(50,250)">
+    <rect width="200" height="150" rx="10" fill="#334155"/>
+    <circle cx="100" cy="75" r="40" fill="#1e293b"/>
+    <text x="100" y="80" text-anchor="middle" font-family="Arial" font-size="16" fill="#22c55e">3.3V</text>
+    <!-- Dial -->
+    <path d="M 100,75 L 130,75" stroke="#22c55e" stroke-width="2">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        values="0 100 75; 30 100 75; 0 100 75"
+        dur="3s"
+        repeatCount="indefinite"/>
+    </path>
+    <!-- Probes -->
+    <line x1="40" y1="150" x2="40" y2="200" stroke="red" stroke-width="2"/>
+    <line x1="160" y1="150" x2="160" y2="200" stroke="black" stroke-width="2"/>
+  </g>
+
+  <!-- Components -->
+  <g transform="translate(300,250)">
+    <!-- Resistor -->
+    <g transform="translate(0,0)">
+      <text x="0" y="-10" font-family="Arial" font-size="14" fill="#475569">Resistor</text>
+      <path d="M 0,0 L 10,0 L 15,-5 L 25,5 L 35,-5 L 45,5 L 55,-5 L 60,0 L 70,0" 
+            stroke="#475569" stroke-width="2" fill="none"/>
+      <text x="80" y="5" font-family="Arial" font-size="12" fill="#475569">1kΩ</text>
+    </g>
+
+    <!-- Capacitor -->
+    <g transform="translate(0,50)">
+      <text x="0" y="-10" font-family="Arial" font-size="14" fill="#475569">Capacitor</text>
+      <path d="M 0,0 L 30,0 M 30,-10 L 30,10 M 40,-10 L 40,10 M 40,0 L 70,0" 
+            stroke="#475569" stroke-width="2" fill="none"/>
+      <text x="80" y="5" font-family="Arial" font-size="12" fill="#475569">10μF</text>
+    </g>
+
+    <!-- Inductor -->
+    <g transform="translate(0,100)">
+      <text x="0" y="-10" font-family="Arial" font-size="14" fill="#475569">Inductor</text>
+      <path d="M 0,0 C 10,0 10,-10 20,-10 C 30,-10 30,10 40,10 C 50,10 50,-10 60,-10 C 70,-10 70,0 80,0" 
+            stroke="#475569" stroke-width="2" fill="none"/>
+      <text x="90" y="5" font-family="Arial" font-size="12" fill="#475569">100mH</text>
+    </g>
+  </g>
+
+  <!-- Oscilloscope Display -->
+  <g transform="translate(500,250)">
+    <rect width="250" height="200" rx="10" fill="#1e293b"/>
+    <rect x="10" y="10" width="230" height="150" fill="#0f172a"/>
+    
+    <!-- Grid -->
+    <g stroke="#27272a" stroke-width="0.5">
+      <line x1="10" y1="85" x2="240" y2="85"/>
+      <line x1="125" y1="10" x2="125" y2="160"/>
+    </g>
+    
+    <!-- Waveform -->
+    <path d="M 10,85 Q 30,85 40,45 Q 50,5 70,85 Q 90,165 110,85 Q 130,5 150,85 Q 170,165 190,85 Q 210,5 230,85" 
+          stroke="#22c55e" stroke-width="2" fill="none">
+      <animate attributeName="d" 
+               values="M 10,85 Q 30,85 40,45 Q 50,5 70,85 Q 90,165 110,85 Q 130,5 150,85 Q 170,165 190,85 Q 210,5 230,85;
+                       M 10,85 Q 30,85 40,125 Q 50,165 70,85 Q 90,5 110,85 Q 130,165 150,85 Q 170,5 190,85 Q 210,165 230,85;
+                       M 10,85 Q 30,85 40,45 Q 50,5 70,85 Q 90,165 110,85 Q 130,5 150,85 Q 170,165 190,85 Q 210,5 230,85"
+               dur="4s"
+               repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Controls -->
+    <circle cx="30" cy="180" r="8" fill="#475569"/>
+    <circle cx="60" cy="180" r="8" fill="#475569"/>
+    <rect x="90" y="175" width="40" height="10" rx="5" fill="#475569"/>
+  </g>
+
+  <!-- Measurements and Equations -->
+  <g transform="translate(50,450)" font-family="Arial" font-size="14" fill="#1e3a8a">
+    <text x="0" y="0">V = IR (Ohm's Law)</text>
+    <text x="0" y="25">P = VI (Power)</text>
+    <text x="0" y="50">Z = √(R² + (XL - XC)²) (Impedance)</text>
+    
+    <text x="300" y="0">Common Measurements:</text>
+    <text x="300" y="25" fill="#475569">• Voltage (V)</text>
+    <text x="300" y="50" fill="#475569">• Current (I)</text>
+    <text x="300" y="75" fill="#475569">• Resistance (Ω)</text>
+    <text x="300" y="100" fill="#475569">• Frequency (Hz)</text>
+  </g>
+</svg>
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Circuit Lab</h3>
@@ -390,7 +644,92 @@
                 <a href="em_waves.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="EM Waves" class="w-full h-full object-cover">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Electromagnetic Wave Propagation
+  </text>
+
+  <!-- Coordinate system -->
+  <g transform="translate(100,300)">
+    <!-- Axes -->
+    <line x1="0" y1="0" x2="600" y2="0" stroke="#334155" stroke-width="2"/> <!-- x-axis -->
+    <line x1="300" y1="-200" x2="300" y2="200" stroke="#334155" stroke-width="2"/> <!-- y-axis -->
+    <line x1="300" y1="0" x2="300" y2="-200" stroke="#334155" stroke-width="2"/> <!-- z-axis -->
+    <path d="M 300,-200 L 295,-190 L 305,-190 Z" fill="#334155"/> <!-- z arrow -->
+    
+    <!-- Axis labels -->
+    <text x="610" y="5" font-family="Arial" font-size="14" fill="#334155">x (Propagation)</text>
+    <text x="305" y="220" font-family="Arial" font-size="14" fill="#334155">y (E-field)</text>
+    <text x="305" y="-210" font-family="Arial" font-size="14" fill="#334155">z (B-field)</text>
+
+    <!-- Electric field wave (blue) -->
+    <path d="M 0,0 C 50,-80 150,-80 200,0 C 250,80 350,80 400,0 C 450,-80 550,-80 600,0" 
+          stroke="#3b82f6" stroke-width="3" fill="none">
+      <animate attributeName="d" 
+               values="M 0,0 C 50,-80 150,-80 200,0 C 250,80 350,80 400,0 C 450,-80 550,-80 600,0;
+                       M 0,0 C 50,80 150,80 200,0 C 250,-80 350,-80 400,0 C 450,80 550,80 600,0;
+                       M 0,0 C 50,-80 150,-80 200,0 C 250,80 350,80 400,0 C 450,-80 550,-80 600,0"
+               dur="3s"
+               repeatCount="indefinite"/>
+    </path>
+
+    <!-- Magnetic field wave (red) -->
+    <g transform="rotate(90 300 0)">
+      <path d="M 0,0 C 50,-80 150,-80 200,0 C 250,80 350,80 400,0 C 450,-80 550,-80 600,0" 
+            stroke="#dc2626" stroke-width="3" fill="none" transform="translate(0 -300)">
+        <animate attributeName="d" 
+                 values="M 0,0 C 50,-80 150,-80 200,0 C 250,80 350,80 400,0 C 450,-80 550,-80 600,0;
+                         M 0,0 C 50,80 150,80 200,0 C 250,-80 350,-80 400,0 C 450,80 550,80 600,0;
+                         M 0,0 C 50,-80 150,-80 200,0 C 250,80 350,80 400,0 C 450,-80 550,-80 600,0"
+                 dur="3s"
+                 repeatCount="indefinite"/>
+      </path>
+    </g>
+
+    <!-- Wavelength indicator -->
+    <path d="M 200,-100 L 200,-120 L 400,-120 L 400,-100" 
+          stroke="#475569" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="300" y="-140" text-anchor="middle" font-family="Arial" font-size="14" fill="#475569">λ (wavelength)</text>
+  </g>
+
+  <!-- EM Spectrum -->
+  <g transform="translate(50,500)">
+    <text x="0" y="-20" font-family="Arial" font-size="16" fill="#1e3a8a">Electromagnetic Spectrum</text>
+    <!-- Spectrum bar -->
+    <defs>
+      <linearGradient id="spectrum" x1="0%" y1="0%" x2="100%" y1="0%">
+        <stop offset="0%" style="stop-color:#7c3aed"/> <!-- Radio -->
+        <stop offset="15%" style="stop-color:#4338ca"/> <!-- Microwave -->
+        <stop offset="30%" style="stop-color:#3b82f6"/> <!-- Infrared -->
+        <stop offset="45%" style="stop-color:#22c55e"/> <!-- Visible -->
+        <stop offset="60%" style="stop-color:#f59e0b"/> <!-- UV -->
+        <stop offset="75%" style="stop-color:#dc2626"/> <!-- X-ray -->
+        <stop offset="90%" style="stop-color:#7c2d12"/> <!-- Gamma -->
+      </linearGradient>
+    </defs>
+    <rect width="700" height="30" fill="url(#spectrum)"/>
+    
+    <!-- Wavelength markers -->
+    <g font-family="Arial" font-size="12" fill="#1e3a8a">
+      <text x="0" y="50">Radio</text>
+      <text x="100" y="50">Microwave</text>
+      <text x="250" y="50">IR</text>
+      <text x="350" y="50">Visible</text>
+      <text x="450" y="50">UV</text>
+      <text x="550" y="50">X-ray</text>
+      <text x="650" y="50">Gamma</text>
+    </g>
+  </g>
+
+  <!-- Equations -->
+  <g transform="translate(50,100)" font-family="Arial" font-size="14" fill="#1e3a8a">
+    <text x="0" y="0">c = λf (Wave speed)</text>
+    <text x="0" y="25">E = hf (Photon energy)</text>
+    <text x="0" y="50">c = 3 × 10⁸ m/s
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Electromagnetic Waves</h3>
@@ -408,7 +747,166 @@
                 <a href="wave_motion.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="Wave Motion" class="w-full h-full object-cover">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Wave Motion and Properties
+  </text>
+
+  <!-- Sine Wave Section -->
+  <g transform="translate(50,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Sinusoidal Wave</text>
+    
+    <!-- Axes -->
+    <line x1="0" y1="100" x2="400" y2="100" stroke="#334155" stroke-width="2"/> <!-- x-axis -->
+    <line x1="50" y1="20" x2="50" y2="180" stroke="#334155" stroke-width="2"/> <!-- y-axis -->
+    
+    <!-- Wave -->
+    <path d="M 50,100 C 100,50 150,50 200,100 C 250,150 300,150 350,100" 
+          stroke="#3b82f6" stroke-width="3" fill="none">
+      <animate attributeName="d" 
+               values="M 50,100 C 100,50 150,50 200,100 C 250,150 300,150 350,100;
+                       M 50,100 C 100,150 150,150 200,100 C 250,50 300,50 350,100;
+                       M 50,100 C 100,50 150,50 200,100 C 250,150 300,150 350,100"
+               dur="2s"
+               repeatCount="indefinite"/>
+    </path>
+
+    <!-- Amplitude Marker -->
+    <line x1="200" y1="100" x2="200" y2="50" stroke="#22c55e" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="210" y="75" font-family="Arial" font-size="14" fill="#22c55e">Amplitude</text>
+
+    <!-- Wavelength Marker -->
+    <path d="M 50,160 L 200,160" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="125" y="175" font-family="Arial" font-size="14" fill="#dc2626">Wavelength (λ)</text>
+  </g>
+
+  <!-- Standing Wave Section -->
+  <g transform="translate(50,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Standing Wave</text>
+    
+    <!-- String -->
+    <line x1="50" y1="100" x2="350" y2="100" stroke="#94a3b8" stroke-width="4"/>
+    
+    <!-- Nodes -->
+    <circle cx="50" cy="100" r="5" fill="#f97316"/>
+    <circle cx="200" cy="100" r="5" fill="#f97316"/>
+    <circle cx="350" cy="100" r="5" fill="#f97316"/>
+    
+    <!-- Standing Wave -->
+    <path d="M 50,100 Q 125,50 200,100 Q 275,150 350,100" 
+          stroke="#8b5cf6" stroke-width="3" fill="none">
+      <animate attributeName="d"
+               values="M 50,100 Q 125,50 200,100 Q 275,150 350,100;
+                       M 50,100 Q 125,150 200,100 Q 275,50 350,100;
+                       M 50,100 Q 125,50 200,100 Q 275,150 350,100"
+               dur="1s"
+               repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Node Labels -->
+    <text x="50" y="120" text-anchor="middle" font-family="Arial" font-size="14" fill="#f97316">Node</text>
+    <text x="200" y="130" text-anchor="middle" font-family="Arial" font-size="14" fill="#8b5cf6">Antinode</text>
+  </g>
+
+  <!-- Wave Interference Section -->
+  <g transform="translate(450,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Wave Interference</text>
+    
+    <!-- Axes -->
+    <line x1="0" y1="100" x2="300" y2="100" stroke="#334155" stroke-width="2"/>
+    
+    <!-- Wave 1 -->
+    <path d="M 0,100 C 25,80 75,80 100,100 C 125,120 175,120 200,100" 
+          stroke="#ef4444" stroke-width="2" fill="none" stroke-dasharray="4,4">
+      <animate attributeName="d"
+               values="M 0,100 C 25,80 75,80 100,100 C 125,120 175,120 200,100;
+                       M 0,100 C 25,120 75,120 100,100 C 125,80 175,80 200,100;
+                       M 0,100 C 25,80 75,80 100,100 C 125,120 175,120 200,100"
+               dur="2s"
+               repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Wave 2 -->
+    <path d="M 0,100 C 25,120 75,120 100,100 C 125,80 175,80 200,100" 
+          stroke="#3b82f6" stroke-width="2" fill="none" stroke-dasharray="4,4">
+      <animate attributeName="d"
+               values="M 0,100 C 25,120 75,120 100,100 C 125,80 175,80 200,100;
+                       M 0,100 C 25,80 75,80 100,100 C 125,120 175,120 200,100;
+                       M 0,100 C 25,120 75,120 100,100 C 125,80 175,80 200,100"
+               dur="2s"
+               repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Resultant Wave -->
+    <path d="M 0,100 C 25,60 75,60 100,100 C 125,140 175,140 200,100" 
+          stroke="#22c55e" stroke-width="3" fill="none">
+      <animate attributeName="d"
+               values="M 0,100 C 25,60 75,60 100,100 C 125,140 175,140 200,100;
+                       M 0,100 C 25,140 75,140 100,100 C 125,60 175,60 200,100;
+                       M 0,100 C 25,60 75,60 100,100 C 125,140 175,140 200,100"
+               dur="2s"
+               repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Wave Types Section -->
+  <g transform="translate(450,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Wave Types</text>
+    
+    <!-- Longitudinal Wave (Sound Wave) -->
+    <g transform="translate(0,50)">
+      <text x="0" y="0" font-family="Arial" font-size="14" fill="#475569">Longitudinal Wave</text>
+      <g id="compression">
+        <line x1="0" y1="20" x2="5" y2="20" stroke="#64748b" stroke-width="2"/>
+        <line x1="10" y1="20" x2="15" y2="20" stroke="#64748b" stroke-width="2"/>
+        <line x1="20" y1="20" x2="25" y2="20" stroke="#64748b" stroke-width="2"/>
+      </g>
+      <use href="#compression" x="30"/>
+      <use href="#compression" x="90"/>
+      <use href="#compression" x="150"/>
+      <animateTransform
+        attributeName="transform"
+        type="translate"
+        values="0,50; 10,50; 0,50"
+        dur="1s"
+        repeatCount="indefinite"/>
+    </g>
+    
+    <!-- Surface Wave -->
+    <g transform="translate(0,120)">
+      <text x="0" y="0" font-family="Arial" font-size="14" fill="#475569">Surface Wave</text>
+      <path d="M 0,50 C 25,30 50,70 75,50 C 100,30 125,70 150,50" 
+            stroke="#0ea5e9" stroke-width="3" fill="none">
+        <animate attributeName="d"
+                 values="M 0,50 C 25,30 50,70 75,50 C 100,30 125,70 150,50;
+                         M 0,50 C 25,70 50,30 75,50 C 100,70 125,30 150,50;
+                         M 0,50 C 25,30 50,70 75,50 C 100,30 125,70 150,50"
+                 dur="2s"
+                 repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- Wave Equations -->
+  <g transform="translate(50,500)" font-family="Arial" font-size="14" fill="#1e3a8a">
+    <text x="0" y="0">v = fλ (Wave speed)</text>
+    <text x="0" y="25">E = ½A²ω² (Wave energy)</text>
+    <text x="0" y="50">ω = 2πf (Angular frequency)</text>
+    
+    <text x="200" y="0">Key Properties:</text>
+    <text x="200" y="25" fill="#475569">• Frequency (f)</text>
+    <text x="200" y="50" fill="#475569">• Period (T = 1/f)</text>
+    <text x="200" y="75" fill="#475569">• Amplitude (A)</text>
+  </g>
+</svg>
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Wave Motion</h3>
@@ -418,7 +916,134 @@
                 <a href="optics.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="Optics Lab" class="w-full h-full object-cover">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Optics Lab
+  </text>
+
+  <!-- Reflection Section -->
+  <g transform="translate(50,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Law of Reflection</text>
+    
+    <!-- Mirror Surface -->
+    <line x1="50" y1="100" x2="350" y2="100" stroke="#94a3b8" stroke-width="4"/>
+    
+    <!-- Normal Line -->
+    <line x1="200" y1="50" x2="200" y2="150" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+    
+    <!-- Incident Ray -->
+    <path d="M 100,50 L 200,100" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowhead)">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Reflected Ray -->
+    <path d="M 200,100 L 300,50" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowhead)">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </path>
+    
+    <!-- Angle Labels -->
+    <text x="160" y="80" font-family="Arial" font-size="14" fill="#475569">θ</text>
+    <text x="240" y="80" font-family="Arial" font-size="14" fill="#475569">θ</text>
+  </g>
+
+  <!-- Refraction Section -->
+  <g transform="translate(450,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Refraction</text>
+    
+    <!-- Interface Line -->
+    <line x1="50" y1="100" x2="250" y2="100" stroke="#94a3b8" stroke-width="4"/>
+    
+    <!-- Medium Labels -->
+    <text x="70" y="80" font-family="Arial" font-size="14" fill="#475569">n₁</text>
+    <text x="70" y="130" font-family="Arial" font-size="14" fill="#475569">n₂</text>
+    
+    <!-- Incident Ray -->
+    <path d="M 100,50 L 150,100" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Refracted Ray -->
+    <path d="M 150,100 L 180,150" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </path>
+  </g>
+
+  <!-- Lens Section -->
+  <g transform="translate(50,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Convex Lens</text>
+    
+    <!-- Lens -->
+    <path d="M 150,50 Q 200,50 200,100 Q 200,150 150,150" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+    
+    <!-- Principal Axis -->
+    <line x1="50" y1="100" x2="350" y2="100" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+    
+    <!-- Focal Points -->
+    <circle cx="100" cy="100" r="3" fill="#f97316"/>
+    <circle cx="300" cy="100" r="3" fill="#f97316"/>
+    <text x="100" y="120" text-anchor="middle" font-family="Arial" font-size="14" fill="#f97316">F</text>
+    <text x="300" y="120" text-anchor="middle" font-family="Arial" font-size="14" fill="#f97316">F'</text>
+    
+    <!-- Ray Diagram -->
+    <g>
+      <!-- Incident Rays -->
+      <path d="M 50,80 L 200,80" stroke="#22c55e" stroke-width="2">
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 50,120 L 200,120" stroke="#22c55e" stroke-width="2">
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+      </path>
+      
+      <!-- Refracted Rays -->
+      <path d="M 200,80 L 350,100" stroke="#22c55e" stroke-width="2">
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+      </path>
+      <path d="M 200,120 L 350,100" stroke="#22c55e" stroke-width="2">
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- Optical Instruments Section -->
+  <g transform="translate(450,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Microscope</text>
+    
+    <!-- Simple Microscope Diagram -->
+    <path d="M 100,50 Q 150,50 150,100 Q 150,150 100,150" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+    <path d="M 100,170 Q 150,170 150,220 Q 150,270 100,270" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+    
+    <!-- Labels -->
+    <text x="180" y="100" font-family="Arial" font-size="14" fill="#475569">Objective</text>
+    <text x="180" y="220" font-family="Arial" font-size="14" fill="#475569">Eyepiece</text>
+  </g>
+
+  <!-- Equations and Properties -->
+  <g transform="translate(50,500)" font-family="Arial" font-size="14" fill="#1e3a8a">
+    <text x="0" y="0">n₁sinθ₁ = n₂sinθ₂ (Snell's Law)</text>
+    <text x="0" y="25">1/f = 1/u + 1/v (Lens Formula)</text>
+    <text x="0" y="50">m = -v/u (Magnification)</text>
+    
+    <text x="300" y="0">Key Concepts:</text>
+    <text x="300" y="25" fill="#475569">• Total Internal Reflection</text>
+    <text x="300" y="50" fill="#475569">• Dispersion</text>
+    <text x="300" y="75" fill="#475569">• Image Formation</text>
+  </g>
+
+  <!-- Arrowhead Marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+  </defs>
+</svg>
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Optics Lab</h3>
@@ -436,7 +1061,113 @@
                 <a href="quantum.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="Quantum Mechanics" class="w-full h-full object-cover">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Quantum Mechanics
+  </text>
+
+  <!-- Wave-Particle Duality Section -->
+  <g transform="translate(50,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Wave-Particle Duality</text>
+    
+    <!-- Double Slit -->
+    <rect x="150" y="50" width="10" height="100" fill="#94a3b8"/>
+    <rect x="150" y="80" width="10" height="10" fill="#f8fafc"/>
+    <rect x="150" y="110" width="10" height="10" fill="#f8fafc"/>
+    
+    <!-- Incident Wave -->
+    <path d="M 50,100 L 150,100" stroke="#3b82f6" stroke-width="2">
+      <animate attributeName="stroke-dasharray" values="5,5;10,5;5,5" dur="2s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Interference Pattern -->
+    <path d="M 160,60 Q 200,60 240,100 Q 280,140 320,100" stroke="#3b82f6" stroke-width="1" fill="none">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 160,120 Q 200,120 240,100 Q 280,80 320,100" stroke="#3b82f6" stroke-width="1" fill="none">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Quantum States Section -->
+  <g transform="translate(450,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Energy Levels</text>
+    
+    <!-- Energy Levels -->
+    <line x1="50" y1="50" x2="250" y2="50" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="50" y1="100" x2="250" y2="100" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="50" y1="150" x2="250" y2="150" stroke="#94a3b8" stroke-width="2"/>
+    
+    <!-- Labels -->
+    <text x="30" y="55" font-family="Arial" font-size="14" fill="#475569">n=3</text>
+    <text x="30" y="105" font-family="Arial" font-size="14" fill="#475569">n=2</text>
+    <text x="30" y="155" font-family="Arial" font-size="14" fill="#475569">n=1</text>
+    
+    <!-- Electron Transitions -->
+    <circle r="5" fill="#ef4444">
+      <animate attributeName="cx" values="150;150;150" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="150;100;150" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Uncertainty Principle Section -->
+  <g transform="translate(50,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Heisenberg Uncertainty</text>
+    
+    <!-- Position-Momentum Visualization -->
+    <path d="M 50,100 Q 150,50 250,100" stroke="#22c55e" stroke-width="2" fill="none"/>
+    <path d="M 50,100 Q 150,150 250,100" stroke="#22c55e" stroke-width="2" fill="none"/>
+    
+    <!-- Gaussian Wave Packet -->
+    <path d="M 100,100 Q 150,50 200,100 Q 250,150 300,100" stroke="#8b5cf6" stroke-width="2" fill="none">
+      <animate attributeName="d" 
+               values="M 100,100 Q 150,50 200,100 Q 250,150 300,100;
+                       M 100,100 Q 150,150 200,100 Q 250,50 300,100;
+                       M 100,100 Q 150,50 200,100 Q 250,150 300,100"
+               dur="3s" 
+               repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Schrödinger Equation Section -->
+  <g transform="translate(450,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Quantum Tunneling</text>
+    
+    <!-- Potential Barrier -->
+    <rect x="150" y="50" width="20" height="100" fill="#94a3b8" fill-opacity="0.3"/>
+    
+    <!-- Wave Function -->
+    <path d="M 50,100 Q 100,50 150,100 Q 170,150 190,100 Q 240,50 290,100" 
+          stroke="#f97316" stroke-width="2" fill="none">
+      <animate attributeName="d"
+               values="M 50,100 Q 100,50 150,100 Q 170,150 190,100 Q 240,50 290,100;
+                       M 50,100 Q 100,150 150,100 Q 170,50 190,100 Q 240,150 290,100;
+                       M 50,100 Q 100,50 150,100 Q 170,150 190,100 Q 240,50 290,100"
+               dur="4s"
+               repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Key Equations -->
+  <g transform="translate(50,500)" font-family="Arial" font-size="14" fill="#1e3a8a">
+    <text x="0" y="0">E = hf (Planck-Einstein)</text>
+    <text x="0" y="25">λ = h/p (de Broglie)</text>
+    <text x="0" y="50">ΔxΔp ≥ ℏ/2 (Uncertainty)</text>
+    
+    <text x="300" y="0">Key Concepts:</text>
+    <text x="300" y="25" fill="#475569">• Superposition</text>
+    <text x="300" y="50" fill="#475569">• Entanglement</text>
+    <text x="300" y="75" fill="#475569">• Wave Function</text>
+  </g>
+</svg>
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Quantum Mechanics</h3>
@@ -446,7 +1177,127 @@
                 <a href="nuclear.html" class="sim-card group">
                     <div class="aspect-w-16 aspect-h-9 mb-4">
                         <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-                            <img src="/api/placeholder/600/400" alt="Nuclear Physics" class="w-full h-full object-cover">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e3a8a">
+    Nuclear Physics
+  </text>
+
+  <!-- Nuclear Structure Section -->
+  <g transform="translate(50,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Nuclear Structure</text>
+    
+    <!-- Nucleus -->
+    <circle cx="200" cy="100" r="60" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+    
+    <!-- Protons and Neutrons -->
+    <circle cx="180" cy="80" r="15" fill="#ef4444">
+      <animate attributeName="cx" values="180;190;180" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="80;90;80" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <text x="180" y="85" text-anchor="middle" fill="white" font-family="Arial" font-size="12">p+</text>
+    
+    <circle cx="210" cy="110" r="15" fill="#3b82f6">
+      <animate attributeName="cx" values="210;200;210" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="110;100;110" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <text x="210" y="115" text-anchor="middle" fill="white" font-family="Arial" font-size="12">n</text>
+  </g>
+
+  <!-- Radioactive Decay Section -->
+  <g transform="translate(450,100)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Radioactive Decay</text>
+    
+    <!-- Alpha Decay -->
+    <g transform="translate(0,50)">
+      <circle cx="50" cy="50" r="20" fill="#f97316"/>
+      <path d="M 70,50 L 120,50" stroke="#f97316" stroke-width="2" marker-end="url(#arrowhead)">
+        <animate attributeName="stroke-dasharray" values="5,5;10,5;5,5" dur="2s" repeatCount="indefinite"/>
+      </path>
+      <text x="140" y="55" font-family="Arial" font-size="14" fill="#475569">α</text>
+    </g>
+    
+    <!-- Beta Decay -->
+    <g transform="translate(0,100)">
+      <circle cx="50" cy="50" r="20" fill="#22c55e"/>
+      <path d="M 70,50 L 120,50" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowhead)">
+        <animate attributeName="stroke-dasharray" values="5,5;10,5;5,5" dur="2s" repeatCount="indefinite"/>
+      </path>
+      <text x="140" y="55" font-family="Arial" font-size="14" fill="#475569">β</text>
+    </g>
+  </g>
+
+  <!-- Nuclear Fission Section -->
+  <g transform="translate(50,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Nuclear Fission</text>
+    
+    <!-- Initial Nucleus -->
+    <circle cx="100" cy="100" r="30" fill="#8b5cf6">
+      <animate attributeName="r" values="30;35;30" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Fission Products -->
+    <g>
+      <circle cx="200" cy="70" r="20" fill="#8b5cf6">
+        <animate attributeName="cx" values="100;200;200" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="100;70;70" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="200" cy="130" r="20" fill="#8b5cf6">
+        <animate attributeName="cx" values="100;200;200" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="100;130;130" dur="4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- Neutrons -->
+    <circle cx="250" cy="100" r="5" fill="#ef4444">
+      <animate attributeName="cx" values="100;250;250" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Nuclear Fusion Section -->
+  <g transform="translate(450,300)">
+    <!-- Section Title -->
+    <text x="0" y="20" font-family="Arial" font-size="18" fill="#1e3a8a">Nuclear Fusion</text>
+    
+    <!-- Fusion Nuclei -->
+    <circle cx="150" cy="80" r="15" fill="#0ea5e9">
+      <animate attributeName="cy" values="80;100;80" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="150" cy="120" r="15" fill="#0ea5e9">
+      <animate attributeName="cy" values="120;100;120" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Fusion Product -->
+    <circle cx="250" cy="100" r="25" fill="#0ea5e9">
+      <animate attributeName="opacity" values="0;1;1" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Key Equations -->
+  <g transform="translate(50,500)" font-family="Arial" font-size="14" fill="#1e3a8a">
+    <text x="0" y="0">E = mc² (Mass-Energy)</text>
+    <text x="0" y="25">N(t) = N₀e^(-λt) (Decay)</text>
+    <text x="0" y="50">BE = (Zm_p + Nm_n - M)c² (Binding Energy)</text>
+    
+    <text x="300" y="0">Key Concepts:</text>
+    <text x="300" y="25" fill="#475569">• Strong Force</text>
+    <text x="300" y="50" fill="#475569">• Half-life</text>
+    <text x="300" y="75" fill="#475569">• Nuclear Stability</text>
+  </g>
+
+  <!-- Arrowhead Marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+  </defs>
+</svg>
                         </div>
                     </div>
                     <h3 class="text-lg font-medium mb-2">Nuclear Physics</h3>
@@ -454,95 +1305,9 @@
                 </a>
             </div>
         </div>
-    </div>
+    </section>
 
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-            authDomain: "lumenos-749a1.firebaseapp.com",
-            projectId: "lumenos-749a1",
-            storageBucket: "lumenos-749a1.firebasestorage.app",
-            messagingSenderId: "857410556058",
-            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-            measurementId: "G-CEZ4PHV9GE"
-        };
-        firebase.initializeApp(firebaseConfig);
-
-        // Auth state observer
-        firebase.auth().onAuthStateChanged(async (user) => {
-            try {
-                if (user) {
-                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                    const userData = userDoc.data();
-
-                    if (userData?.subscriptionId) {
-                        // User has active subscription
-                        showContent();
-                    } else {
-                        // No subscription
-                        showPaywall();
-                    }
-                } else {
-                    // Not logged in
-                    showPaywall();
-                }
-            } catch (error) {
-                console.error('Auth error:', error);
-                showPaywall();
-            } finally {
-                document.getElementById('authLoading').style.display = 'none';
-            }
-        });
-
-        function showContent() {
-            document.getElementById('paywallOverlay').classList.remove('visible');
-            document.getElementById('mainContent').classList.remove('content-blur');
-            document.getElementById('mainContent').style.opacity = '1';
-            updateAuthButtons(true);
-        }
-
-        function showPaywall() {
-            document.getElementById('paywallOverlay').classList.add('visible');
-            document.getElementById('mainContent').classList.add('content-blur');
-            updateAuthButtons(false);
-        }
-
-        function updateAuthButtons(isSubscribed) {
-            const authSection = document.createElement('div');
-            authSection.className = 'absolute right-4 top-4';
-            authSection.innerHTML = isSubscribed ? `
-                <button onclick="handleSignOut()" 
-                        class="text-sm text-gray-600 hover:text-gray-900">
-                    Sign Out
-                </button>
-            ` : `
-                <button onclick="window.location.href='login.html'" 
-                        class="text-sm text-gray-600 hover:text-gray-900 mr-4">
-                    Sign In
-                </button>
-                <button onclick="window.location.href='pricing.html'"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700">
-                    Subscribe
-                </button>
-            `;
-            
-            // Update navigation
-            const nav = document.querySelector('nav');
-            const existingAuth = nav.querySelector('.auth-buttons');
-            if (existingAuth) existingAuth.remove();
-            nav.appendChild(authSection);
-        }
-
-        async function handleSignOut() {
-            try {
-                await firebase.auth().signOut();
-                window.location.reload();
-            } catch (error) {
-                console.error('Sign out error:', error);
-            }
-        }
-
         // Simulation data for search functionality
         const simulations = [
             { title: "Newton's Laws", category: "Mechanics", url: "newtons_laws.html", description: "Understand the fundamental principles of motion" },
@@ -659,25 +1424,6 @@ document.addEventListener('click', (e) => {
 window.addEventListener('resize', () => {
     if (window.innerWidth >= 768) {
         mobileMenu.classList.add('hidden');
-    }
-});
-        // Newton's Laws Dropdown
-function toggleNewtonDropdown() {
-    const dropdown = document.getElementById('newton-dropdown');
-    const arrow = document.getElementById('newton-arrow');
-    
-    dropdown.classList.toggle('hidden');
-    arrow.style.transform = dropdown.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-}
-
-// Close Newton's dropdown when clicking outside
-document.addEventListener('click', (e) => {
-    const dropdown = document.getElementById('newton-dropdown');
-    const card = e.target.closest('.sim-card');
-    
-    if (!card && !dropdown.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
-        document.getElementById('newton-arrow').style.transform = 'rotate(0deg)';
     }
 });
     </script>
