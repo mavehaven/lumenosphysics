@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Newton's Laws of Motion</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -52,7 +51,6 @@
             padding: 1.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
         }
 
         .card:hover {
@@ -63,7 +61,6 @@
         .card-icon {
             width: 50px;
             height: 50px;
-            background: #4a90e2;
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -92,70 +89,6 @@
             margin-bottom: 1rem;
         }
 
-        .simulation-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-        }
-
-        .simulation {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-        }
-
-        canvas {
-            width: 100%;
-            height: 300px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            margin: 1rem 0;
-        }
-
-        .controls {
-            margin-top: 1rem;
-            display: flex;
-            gap: 1rem;
-        }
-
-        button {
-            padding: 0.5rem 1rem;
-            background: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background: #357abd;
-        }
-
         .launch-btn {
             display: inline-block;
             padding: 0.5rem 1rem;
@@ -164,7 +97,20 @@
             text-decoration: none;
             border-radius: 5px;
             margin-top: 1rem;
+            transition: background 0.3s;
         }
+
+        .launch-btn:hover {
+            background: #357abd;
+        }
+
+        .law1 .launch-btn { background: #4a90e2; }
+        .law2 .launch-btn { background: #50c878; }
+        .law3 .launch-btn { background: #9b59b6; }
+
+        .law1 .launch-btn:hover { background: #357abd; }
+        .law2 .launch-btn:hover { background: #3da15c; }
+        .law3 .launch-btn:hover { background: #8e44ad; }
     </style>
 </head>
 <body>
@@ -176,7 +122,7 @@
 
         <div class="grid">
             <!-- First Law Card -->
-            <div class="card law1" onclick="openSimulation('first')">
+            <div class="card law1">
                 <div class="card-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
@@ -184,11 +130,11 @@
                 </div>
                 <h2>First Law of Motion</h2>
                 <p>An object will remain at rest or in uniform motion in a straight line unless acted upon by an external force.</p>
-                <span class="launch-btn">Launch Simulation</span>
+                <a href="newtons_first_law.html" class="launch-btn">Launch Simulation</a>
             </div>
 
             <!-- Second Law Card -->
-            <div class="card law2" onclick="openSimulation('second')">
+            <div class="card law2">
                 <div class="card-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
@@ -196,11 +142,11 @@
                 </div>
                 <h2>Second Law of Motion</h2>
                 <p>The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.</p>
-                <span class="launch-btn">Launch Simulation</span>
+                <a href="newtons_second_law.html" class="launch-btn">Launch Simulation</a>
             </div>
 
             <!-- Third Law Card -->
-            <div class="card law3" onclick="openSimulation('third')">
+            <div class="card law3">
                 <div class="card-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M7.41 18.59L8.83 20 12 16.83 15.17 20l1.41-1.41L12 14l-4.59 4.59zm9.18-13.18L15.17 4 12 7.17 8.83 4 7.41 5.41 12 10l4.59-4.59z"/>
@@ -208,170 +154,9 @@
                 </div>
                 <h2>Third Law of Motion</h2>
                 <p>For every action, there is an equal and opposite reaction.</p>
-                <span class="launch-btn">Launch Simulation</span>
+                <a href="newtons_third_law.html" class="launch-btn">Launch Simulation</a>
             </div>
         </div>
     </div>
-
-    <!-- Simulation Modal -->
-    <div id="simulationModal" class="simulation-container">
-        <div class="simulation">
-            <button class="close-btn" onclick="closeSimulation()">×</button>
-            <h2 id="simulationTitle"></h2>
-            <canvas id="simulationCanvas"></canvas>
-            <div class="controls">
-                <button onclick="startSimulation()">Start</button>
-                <button onclick="resetSimulation()">Reset</button>
-            </div>
-            <p id="simulationDescription"></p>
-        </div>
-    </div>
-
-    <script>
-        // Matter.js setup
-        let engine, render, world;
-        let currentSimulation = null;
-
-        function initMatter() {
-            engine = Matter.Engine.create();
-            world = engine.world;
-
-            render = Matter.Render.create({
-                canvas: document.getElementById('simulationCanvas'),
-                engine: engine,
-                options: {
-                    width: 800,
-                    height: 300,
-                    wireframes: false,
-                    background: '#f8f9fa'
-                }
-            });
-
-            Matter.Render.run(render);
-        }
-
-        function openSimulation(law) {
-            document.getElementById('simulationModal').style.display = 'block';
-            
-            if (currentSimulation) {
-                Matter.World.clear(world);
-                Matter.Engine.clear(engine);
-            }
-
-            switch(law) {
-                case 'first':
-                    setupFirstLaw();
-                    break;
-                case 'second':
-                    setupSecondLaw();
-                    break;
-                case 'third':
-                    setupThirdLaw();
-                    break;
-            }
-        }
-
-        function closeSimulation() {
-            document.getElementById('simulationModal').style.display = 'none';
-            if (currentSimulation) {
-                Matter.World.clear(world);
-                Matter.Engine.clear(engine);
-            }
-        }
-
-        function setupFirstLaw() {
-            document.getElementById('simulationTitle').textContent = "First Law of Motion";
-            document.getElementById('simulationDescription').textContent = 
-                "This simulation demonstrates Newton's First Law: An object in motion stays in motion unless acted upon by an external force.";
-
-            const ball = Matter.Bodies.circle(400, 150, 20, {
-                restitution: 0.8,
-                render: { fillStyle: '#4a90e2' }
-            });
-
-            Matter.World.add(world, [
-                ball,
-                Matter.Bodies.rectangle(400, 290, 800, 20, { isStatic: true })
-            ]);
-
-            currentSimulation = 'first';
-        }
-
-        function setupSecondLaw() {
-            document.getElementById('simulationTitle').textContent = "Second Law of Motion";
-            document.getElementById('simulationDescription').textContent = 
-                "This simulation demonstrates Newton's Second Law: F = ma. The force applied to an object produces acceleration proportional to its mass.";
-
-            const box = Matter.Bodies.rectangle(200, 150, 40, 40, {
-                render: { fillStyle: '#50c878' }
-            });
-
-            Matter.World.add(world, [
-                box,
-                Matter.Bodies.rectangle(400, 290, 800, 20, { isStatic: true })
-            ]);
-
-            currentSimulation = 'second';
-        }
-
-        function setupThirdLaw() {
-            document.getElementById('simulationTitle').textContent = "Third Law of Motion";
-            document.getElementById('simulationDescription').textContent = 
-                "This simulation demonstrates Newton's Third Law: For every action, there is an equal and opposite reaction.";
-
-            const ball1 = Matter.Bodies.circle(300, 150, 20, {
-                restitution: 1,
-                render: { fillStyle: '#9b59b6' }
-            });
-
-            const ball2 = Matter.Bodies.circle(500, 150, 20, {
-                restitution: 1,
-                render: { fillStyle: '#9b59b6' }
-            });
-
-            Matter.World.add(world, [
-                ball1,
-                ball2,
-                Matter.Bodies.rectangle(400, 290, 800, 20, { isStatic: true })
-            ]);
-
-            currentSimulation = 'third';
-        }
-
-        function startSimulation() {
-            if (currentSimulation === 'first') {
-                Matter.Body.setVelocity(world.bodies[0], { x: 5, y: 0 });
-            } else if (currentSimulation === 'second') {
-                Matter.Body.applyForce(world.bodies[0], 
-                    world.bodies[0].position, 
-                    { x: 0.05, y: -0.05 }
-                );
-            } else if (currentSimulation === 'third') {
-                Matter.Body.setVelocity(world.bodies[0], { x: 5, y: 0 });
-                Matter.Body.setVelocity(world.bodies[1], { x: -5, y: 0 });
-            }
-        }
-
-        function resetSimulation() {
-            Matter.World.clear(world);
-            switch(currentSimulation) {
-                case 'first':
-                    setupFirstLaw();
-                    break;
-                case 'second':
-                    setupSecondLaw();
-                    break;
-                case 'third':
-                    setupThirdLaw();
-                    break;
-            }
-        }
-
-        // Initialize Matter.js when the page loads
-        window.addEventListener('load', initMatter);
-
-        // Start the Matter.js engine
-        Matter.Engine.run(engine);
-    </script>
 </body>
 </html>
