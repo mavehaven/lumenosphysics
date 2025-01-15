@@ -158,5 +158,153 @@
             </div>
         </div>
     </div>
+    <script>
+        // Matter.js setup
+        let engine, render, world;
+        let currentSimulation = null;
+
+        function initMatter() {
+            engine = Matter.Engine.create();
+            world = engine.world;
+
+            render = Matter.Render.create({
+                canvas: document.getElementById('simulationCanvas'),
+                engine: engine,
+                options: {
+                    width: 800,
+                    height: 300,
+                    wireframes: false,
+                    background: '#f8f9fa'
+                }
+            });
+
+            Matter.Render.run(render);
+        }
+
+        function openSimulation(law) {
+            document.getElementById('simulationModal').style.display = 'block';
+            
+            if (currentSimulation) {
+                Matter.World.clear(world);
+                Matter.Engine.clear(engine);
+            }
+
+            switch(law) {
+                case 'first':
+                    setupFirstLaw();
+                    break;
+                case 'second':
+                    setupSecondLaw();
+                    break;
+                case 'third':
+                    setupThirdLaw();
+                    break;
+            }
+        }
+
+        function closeSimulation() {
+            document.getElementById('simulationModal').style.display = 'none';
+            if (currentSimulation) {
+                Matter.World.clear(world);
+                Matter.Engine.clear(engine);
+            }
+        }
+
+        function setupFirstLaw() {
+            document.getElementById('simulationTitle').textContent = "First Law of Motion";
+            document.getElementById('simulationDescription').textContent = 
+                "This simulation demonstrates Newton's First Law: An object in motion stays in motion unless acted upon by an external force.";
+
+            const ball = Matter.Bodies.circle(400, 150, 20, {
+                restitution: 0.8,
+                render: { fillStyle: '#4a90e2' }
+            });
+
+            Matter.World.add(world, [
+                ball,
+                Matter.Bodies.rectangle(400, 290, 800, 20, { isStatic: true })
+            ]);
+
+            currentSimulation = 'first';
+        }
+
+        function setupSecondLaw() {
+            document.getElementById('simulationTitle').textContent = "Second Law of Motion";
+            document.getElementById('simulationDescription').textContent = 
+                "This simulation demonstrates Newton's Second Law: F = ma. The force applied to an object produces acceleration proportional to its mass.";
+
+            const box = Matter.Bodies.rectangle(200, 150, 40, 40, {
+                render: { fillStyle: '#50c878' }
+            });
+
+            Matter.World.add(world, [
+                box,
+                Matter.Bodies.rectangle(400, 290, 800, 20, { isStatic: true })
+            ]);
+
+            currentSimulation = 'second';
+        }
+
+        function setupThirdLaw() {
+            document.getElementById('simulationTitle').textContent = "Third Law of Motion";
+            document.getElementById('simulationDescription').textContent = 
+                "This simulation demonstrates Newton's Third Law: For every action, there is an equal and opposite reaction.";
+
+            const ball1 = Matter.Bodies.circle(300, 150, 20, {
+                restitution: 1,
+                render: { fillStyle: '#9b59b6' }
+            });
+
+            const ball2 = Matter.Bodies.circle(500, 150, 20, {
+                restitution: 1,
+                render: { fillStyle: '#9b59b6' }
+            });
+
+            Matter.World.add(world, [
+                ball1,
+                ball2,
+                Matter.Bodies.rectangle(400, 290, 800, 20, { isStatic: true })
+            ]);
+
+            currentSimulation = 'third';
+        }
+
+        function startSimulation() {
+            if (currentSimulation === 'first') {
+                Matter.Body.setVelocity(world.bodies[0], { x: 5, y: 0 });
+            } else if (currentSimulation === 'second') {
+                Matter.Body.applyForce(world.bodies[0], 
+                    world.bodies[0].position, 
+                    { x: 0.05, y: -0.05 }
+                );
+            } else if (currentSimulation === 'third') {
+                Matter.Body.setVelocity(world.bodies[0], { x: 5, y: 0 });
+                Matter.Body.setVelocity(world.bodies[1], { x: -5, y: 0 });
+            }
+        }
+
+        function resetSimulation() {
+            Matter.World.clear(world);
+            switch(currentSimulation) {
+                case 'first':
+                    setupFirstLaw();
+                    break;
+                case 'second':
+                    setupSecondLaw();
+                    break;
+                case 'third':
+                    setupThirdLaw();
+                    break;
+            }
+        }
+
+        // Initialize Matter.js when the page loads
+        window.addEventListener('load', initMatter);
+
+        // Start the Matter.js engine
+        Matter.Engine.run(engine);
+    </script>
+</body>
+</html>
 </body>
 </html>
