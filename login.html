@@ -3,92 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Physics Simulator Login Page">
     <title>Login - Physics Simulator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-            authDomain: "lumenos-749a1.firebaseapp.com",
-            projectId: "lumenos-749a1",
-            storageBucket: "lumenos-749a1.firebasestorage.app",
-            messagingSenderId: "857410556058",
-            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-            measurementId: "G-CEZ4PHV9GE"
-        };
-
-        window.firebaseApp = initializeApp(firebaseConfig);
-        window.auth = getAuth(window.firebaseApp);
-    </script>
 </head>
 <body class="bg-gray-50">
-    <div class="flex justify-center items-center h-screen">
+    <div class="flex justify-center items-center min-h-screen p-4">
         <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
             <h1 class="text-2xl font-bold mb-4 text-center">Physics Simulator Login</h1>
-            <div id="error-message" class="hidden mb-4 p-4 text-red-700 bg-red-100 rounded"></div>
-            <button id="google-signin" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center">
-                <svg class="h-6 w-6 mr-2" viewBox="0 0 24 24">
+            <div id="error-message" class="hidden mb-4 p-4 text-red-700 bg-red-100 rounded" role="alert"></div>
+            <button 
+                id="google-signin" 
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center transition-colors duration-200"
+                aria-label="Sign in with Google">
+                <svg class="h-6 w-6 mr-2" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
                 </svg>
                 Sign in with Google
             </button>
-            <div id="loading" class="hidden mt-4 text-center">
+            <div id="loading" class="hidden mt-4 text-center" role="status">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
                 <p class="mt-2 text-gray-600">Signing you in...</p>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    <!-- Load configuration first -->
+    <script>
+        // This should be replaced with environment-specific values during build/deployment
+        window.APP_CONFIG = {
+            firebase: {
+                apiKey: process.env.FIREBASE_API_KEY || "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+                authDomain: process.env.FIREBASE_AUTH_DOMAIN || "lumenos-749a1.firebaseapp.com",
+                projectId: process.env.FIREBASE_PROJECT_ID || "lumenos-749a1",
+                storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "lumenos-749a1.firebasestorage.app",
+                messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "857410556058",
+                appId: process.env.FIREBASE_APP_ID || "1:857410556058:web:bb28ae2a03874f8f27cf23",
+                measurementId: process.env.FIREBASE_MEASUREMENT_ID || "G-CEZ4PHV9GE"
+            },
+            googleClientId: process.env.GOOGLE_CLIENT_ID || "857410556058-i80dgt79ofmdl10n23t4ev47i15m28h9.apps.googleusercontent.com",
+            allowedDomains: (process.env.ALLOWED_DOMAINS || "edu.lumenos.app").split(","),
+            redirectPaths: {
+                production: "https://edu.lumenos.app/dashboard",
+                development: "/dashboard.html"
+            }
+        };
+    </script>
 
-        const auth = window.auth;
+    <!-- Firebase initialization -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } 
+            from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        // Initialize Firebase
+        const app = initializeApp(window.APP_CONFIG.firebase);
+        const auth = getAuth(app);
+
+        // UI elements
         const errorMessage = document.getElementById('error-message');
         const loading = document.getElementById('loading');
         const googleSigninButton = document.getElementById('google-signin');
-        
-        // Determine the redirect URL based on the current domain
-        const isProduction = window.location.hostname === 'edu.lumenos.app';
-        const redirectPath = isProduction ? 'https://edu.lumenos.app/dashboard' : '/dashboard.html';
+
+        // Helper functions
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            loading.classList.add('hidden');
+            googleSigninButton.disabled = false;
+        }
+
+        function getRedirectPath() {
+            const isProduction = window.location.hostname === 'edu.lumenos.app';
+            return isProduction 
+                ? window.APP_CONFIG.redirectPaths.production 
+                : window.APP_CONFIG.redirectPaths.development;
+        }
 
         // Check for redirect result on page load
-        getRedirectResult(auth)
-            .then((result) => {
-                if (result) {
-                    window.location.href = redirectPath;
+        try {
+            const result = await getRedirectResult(auth);
+            if (result) {
+                const userDomain = result.user.email.split('@')[1];
+                if (!window.APP_CONFIG.allowedDomains.includes(userDomain)) {
+                    await auth.signOut();
+                    throw new Error('Invalid email domain. Please use your organization email.');
                 }
-            })
-            .catch((error) => {
-                showError('Error signing in: ' + error.message);
-            });
+                window.location.href = getRedirectPath();
+            }
+        } catch (error) {
+            showError(error.message);
+        }
 
-        // Handle Google sign-in button click
+        // Handle Google sign-in
         googleSigninButton.addEventListener('click', async () => {
             try {
                 loading.classList.remove('hidden');
                 googleSigninButton.disabled = true;
+                errorMessage.classList.add('hidden');
                 
                 const provider = new GoogleAuthProvider();
                 provider.setCustomParameters({
-                    client_id: '857410556058-i80dgt79ofmdl10n23t4ev47i15m28h9.apps.googleusercontent.com',
-                    hd: 'edu.lumenos.app'  // Restrict to your domain
+                    client_id: window.APP_CONFIG.googleClientId,
+                    prompt: 'select_account'
                 });
                 
                 await signInWithRedirect(auth, provider);
             } catch (error) {
                 showError('Error starting sign-in: ' + error.message);
-                loading.classList.add('hidden');
-                googleSigninButton.disabled = false;
             }
         });
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-        }
     </script>
 </body>
 </html>
