@@ -95,59 +95,44 @@
         // Check if user is already logged in
         firebase.auth().onAuthStateChanged(handleAuthenticatedUser);
 
-        // Check for redirect result on page load
         firebase.auth().getRedirectResult()
-            .then((result) => {
-                if (result.user) {
-                    handleAuthenticatedUser(result.user);
-                }
-            })
-            .catch((error) => {
-                if (error.message) {
-                    showError(error.message);
-                }
-            });
+    .then((result) => {
+        if (result.user) {
+            handleAuthenticatedUser(result.user);
+        }
+    })
+    .catch((error) => {
+        showError(error.message);
+    });
 
-        // Handle Google sign-in
-        googleSigninButton.addEventListener('click', () => {
-            loading.classList.remove('hidden');
-            googleSigninButton.disabled = true;
-            errorMessage.classList.add('hidden');
-
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.setCustomParameters({
-                prompt: 'select_account'
-            });
-
-            firebase.auth().signInWithRedirect(provider)
-                .catch((error) => {
-                    showError('Error starting sign-in: ' + error.message);
-                });
-        });
-
-        let hasHandledInvalidDomain = false;
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        handleAuthenticatedUser(user);
+    } else {
+        const currentPage = window.location.pathname.toLowerCase();
+        if (!currentPage.includes('login.html')) {
+            window.location.replace('login.html');
+        }
+    }
+});
 
 function handleAuthenticatedUser(user) {
     if (!user) return;
 
     const userDomain = user.email.split('@')[1];
     if (!config.allowedDomains.includes(userDomain)) {
-        if (!hasHandledInvalidDomain) {
-            hasHandledInvalidDomain = true;
-            firebase.auth().signOut()
-                .then(() => {
-                    showError('Invalid email domain. Please use your organization email.');
-                });
-        }
+        firebase.auth().signOut()
+            .then(() => {
+                showError('Invalid email domain. Please use your organization email.');
+            });
         return;
     }
 
     const currentPage = window.location.pathname.toLowerCase();
-    if (currentPage.includes('login.html') || currentPage === '/' || currentPage === '') {
+    if (currentPage.includes('login.html')) {
         window.location.replace('dashboard.html');
     }
 }
-
     </script>
 </body>
 </html>
