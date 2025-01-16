@@ -147,6 +147,38 @@ function handleAuthenticatedUser(user) {
         window.location.replace('dashboard.html');
     }
 }
+// Auth state observer
+firebase.auth().onAuthStateChanged((user) => {
+    const authSection = document.querySelector('.auth-buttons');
+    const mobileAuthSection = document.getElementById('mobileAuthSection');
+
+    if (user) {
+        // User is signed in
+        const authContent = `
+            <a href="dashboard.html" style="color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 8px; background: var(--glass); border: 1px solid var(--glass-border); transition: all 0.3s ease;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>${user.displayName || 'Dashboard'}</span>
+            </a>
+        `;
+        authSection.innerHTML = authContent;
+        if (mobileAuthSection) {
+            mobileAuthSection.innerHTML = authContent;
+        }
+    } else {
+        // User is signed out
+        const authContent = `
+            <a href="login.html" style="color: var(--text); text-decoration: none; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass); transition: all 0.3s ease;">Log In</a>
+            <a href="signup.html" style="color: var(--light); text-decoration: none; font-weight: 500; padding: 0.5rem 1.5rem; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; transition: all 0.3s ease;">Sign Up</a>
+        `;
+        authSection.innerHTML = authContent;
+        if (mobileAuthSection) {
+            mobileAuthSection.innerHTML = authContent;
+        }
+    }
+});
 
     </script>
 </body>
