@@ -64,33 +64,34 @@
             googleSigninButton.disabled = false;
         }
 
-        // Check if user is already logged in
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                const userDomain = user.email.split('@')[1];
-                if (!config.allowedDomains.includes(userDomain)) {
-                    firebase.auth().signOut()
-                        .then(() => {
-                            showError('Invalid email domain. Please use your organization email.');
-                        });
-                    return;
-                }
-                window.location.href = 'dashboard.html';
+        // Handle domain validation and redirection
+        function handleAuthenticatedUser(user) {
+            if (!user) return;
+            
+            const userDomain = user.email.split('@')[1];
+            if (!config.allowedDomains.includes(userDomain)) {
+                firebase.auth().signOut()
+                    .then(() => {
+                        showError('Invalid email domain. Please use your organization email.');
+                    });
+                return;
             }
-        });
+
+            // Only redirect if we're on the login page
+            const currentPage = window.location.pathname.toLowerCase();
+            if (currentPage.includes('login.html') || currentPage === '/' || currentPage === '') {
+                window.location.replace('dashboard.html');
+            }
+        }
+
+        // Check if user is already logged in
+        firebase.auth().onAuthStateChanged(handleAuthenticatedUser);
 
         // Check for redirect result on page load
         firebase.auth().getRedirectResult()
             .then((result) => {
                 if (result.user) {
-                    const userDomain = result.user.email.split('@')[1];
-                    if (!config.allowedDomains.includes(userDomain)) {
-                        return firebase.auth().signOut()
-                            .then(() => {
-                                throw new Error('Invalid email domain. Please use your organization email.');
-                            });
-                    }
-                    window.location.href = 'dashboard.html';
+                    handleAuthenticatedUser(result.user);
                 }
             })
             .catch((error) => {
