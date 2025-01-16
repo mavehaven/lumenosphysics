@@ -116,6 +116,30 @@
                     showError('Error starting sign-in: ' + error.message);
                 });
         });
+
+        let hasHandledInvalidDomain = false;
+
+function handleAuthenticatedUser(user) {
+    if (!user) return;
+
+    const userDomain = user.email.split('@')[1];
+    if (!config.allowedDomains.includes(userDomain)) {
+        if (!hasHandledInvalidDomain) {
+            hasHandledInvalidDomain = true;
+            firebase.auth().signOut()
+                .then(() => {
+                    showError('Invalid email domain. Please use your organization email.');
+                });
+        }
+        return;
+    }
+
+    const currentPage = window.location.pathname.toLowerCase();
+    if (currentPage.includes('login.html') || currentPage === '/' || currentPage === '') {
+        window.location.replace('dashboard.html');
+    }
+}
+
     </script>
 </body>
 </html>
