@@ -28,37 +28,32 @@
         </div>
     </div>
 
-    <!-- Load configuration first -->
+    <!-- Load Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <!-- Configuration and Authentication Logic -->
     <script>
-        // This should be replaced with environment-specific values during build/deployment
-        window.APP_CONFIG = {
+        // Configuration
+        const config = {
             firebase: {
-                apiKey: process.env.FIREBASE_API_KEY || "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-                authDomain: process.env.FIREBASE_AUTH_DOMAIN || "lumenos-749a1.firebaseapp.com",
-                projectId: process.env.FIREBASE_PROJECT_ID || "lumenos-749a1",
-                storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "lumenos-749a1.firebasestorage.app",
-                messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "857410556058",
-                appId: process.env.FIREBASE_APP_ID || "1:857410556058:web:bb28ae2a03874f8f27cf23",
-                measurementId: process.env.FIREBASE_MEASUREMENT_ID || "G-CEZ4PHV9GE"
+                apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+                authDomain: "lumenos-749a1.firebaseapp.com",
+                projectId: "lumenos-749a1",
+                storageBucket: "lumenos-749a1.firebasestorage.app",
+                messagingSenderId: "857410556058",
+                appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+                measurementId: "G-CEZ4PHV9GE"
             },
-            googleClientId: process.env.GOOGLE_CLIENT_ID || "857410556058-i80dgt79ofmdl10n23t4ev47i15m28h9.apps.googleusercontent.com",
-            allowedDomains: (process.env.ALLOWED_DOMAINS || "edu.lumenos.app").split(","),
+            allowedDomains: ["edu.lumenos.app"],
             redirectPaths: {
                 production: "https://edu.lumenos.app/dashboard",
                 development: "/dashboard.html"
             }
         };
-    </script>
-
-    <!-- Firebase initialization -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } 
-            from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
         // Initialize Firebase
-        const app = initializeApp(window.APP_CONFIG.firebase);
-        const auth = getAuth(app);
+        firebase.initializeApp(config.firebase);
 
         // UI elements
         const errorMessage = document.getElementById('error-message');
@@ -76,42 +71,45 @@
         function getRedirectPath() {
             const isProduction = window.location.hostname === 'edu.lumenos.app';
             return isProduction 
-                ? window.APP_CONFIG.redirectPaths.production 
-                : window.APP_CONFIG.redirectPaths.development;
+                ? config.redirectPaths.production 
+                : config.redirectPaths.development;
         }
 
         // Check for redirect result on page load
-        try {
-            const result = await getRedirectResult(auth);
-            if (result) {
-                const userDomain = result.user.email.split('@')[1];
-                if (!window.APP_CONFIG.allowedDomains.includes(userDomain)) {
-                    await auth.signOut();
-                    throw new Error('Invalid email domain. Please use your organization email.');
+        firebase.auth().getRedirectResult()
+            .then((result) => {
+                if (result.user) {
+                    const userDomain = result.user.email.split('@')[1];
+                    if (!config.allowedDomains.includes(userDomain)) {
+                        return firebase.auth().signOut()
+                            .then(() => {
+                                throw new Error('Invalid email domain. Please use your organization email.');
+                            });
+                    }
+                    window.location.href = getRedirectPath();
                 }
-                window.location.href = getRedirectPath();
-            }
-        } catch (error) {
-            showError(error.message);
-        }
+            })
+            .catch((error) => {
+                if (error.message) {
+                    showError(error.message);
+                }
+            });
 
         // Handle Google sign-in
-        googleSigninButton.addEventListener('click', async () => {
-            try {
-                loading.classList.remove('hidden');
-                googleSigninButton.disabled = true;
-                errorMessage.classList.add('hidden');
-                
-                const provider = new GoogleAuthProvider();
-                provider.setCustomParameters({
-                    client_id: window.APP_CONFIG.googleClientId,
-                    prompt: 'select_account'
+        googleSigninButton.addEventListener('click', () => {
+            loading.classList.remove('hidden');
+            googleSigninButton.disabled = true;
+            errorMessage.classList.add('hidden');
+
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
+
+            firebase.auth().signInWithRedirect(provider)
+                .catch((error) => {
+                    showError('Error starting sign-in: ' + error.message);
                 });
-                
-                await signInWithRedirect(auth, provider);
-            } catch (error) {
-                showError('Error starting sign-in: ' + error.message);
-            }
         });
     </script>
 </body>
