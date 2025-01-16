@@ -34,28 +34,22 @@
 
     <!-- Configuration and Authentication Logic -->
     <script>
-        // Configuration
-        const config = {
-            firebase: {
-                apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-                authDomain: "lumenos-749a1.firebaseapp.com",
-                projectId: "lumenos-749a1",
-                storageBucket: "lumenos-749a1.firebasestorage.app",
-                messagingSenderId: "857410556058",
-                appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-                measurementId: "G-CEZ4PHV9GE"
-            }
-        };
-
         // Initialize Firebase
-        firebase.initializeApp(config.firebase);
+        firebase.initializeApp({
+            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+            authDomain: "lumenos-749a1.firebaseapp.com",
+            projectId: "lumenos-749a1",
+            storageBucket: "lumenos-749a1.firebasestorage.app",
+            messagingSenderId: "857410556058",
+            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+            measurementId: "G-CEZ4PHV9GE"
+        });
 
         // UI elements
         const errorMessage = document.getElementById('error-message');
         const loading = document.getElementById('loading');
         const googleSigninButton = document.getElementById('google-signin');
 
-        // Helper functions
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
@@ -63,38 +57,12 @@
             googleSigninButton.disabled = false;
         }
 
-        // Handle authenticated user
-        function handleAuthenticatedUser(user) {
-            if (!user) return;
-            
-            // Get the current path and check if we're on the login page
-            const path = window.location.pathname;
-            const currentPage = path.split('/').pop().toLowerCase();
-            
-            // If we're on login.html, index.html, or root path, redirect to dashboard
-            if (!currentPage || 
-                currentPage === 'login.html' || 
-                currentPage === 'index.html' || 
-                currentPage === '/') {
+        // Simple auth state listener
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
                 window.location.href = 'dashboard.html';
             }
-        }
-
-        // Check if user is already logged in
-        firebase.auth().onAuthStateChanged(handleAuthenticatedUser);
-
-        // Check for redirect result on page load
-        firebase.auth().getRedirectResult()
-            .then((result) => {
-                if (result.user) {
-                    handleAuthenticatedUser(result.user);
-                }
-            })
-            .catch((error) => {
-                if (error.message) {
-                    showError(error.message);
-                }
-            });
+        });
 
         // Handle Google sign-in
         googleSigninButton.addEventListener('click', () => {
