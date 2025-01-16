@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physics Hub</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-app.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-auth.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
         /* Dark mode styles */
         .dark {
             background-color: #111827;
@@ -199,6 +198,36 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                         </svg>
                     </button>
+                </div>
+
+                <!-- Profile Section (Unauthenticated) -->
+                    <div id="unauthenticated" class="flex items-center">
+                        <button onclick="signIn()" class="flex items-center space-x-2 px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <span>Sign In</span>
+                        </button>
+                    </div>
+
+                    <!-- Profile Section (Authenticated) -->
+                    <div id="authenticated" class="relative hidden">
+                        <button onclick="toggleDropdown()" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-100">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                                <span id="userInitial" class="text-white text-sm"></span>
+                            </div>
+                        </button>
+                        <!-- Profile Dropdown -->
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                            <div id="userEmail" class="px-4 py-2 text-sm text-gray-700 border-b"></div>
+                            <button onclick="signOut()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mobile menu button -->
@@ -1424,6 +1453,51 @@ document.addEventListener('click', (e) => {
 window.addEventListener('resize', () => {
     if (window.innerWidth >= 768) {
         mobileMenu.classList.add('hidden');
+    }
+});
+        
+       const firebaseConfig = {
+    apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+    authDomain: "lumenos-749a1.firebaseapp.com",
+    projectId: "lumenos-749a1",
+    storageBucket: "lumenos-749a1.firebasestorage.app",
+    messagingSenderId: "857410556058",
+    appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+    measurementId: "G-CEZ4PHV9GE"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// Auth state observer
+firebase.auth().onAuthStateChanged((user) => {
+    const authSection = document.querySelector('.auth-buttons');
+    const mobileAuthSection = document.getElementById('mobileAuthSection');
+
+    if (user) {
+        // User is signed in
+        const authContent = `
+            <a href="dashboard.html" style="color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 8px; background: var(--glass); border: 1px solid var(--glass-border); transition: all 0.3s ease;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>${user.displayName || 'Dashboard'}</span>
+            </a>
+        `;
+        authSection.innerHTML = authContent;
+        if (mobileAuthSection) {
+            mobileAuthSection.innerHTML = authContent;
+        }
+    } else {
+        // User is signed out
+        const authContent = `
+            <a href="login.html" style="color: var(--text); text-decoration: none; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass); transition: all 0.3s ease;">Log In</a>
+            <a href="signup.html" style="color: var(--light); text-decoration: none; font-weight: 500; padding: 0.5rem 1.5rem; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; transition: all 0.3s ease;">Sign Up</a>
+        `;
+        authSection.innerHTML = authContent;
+        if (mobileAuthSection) {
+            mobileAuthSection.innerHTML = authContent;
+        }
     }
 });
     </script>
