@@ -111,7 +111,7 @@ firebase.auth().onAuthStateChanged((user) => {
     } else {
         const currentPage = window.location.pathname.toLowerCase();
         if (!currentPage.includes('login.html')) {
-            window.location.replace('login.html');
+            window.location.replace('dashboard.html');
         }
     }
 });
