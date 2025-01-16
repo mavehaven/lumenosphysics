@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Physics Simulator Login Page">
+    <meta name="description" content="Physics Simulator Login">
     <title>Login - Physics Simulator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
@@ -44,8 +44,7 @@
                 messagingSenderId: "857410556058",
                 appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
                 measurementId: "G-CEZ4PHV9GE"
-            },
-            allowedDomains: ["edu.lumenos.app"]
+            }
         };
 
         // Initialize Firebase
@@ -64,19 +63,10 @@
             googleSigninButton.disabled = false;
         }
 
-        // Handle domain validation and redirection
+        // Handle authenticated user
         function handleAuthenticatedUser(user) {
             if (!user) return;
             
-            const userDomain = user.email.split('@')[1];
-            if (!config.allowedDomains.includes(userDomain)) {
-                firebase.auth().signOut()
-                    .then(() => {
-                        showError('Invalid email domain. Please use your organization email.');
-                    });
-                return;
-            }
-
             // Only redirect if we're on the login page
             const currentPage = window.location.pathname.toLowerCase();
             if (currentPage.includes('login.html') || currentPage === '/' || currentPage === '') {
