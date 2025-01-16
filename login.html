@@ -10,18 +10,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
-            authDomain: "lumenosphys.firebaseapp.com",
-            projectId: "lumenosphys",
-            storageBucket: "lumenosphys.firebasestorage.app",
-            messagingSenderId: "501424803085",
-            appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
-            measurementId: "G-7RTGWQ515B"
+            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+            authDomain: "lumenos-749a1.firebaseapp.com",
+            projectId: "lumenos-749a1",
+            storageBucket: "lumenos-749a1.firebasestorage.app",
+            messagingSenderId: "857410556058",
+            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+            measurementId: "G-CEZ4PHV9GE"
         };
 
-        // Initialize Firebase
         window.firebaseApp = initializeApp(firebaseConfig);
         window.auth = getAuth(window.firebaseApp);
     </script>
@@ -51,12 +49,16 @@
         const errorMessage = document.getElementById('error-message');
         const loading = document.getElementById('loading');
         const googleSigninButton = document.getElementById('google-signin');
+        
+        // Determine the redirect URL based on the current domain
+        const isProduction = window.location.hostname === 'edu.lumenos.app';
+        const redirectPath = isProduction ? 'https://edu.lumenos.app/dashboard' : '/dashboard.html';
 
         // Check for redirect result on page load
         getRedirectResult(auth)
             .then((result) => {
                 if (result) {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = redirectPath;
                 }
             })
             .catch((error) => {
@@ -68,10 +70,13 @@
             try {
                 loading.classList.remove('hidden');
                 googleSigninButton.disabled = true;
+                
                 const provider = new GoogleAuthProvider();
                 provider.setCustomParameters({
-                    client_id: '857410556058-i80dgt79ofmdl10n23t4ev47i15m28h9.apps.googleusercontent.com'
+                    client_id: '857410556058-i80dgt79ofmdl10n23t4ev47i15m28h9.apps.googleusercontent.com',
+                    hd: 'edu.lumenos.app'  // Restrict to your domain
                 });
+                
                 await signInWithRedirect(auth, provider);
             } catch (error) {
                 showError('Error starting sign-in: ' + error.message);
