@@ -34,33 +34,23 @@
 
     <!-- Configuration and Authentication Logic -->
     <script>
-        // Configuration
-        const config = {
-            firebase: {
-                apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-                authDomain: "lumenos-749a1.firebaseapp.com",
-                projectId: "lumenos-749a1",
-                storageBucket: "lumenos-749a1.firebasestorage.app",
-                messagingSenderId: "857410556058",
-                appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-                measurementId: "G-CEZ4PHV9GE"
-            },
-            allowedDomains: ["edu.lumenos.app"],
-            redirectPaths: {
-                production: "https://edu.lumenos.app/dashboard",
-                development: "/dashboard.html"
-            }
-        };
-
         // Initialize Firebase
-        firebase.initializeApp(config.firebase);
+        firebase.initializeApp({
+            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+            authDomain: "lumenos-749a1.firebaseapp.com",
+            projectId: "lumenos-749a1",
+            storageBucket: "lumenos-749a1.firebasestorage.app",
+            messagingSenderId: "857410556058",
+            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+            measurementId: "G-CEZ4PHV9GE"
+        });
 
         // UI elements
         const errorMessage = document.getElementById('error-message');
         const loading = document.getElementById('loading');
         const googleSigninButton = document.getElementById('google-signin');
 
-        // Helper functions
+        // Helper function to show errors
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
@@ -68,25 +58,11 @@
             googleSigninButton.disabled = false;
         }
 
-        function getRedirectPath() {
-            const isProduction = window.location.hostname === 'edu.lumenos.app';
-            return isProduction 
-                ? config.redirectPaths.production 
-                : config.redirectPaths.development;
-        }
-
         // Check for redirect result on page load
         firebase.auth().getRedirectResult()
             .then((result) => {
                 if (result.user) {
-                    const userDomain = result.user.email.split('@')[1];
-                    if (!config.allowedDomains.includes(userDomain)) {
-                        return firebase.auth().signOut()
-                            .then(() => {
-                                throw new Error('Invalid email domain. Please use your organization email.');
-                            });
-                    }
-                    window.location.href = getRedirectPath();
+                    window.location.href = 'dashboard.html';
                 }
             })
             .catch((error) => {
