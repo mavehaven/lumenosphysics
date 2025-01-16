@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Physics Simulator Login Page">
+    <meta name="description" content="Physics Simulator Login">
     <title>Login - Physics Simulator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
@@ -34,27 +34,18 @@
 
     <!-- Configuration and Authentication Logic -->
     <script>
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "firebase/app";
-        import { getAnalytics } from "firebase/analytics";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
-        
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-          apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-          authDomain: "lumenos-749a1.firebaseapp.com",
-          projectId: "lumenos-749a1",
-          storageBucket: "lumenos-749a1.firebasestorage.app",
-          messagingSenderId: "857410556058",
-          appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-          measurementId: "G-CEZ4PHV9GE"
+        // Configuration
+        const config = {
+            firebase: {
+                apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+                authDomain: "lumenos-749a1.firebaseapp.com",
+                projectId: "lumenos-749a1",
+                storageBucket: "lumenos-749a1.firebasestorage.app",
+                messagingSenderId: "857410556058",
+                appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+                measurementId: "G-CEZ4PHV9GE"
+            }
         };
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
 
         // Initialize Firebase
         firebase.initializeApp(config.firebase);
@@ -72,67 +63,55 @@
             googleSigninButton.disabled = false;
         }
 
-        // Handle domain validation and redirection
+        // Handle authenticated user
         function handleAuthenticatedUser(user) {
             if (!user) return;
             
-            const userDomain = user.email.split('@')[1];
-            if (!config.allowedDomains.includes(userDomain)) {
-                firebase.auth().signOut()
-                    .then(() => {
-                        showError('Invalid email domain. Please use your organization email.');
-                    });
-                return;
-            }
-
-            // Only redirect if we're on the login page
-            const currentPage = window.location.pathname.toLowerCase();
-            if (currentPage.includes('login.html') || currentPage === '/' || currentPage === '') {
-                window.location.replace('dashboard.html');
+            // Get the current path and check if we're on the login page
+            const path = window.location.pathname;
+            const currentPage = path.split('/').pop().toLowerCase();
+            
+            // If we're on login.html, index.html, or root path, redirect to dashboard
+            if (!currentPage || 
+                currentPage === 'login.html' || 
+                currentPage === 'index.html' || 
+                currentPage === '/') {
+                window.location.href = 'dashboard.html';
             }
         }
 
         // Check if user is already logged in
         firebase.auth().onAuthStateChanged(handleAuthenticatedUser);
 
+        // Check for redirect result on page load
         firebase.auth().getRedirectResult()
-    .then((result) => {
-        if (result.user) {
-            handleAuthenticatedUser(result.user);
-        }
-    })
-    .catch((error) => {
-        showError(error.message);
-    });
-
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        handleAuthenticatedUser(user);
-    } else {
-        const currentPage = window.location.pathname.toLowerCase();
-        if (!currentPage.includes('login.html')) {
-            window.location.replace('dashboard.html');
-        }
-    }
-});
-
-function handleAuthenticatedUser(user) {
-    if (!user) return;
-
-    const userDomain = user.email.split('@')[1];
-    if (!config.allowedDomains.includes(userDomain)) {
-        firebase.auth().signOut()
-            .then(() => {
-                showError('Invalid email domain. Please use your organization email.');
+            .then((result) => {
+                if (result.user) {
+                    handleAuthenticatedUser(result.user);
+                }
+            })
+            .catch((error) => {
+                if (error.message) {
+                    showError(error.message);
+                }
             });
-        return;
-    }
 
-    const currentPage = window.location.pathname.toLowerCase();
-    if (currentPage.includes('login.html')) {
-        window.location.replace('dashboard.html');
-    }
-}
+        // Handle Google sign-in
+        googleSigninButton.addEventListener('click', () => {
+            loading.classList.remove('hidden');
+            googleSigninButton.disabled = true;
+            errorMessage.classList.add('hidden');
+
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
+
+            firebase.auth().signInWithRedirect(provider)
+                .catch((error) => {
+                    showError('Error starting sign-in: ' + error.message);
+                });
+        });
     </script>
 </body>
 </html>
