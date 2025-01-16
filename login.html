@@ -67,10 +67,16 @@
         function handleAuthenticatedUser(user) {
             if (!user) return;
             
-            // Only redirect if we're on the login page
-            const currentPage = window.location.pathname.toLowerCase();
-            if (currentPage.includes('login.html') || currentPage === '/' || currentPage === '') {
-                window.location.replace('dashboard.html');
+            // Get the current path and check if we're on the login page
+            const path = window.location.pathname;
+            const currentPage = path.split('/').pop().toLowerCase();
+            
+            // If we're on login.html, index.html, or root path, redirect to dashboard
+            if (!currentPage || 
+                currentPage === 'login.html' || 
+                currentPage === 'index.html' || 
+                currentPage === '/') {
+                window.location.href = 'dashboard.html';
             }
         }
 
