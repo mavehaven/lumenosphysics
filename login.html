@@ -68,7 +68,11 @@
             try {
                 loading.classList.remove('hidden');
                 googleSigninButton.disabled = true;
-                await signInWithRedirect(auth, new GoogleAuthProvider());
+                const provider = new GoogleAuthProvider();
+                provider.setCustomParameters({
+                    client_id: '857410556058-i80dgt79ofmdl10n23t4ev47i15m28h9.apps.googleusercontent.com'
+                });
+                await signInWithRedirect(auth, provider);
             } catch (error) {
                 showError('Error starting sign-in: ' + error.message);
                 loading.classList.add('hidden');
