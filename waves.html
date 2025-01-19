@@ -65,9 +65,35 @@
         .dark-mode .formula {
             background-color: #3d3d3d;
         }
+        .value-display {
+            display: inline-block;
+            margin-left: 10px;
+            min-width: 50px;
+            font-weight: bold;
+        }
+        .range-info {
+            margin-left: 10px;
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        .dark-mode .range-info {
+            color: #aaa;
+        }
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        .slider-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .slider-label {
+            min-width: 200px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script type="text/javascript" id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"> </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <header>
@@ -102,38 +128,65 @@
     <div class="container">
         <div class="controls">
             <div class="slider-container">
-                <label for="amplitudeSlider">Amplitude (Wave Height): </label>
-                <input type="range" id="amplitudeSlider" min="0" max="10" value="5" step="0.1" oninput="updateWaveParams()">
+                <div class="slider-row">
+                    <span class="slider-label">Amplitude (Wave Height):</span>
+                    <input type="range" id="amplitudeSlider" min="0" max="10" value="5" step="0.1" oninput="updateWaveParams()">
+                    <span class="value-display" id="amplitudeValue">5.0</span> meters (m)
+                    <span class="range-info">[typical ocean waves: 1-3m]</span>
+                </div>
                 <span>Controls how tall the waves are</span>
             </div>
+            
             <div class="slider-container">
-                <label for="frequencySlider1">Frequency (Speed): </label>
-                <input type="range" id="frequencySlider1" min="0.1" max="2" value="0.5" step="0.1" oninput="updateWaveParams()">
+                <div class="slider-row">
+                    <span class="slider-label">Frequency:</span>
+                    <input type="range" id="frequencySlider1" min="0.1" max="2" value="0.5" step="0.1" oninput="updateWaveParams()">
+                    <span class="value-display" id="frequencyValue">0.5</span> Hz (cycles/second)
+                    <span class="range-info">[typical ocean waves: 0.1-0.2 Hz]</span>
+                </div>
                 <span>Controls how fast the waves move</span>
             </div>
+            
             <div class="slider-container">
-                <label for="wavelengthSlider">Wavelength (Wave Width): </label>
-                <input type="range" id="wavelengthSlider" min="5" max="50" value="20" step="1" oninput="updateWaveParams()">
+                <div class="slider-row">
+                    <span class="slider-label">Wavelength (Peak to Peak):</span>
+                    <input type="range" id="wavelengthSlider" min="5" max="50" value="20" step="1" oninput="updateWaveParams()">
+                    <span class="value-display" id="wavelengthValue">20</span> meters (m)
+                    <span class="range-info">[typical ocean waves: 50-150m]</span>
+                </div>
                 <span>Controls the distance between wave peaks</span>
             </div>
+            
             <div class="slider-container">
-                <label for="phaseSlider">Phase (Wave Shift): </label>
-                <input type="range" id="phaseSlider" min="0" max="360" value="0" step="1" oninput="updateWaveParams()">
+                <div class="slider-row">
+                    <span class="slider-label">Phase (Wave Shift):</span>
+                    <input type="range" id="phaseSlider" min="0" max="360" value="0" step="1" oninput="updateWaveParams()">
+                    <span class="value-display" id="phaseValue">0</span>° (degrees)
+                    <span class="range-info">[0° to 360° = one complete cycle]</span>
+                </div>
                 <span>Shifts the wave left or right</span>
             </div>
+            
             <div class="slider-container">
-                <label for="dampingSlider">Damping (Wave Decay): </label>
-                <input type="range" id="dampingSlider" min="0" max="0.1" value="0" step="0.001" oninput="updateWaveParams()">
+                <div class="slider-row">
+                    <span class="slider-label">Damping (Wave Decay):</span>
+                    <input type="range" id="dampingSlider" min="0" max="0.1" value="0" step="0.001" oninput="updateWaveParams()">
+                    <span class="value-display" id="dampingValue">0.000</span> m⁻¹ (per meter)
+                    <span class="range-info">[0 = no decay, 0.1 = rapid decay]</span>
+                </div>
                 <span>Controls how quickly the wave dies out</span>
             </div>
+            
             <div class="slider-container">
-                <label for="waveTypeSelect">Wave Type: </label>
-                <select id="waveTypeSelect" onchange="updateWaveParams()">
-                    <option value="sine">Sine (Smooth waves)</option>
-                    <option value="square">Square (Sharp waves)</option>
-                    <option value="sawtooth">Sawtooth (Ramp waves)</option>
-                    <option value="triangle">Triangle (Pointed waves)</option>
-                </select>
+                <div class="slider-row">
+                    <span class="slider-label">Wave Type:</span>
+                    <select id="waveTypeSelect" onchange="updateWaveParams()">
+                        <option value="sine">Sine (Smooth waves)</option>
+                        <option value="square">Square (Sharp waves)</option>
+                        <option value="sawtooth">Sawtooth (Ramp waves)</option>
+                        <option value="triangle">Triangle (Pointed waves)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -177,6 +230,13 @@
             phase = parseFloat(document.getElementById('phaseSlider').value) * Math.PI / 180;
             damping = parseFloat(document.getElementById('dampingSlider').value);
             waveType = document.getElementById('waveTypeSelect').value;
+
+            // Update display values
+            document.getElementById('amplitudeValue').textContent = amplitude.toFixed(1);
+            document.getElementById('frequencyValue').textContent = frequency1.toFixed(1);
+            document.getElementById('wavelengthValue').textContent = wavelength.toFixed(0);
+            document.getElementById('phaseValue').textContent = (document.getElementById('phaseSlider').value + '°');
+            document.getElementById('dampingValue').textContent = damping.toFixed(3);
         }
 
         function animate() {
