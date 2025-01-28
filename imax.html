@@ -48,6 +48,9 @@
             margin: 0 auto;
             background-color: white;
             padding: 2rem;
+            max-width: 210mm; /* A4 width */
+            margin-left: auto;
+            margin-right: auto;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
@@ -240,7 +243,9 @@
                 let position = 0;
                 let page = 1;
                 
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                // Add margins for better positioning
+                const margin = 20; // 20mm margins
+                pdf.addImage(imgData, 'PNG', margin, position, pdfWidth - (margin * 2), pdfHeight);
                 heightLeft -= pageHeight;
                 
                 while (heightLeft >= 0) {
