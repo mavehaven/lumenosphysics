@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>9-View Autostereoscopic Engine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            background: #f8f9fa;
+            border-color: #0070f3;
+        }
+        .upload-area.drag-over {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .control-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .preview-box {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .preview-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.9em;
+            color: #666;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        #outputCanvas {
+            width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 8px 0;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        button {
+            background: #0070f3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0051b3;
+        }
+        button.active {
+            background: #004299;
+        }
+        .export-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .mode-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #e3f2fd;
+            color: #0070f3;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .progress-panel {
+            display: none;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .progress-bar {
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #0070f3;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            text-align: center;
+            color: #666;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>9-View Autostereoscopic Engine <span class="mode-indicator" id="modeIndicator">Desktop Mode</span></h1>
+        
+        <div class="upload-area" id="dropZone">
+            <p>Drop image here or click to upload</p>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <div class="controls">
+            <div class="control-panel">
+                <h2>View Controls</h2>
+                <div class="control-group">
+                    <button id="toggleMode">Toggle Mobile/Desktop Mode</button>
+                </div>
+                <div class="control-group">
+                    <label>View Separation</label>
+                    <input type="range" id="separation" min="1" max="100" value="30">
+                </div>
+                <div class="control-group">
+                    <label>Animation Speed</label>
+                    <input type="range" id="animSpeed" min="1" max="100" value="50">
+                </div>
+                <div class="control-group">
+                    <label>View Angle</label>
+                    <input type="range" id="viewAngle" min="1" max="45" value="22">
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <h2>Effect Controls</h2>
+                <div class="control-group">
+                    <label>Barrier Width</label>
+                    <input type="range" id="barrierWidth" min="1" max="20" value="4">
+                </div>
+                <div class="control-group">
+                    <label>Barrier Opacity</label>
+                    <input type="range" id="barrierOpacity" min="0" max="100" value="50">
+                </div>
+                <div class="control-group">
+                    <label>Depth Intensity</label>
+                    <input type="range" id="depthIntensity" min="0" max="100" value="50">
+                </div>
+            </div>
+        </div>
+
+        <canvas id="outputCanvas"></canvas>
+        
+        <div class="preview-container">
+            <div class="preview-box">
+                <h3>Left View</h3>
+                <canvas id="leftPreview"></canvas>
+            </div>
+            <div class="preview-box">
+                <h3>Center View</h3>
+                <canvas id="centerPreview"></canvas>
+            </div>
+            <div class="preview-box">
+                <h3>Right View</h3>
+                <canvas id="rightPreview"></canvas>
+            </div>
+        </div>
+
+        <div class="progress-panel" id="progressPanel">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">Preparing...</div>
+        </div>
+
+        <div class="export-panel">
+            <button id="startAnim">Start Animation</button>
+            <button id="stopAnim">Stop Animation</button>
+            <button id="exportGif">Export Animation</button>
+        </div>
+    </div>
+
+    <script>
+        class NineViewEngine {
+            constructor() {
+                this.setupDOM();
+                this.setupEventListeners();
+                this.isMobileMode = false;
+                this.isAnimating = false;
+                this.animationPhase = 0;
+                this.views = [];
+                this.viewCount = 9;
+                this.currentViewIndex = 4; // Center view
+            }
+
+            setupDOM() {
+                this.dropZone = document.getElementById('dropZone');
+                this.imageInput = document.getElementById('imageInput');
+                this.outputCanvas = document.getElementById('outputCanvas');
+                this.leftPreview = document.getElementById('leftPreview');
+                this.centerPreview = document.getElementById('centerPreview');
+                this.rightPreview = document.getElementById('rightPreview');
+                this.ctx = this.outputCanvas.getContext('2d');
+                this.modeIndicator = document.getElementById('modeIndicator');
+                this.progressPanel = document.getElementById('progressPanel');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressText = document.getElementById('progressText');
+            }
+
+            setupEventListeners() {
+                // File upload handling
+                this.dropZone.addEventListener('click', () => this.imageInput.click());
+                this.dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    this.dropZone.classList.add('drag-over');
+                });
+                this.dropZone.addEventListener('dragleave', () => {
+                    this.dropZone.classList.remove('drag-over');
+                });
+                this.dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.dropZone.classList.remove('drag-over');
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        this.loadImage(file);
+                    }
+                });
+                this.imageInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) this.loadImage(file);
+                });
+
+                // Mode toggle
+                document.getElementById('toggleMode').addEventListener('click', () => {
+                    this.isMobileMode = !this.isMobileMode;
+                    this.modeIndicator.textContent = this.isMobileMode ? 'Mobile Mode' : 'Desktop Mode';
+                    if (this.sourceImage) {
+                        this.generateViews();
+                        this.updateView();
+                    }
+                });
+
+                // Animation controls
+                document.getElementById('startAnim').addEventListener('click', () => this.startAnimation());
+                document.getElementById('stopAnim').addEventListener('click', () => this.stopAnimation());
+                document.getElementById('exportGif').addEventListener('click', () => this.exportAsGif());
+
+                // Control updates
+                ['separation', 'animSpeed', 'viewAngle', 'barrierWidth', 'barrierOpacity', 'depthIntensity']
+                    .forEach(id => {
+                        document.getElementById(id).addEventListener('input', () => {
+                            if (this.sourceImage) {
+                                this.generateViews();
+                                this.updateView();
+                            }
+                        });
+                    });
+            }
+
+            loadImage(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.sourceImage = new Image();
+                    this.sourceImage.onload = () => {
+                        this.setupCanvases();
+                        this.generateViews();
+                        this.updateView();
+                        this.startAnimation(); // Auto-start animation
+                    };
+                    this.sourceImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            setupCanvases() {
+                const maxWidth = 800;
+                const scale = Math.min(1, maxWidth / this.sourceImage.width);
+                
+                this.outputCanvas.width = this.sourceImage.width * scale;
+                this.outputCanvas.height = this.sourceImage.height * scale;
+                
+                [this.leftPreview, this.centerPreview, this.rightPreview].forEach(canvas => {
+                    canvas.width = this.outputCanvas.width / 4;
+                    canvas.height = this.outputCanvas.height / 4;
+                });
+            }
+
+            generateViews() {
+                this.views = [];
+                const baseOffset = parseInt(document.getElementById('separation').value);
+                const maxAngle = parseInt(document.getElementById('viewAngle').value) * Math.PI / 180;
+                const depthIntensity = document.getElementById('depthIntensity').value / 100;
+
+                // Create views including buffer views for smooth wrapping
+                const totalViews = this.viewCount + 4;
+                const startIndex = -2;
+
+                for (let i = 0; i < totalViews; i++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.outputCanvas.width;
+                    canvas.height = this.outputCanvas.height;
+                    const ctx = canvas.getContext('2d');
+
+                    // Calculate smooth progress with buffer views
+                    const progress = ((i + startIndex) / (this.viewCount - 1)) * 2;
+                    // Use sine function for smoother angle transitions
+                    const angle = Math.sin(progress * Math.PI / 2) * maxAngle;
+                    // Smooth out offset transitions
+                    const offset = Math.sin(progress * Math.PI / 2) * baseOffset;
+
+                    ctx.save();
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    
+                    // Apply smooth perspective transform
+                    const perspectiveAmount = Math.sin(progress * Math.PI / 2) * depthIntensity;
+                    const transform = new DOMMatrix();
+                    transform.a = Math.cos(angle);
+                    transform.b = 0;
+                    transform.c = Math.sin(angle) * perspectiveAmount;
+                    transform.d = 1;
+                    ctx.transform(transform.a, transform.b, transform.c, transform.d, 0, 0);
+                    
+                    // Apply smooth scale transition
+                    const scaleAmount = 1 + Math.abs(Math.sin(progress * Math.PI / 2)) * 0.15;
+                    ctx.scale(scaleAmount, scaleAmount);
+                    
+                    ctx.translate(-canvas.width / 2, -canvas.height / 2);
+                    ctx.translate(offset, 0);
+                    
+                    // Add subtle vertical shift for more natural movement
+                    const verticalOffset = Math.sin(progress * Math.PI) * 5;
+                    ctx.translate(0, verticalOffset);
+                    
+                    ctx.drawImage(this.sourceImage, 0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                    
+                    this.views.push(canvas);
+                }
+
+                this.updatePreviews();
+            }
+
+            updatePreviews() {
+                if (this.views.length >= 3) {
+                    const leftIndex = 2;
+                    const centerIndex = Math.floor(this.views.length / 2);
+                    const rightIndex = this.views.length - 3;
+
+                    this.leftPreview.getContext('2d').drawImage(this.views[leftIndex], 0, 0, 
+                        this.leftPreview.width, this.leftPreview.height);
+                    this.centerPreview.getContext('2d').drawImage(this.views[centerIndex], 0, 0, 
+                        this.centerPreview.width, this.centerPreview.height);
+                    this.rightPreview.getContext('2d').drawImage(this.views[rightIndex], 0, 0, 
+                        this.rightPreview.width, this.rightPreview.height);
+                }
+            }
+
+            updateView() {
+                if (!this.sourceImage || this.views.length === 0) return;
+
+                // Calculate smooth cyclic phase
+                const smoothPhase = (1 - Math.cos(this.animationPhase)) / 2;
+                const totalViews = this.views.length;
+                const cyclePosition = smoothPhase * totalViews;
+                
+                // Calculate indices for three-way blend
+                const index1 = Math.floor(cyclePosition) % totalViews;
+                const index2 = (index1 + 1) % totalViews;
+                const index3 = (index1 + 2) % totalViews;
+                const blend = cyclePosition - Math.floor(cyclePosition);
+
+                // Calculate smooth blend weights
+                const weight1 = Math.cos(blend * Math.PI / 2) ** 2;
+                const weight2 = Math.sin(blend * Math.PI) / 2 + 0.5;
+                const weight3 = Math.sin(blend * Math.PI / 2) ** 2;
+
+                this.ctx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
+
+                if (this.isMobileMode) {
+                    // Three-way blend for smoother transitions
+                    this.ctx.globalCompositeOperation = 'source-over';
+                    this.ctx.globalAlpha = weight1;
+                    this.ctx.drawImage(this.views[index1], 0, 0);
+                    this.ctx.globalAlpha = weight2;
+                    this.ctx.drawImage(this.views[index2], 0, 0);
+                    this.ctx.globalAlpha = weight3;
+                    this.ctx.drawImage(this.views[index3], 0, 0);
+                    this.ctx.globalAlpha = 1;
+                } else {
+                    // Enhanced barrier strip effect with smooth transitions
+                    const barrierWidth = parseInt(document.getElementById('barrierWidth').value);
+                    
+                    for (let x = 0; x < this.outputCanvas.width; x += barrierWidth * 2) {
+                        // Calculate local blend for this strip
+                        const stripOffset = (x / this.outputCanvas.width) * 0.1;
+                        const localBlend = (blend + stripOffset) % 1;
+                        
+                        // Draw strips with local blend values
+                        const stripWidth = barrierWidth;
+                        if (x + stripWidth <= this.outputCanvas.width) {
+                            // Apply smooth transition between three views
+                            this.ctx.globalAlpha = weight1;
+                            this.ctx.drawImage(this.views[index1],
+                                x, 0, stripWidth, this.outputCanvas.height,
+                                x, 0, stripWidth, this.outputCanvas.height);
+                            
+                            this.ctx.globalAlpha = weight2;
+                            this.ctx.drawImage(this.views[index2],
+                                x, 0, stripWidth, this.outputCanvas.height,
+                                x, 0, stripWidth, this.outputCanvas.height);
+                            
+                            if (x + stripWidth * 2 <= this.outputCanvas.width) {
+                                this.ctx.globalAlpha = weight3;
+                                this.ctx.drawImage(this.views[index3],
+                                    x + stripWidth, 0, stripWidth, this.outputCanvas.height,
+                                    x + stripWidth, 0, stripWidth, this.outputCanvas.height);
+                            }
+                        }
+                    }
+                    
+                    // Smooth barrier overlay
+                    const opacity = document.getElementById('barrierOpacity').value / 100;
+                    const gradient = this.ctx.createLinearGradient(0, 0, barrierWidth, 0);
+                    gradient.addColorStop(0, `rgba(0,0,0,${opacity})`);
+                    gradient.addColorStop(0.5, 'rgba(0,0,0,0)');
+                    gradient.addColorStop(1, `rgba(0,0,0,${opacity})`);
+                    
+                    this.ctx.globalAlpha = 1;
+                    this.ctx.fillStyle = gradient;
+                    for (let x = 0; x < this.outputCanvas.width; x += barrierWidth * 2) {
+                        this.ctx.fillRect(x, 0, barrierWidth, this.outputCanvas.height);
+                    }
+                }
+            }
+
+            startAnimation() {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+                this.animate();
+            }
+
+            stopAnimation() {
+                this.isAnimating = false;
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                }
+            }
+
+            animate() {
+                if (!this.isAnimating) return;
+
+                const speed = document.getElementById('animSpeed').value / 1000;
+                this.animationPhase += speed;
+                this.updateView();
+
+                this.animationFrame = requestAnimationFrame(() => this.animate());
+            }
+
+            async exportAsGif() {
+                if (!this.sourceImage) return;
+
+                this.progressPanel.style.display = 'block';
+                this.progressBar.style.width = '0%';
+                this.progressText.textContent = 'Preparing GIF...';
+
+                try {
+                    const frameCount = 30;
+                    const gif = new GIF({
+                        workers: 2,
+                        quality: 10,
+                        width: this.outputCanvas.width,
+                        height: this.outputCanvas.height,
+                        workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+                    });
+
+                    const wasAnimating = this.isAnimating;
+                    this.stopAnimation();
+
+                    for (let i = 0; i < frameCount; i++) {
+                        this.progressText.textContent = `Generating frame ${i + 1}/${frameCount}`;
+                        this.progressBar.style.width = `${(i / frameCount) * 50}%`;
+                        
+                        const phase = (i / frameCount) * Math.PI * 2;
+                        this.animationPhase = phase;
+                        this.updateView();
+                        
+                        gif.addFrame(this.outputCanvas, { delay: 50, copy: true });
+                        await new Promise(resolve => setTimeout(resolve, 0));
+                    }
+
+                    return new Promise((resolve, reject) => {
+                        gif.on('finished', (blob) => {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'stereoscopic.gif';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            
+                            this.progressPanel.style.display = 'none';
+                            if (wasAnimating) this.startAnimation();
+                            resolve();
+                        });
+
+                        gif.on('progress', (p) => {
+                            this.progressBar.style.width = `${50 + (p * 50)}%`;
+                            this.progressText.textContent = `Encoding GIF: ${Math.round(p * 100)}%`;
+                        });
+
+                        gif.render();
+                    });
+                } catch (error) {
+                    console.error('Error generating GIF:', error);
+                    this.progressPanel.style.display = 'none';
+                    alert('Error generating GIF. Please try again.');
+                }
+            }
+        }
+
+        // Initialize the engine
+        const engine = new NineViewEngine();
+    </script>
+</body>
+</html>
