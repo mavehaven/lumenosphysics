@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LumenOS Blog - Physics Education Insights</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .article-card {
+            transition: transform 0.3s ease;
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+        .nav-scrolled {
+            background: rgba(30, 58, 138, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg bg-opacity-90">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <a href="index.html" class="flex-shrink-0">
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Lumenos Logo" 
+                         class="h-10">
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="hover:text-blue-300 transition-colors duration-300">Home</a>
+                    <a href="#" class="hover:text-blue-300 transition-colors duration-300">Blog</a>
+                    <a href="about.html" class="hover:text-blue-300 transition-colors duration-300">About</a>
+                    <a href="billing.html" class="bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Start Learning</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Header -->
+    <div class="pt-32 pb-20 bg-gradient-to-b from-blue-900 to-gray-900">
+        <div class="container mx-auto px-6">
+            <h1 class="text-5xl md:text-6xl font-bold text-center mb-8 gradient-text">
+                LumenOS Blog
+            </h1>
+            <p class="text-xl text-blue-200 text-center max-w-2xl mx-auto">
+                Exploring the intersection of physics education and interactive technology
+            </p>
+        </div>
+    </div>
+
+    <!-- Blog Articles -->
+    <div class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <!-- Featured Article -->
+            <article class="mb-20 bg-gray-800 rounded-xl overflow-hidden article-card">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="relative h-64 md:h-full">
+                        <img src="/api/placeholder/800/600" alt="Physics Simulation" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-8">
+                        <div class="text-blue-400 text-sm font-semibold mb-4">January 28, 2025</div>
+                        <h2 class="text-3xl font-bold mb-4 text-blue-300">Revolutionizing Physics Education Through Interactive Simulations</h2>
+                        <p class="text-gray-300 mb-6">The integration of interactive simulations in physics education marks a paradigm shift in how students engage with complex scientific concepts. LumenOS's advanced simulation platform enables students to visualize and manipulate physical phenomena in real-time, bridging the gap between theoretical understanding and practical application.</p>
+                        <a href="#" class="inline-block bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Read More</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Second Article -->
+            <article class="bg-gray-800 rounded-xl overflow-hidden article-card">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="relative h-64 md:h-full order-1 md:order-2">
+                        <img src="/api/placeholder/800/600" alt="Future of Education" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-8 order-2 md:order-1">
+                        <div class="text-blue-400 text-sm font-semibold mb-4">January 25, 2025</div>
+                        <h2 class="text-3xl font-bold mb-4 text-blue-300">The Future of Physics Education: AI-Powered Learning Environments</h2>
+                        <p class="text-gray-300 mb-6">As we look toward the future of physics education, artificial intelligence and adaptive learning technologies are set to transform how students learn and understand physics. LumenOS is at the forefront of this revolution, developing AI-driven simulations that adapt to each student's learning pace and style.</p>
+                        <a href="#" class="inline-block bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition-all duration-300">Read More</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <!-- Newsletter Section -->
+    <div class="py-20 bg-gradient-to-b from-gray-900 to-blue-900">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-8 gradient-text">Stay Updated</h2>
+            <p class="text-blue-200 mb-8 max-w-2xl mx-auto">Subscribe to our newsletter for the latest insights on physics education and technology.</p>
+            <form class="max-w-md mx-auto">
+                <div class="flex gap-4">
+                    <input type="email" placeholder="Enter your email" class="flex-1 px-6 py-3 rounded-full bg-gray-800 border border-blue-700 focus:outline-none focus:border-blue-500">
+                    <button type="submit" class="bg-blue-600 px-8 py-3 rounded-full hover:bg-blue-700 transition-all duration-300">Subscribe</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+                         alt="Lumenos Logo" 
+                         class="h-12 mb-4">
+                    <p class="text-gray-400">Revolutionizing physics education through interactive simulations.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Home</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Features</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-4">Resources</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Tutorial Videos</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Community</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 LumenOS. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Navbar scroll effect
+        const navbar = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('nav-scrolled');
+            } else {
+                navbar.classList.remove('nav-scrolled');
+            }
+        });
+
+        // Animate articles on scroll
+        gsap.utils.toArray('.article-card').forEach(article => {
+            gsap.from(article, {
+                scrollTrigger: {
+                    trigger: article,
+                    start: "top bottom-=100",
+                    toggleActions: "play none none reverse"
+                },
+                opacity: 0,
+                y: 50,
+                duration: 0.8
+            });
+        });
+    </script>
+</body>
+</html>
