@@ -147,11 +147,76 @@
         .dark .text-gray-600 {
             color: #d1d5db;
         }
+
+
+        /* Profile section styles */
+        .profile-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Auth popup styles */
+        .auth-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .auth-popup.active {
+            display: block;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .auth-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4285f4;
+            color: white;
+            cursor: pointer;
+        }
+
+        .auth-button:hover {
+            background-color: #3574e2;
+        }
     </style>
 </head>
-                  <body class="bg-white text-gray-900">
-                      <!-- Navigation -->
-                     <body class="bg-white text-gray-900">
+    <body class="bg-white text-gray-900">
+                     
     <!-- Navigation -->
     <header class="fixed w-full bg-white border-b border-gray-200 z-50">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -187,6 +252,15 @@
                         <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50">
                             <!-- [Your existing dropdown content stays the same] -->
                         </div>
+                    </div>
+                     <!-- Auth popup -->
+                    <div class="overlay" id="overlay"></div>
+                    <div class="auth-popup" id="authPopup">
+                        <h2>Sign In</h2>
+                        <p>Choose your sign-in method:</p>
+                        <button class="auth-button" onclick="signInWithGoogle()">
+                            Sign in with Google
+                        </button>
                     </div>
 
                     <!-- Dark Mode Toggle -->
@@ -1426,6 +1500,59 @@ window.addEventListener('resize', () => {
         mobileMenu.classList.add('hidden');
     }
 });
+
+         // Firebase configuration - replace with your own
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+            authDomain: "lumenos-749a1.firebaseapp.com",
+            projectId: "lumenos-749a1",
+            storageBucket: "lumenos-749a1.firebasestorage.app",
+            messagingSenderId: "857410556058",
+            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+            measurementId: "G-CEZ4PHV9GE"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Update profile icon when auth state changes
+        auth.onAuthStateChanged(function(user) {
+            const profileInitial = document.getElementById('profileInitial');
+            if (user) {
+                // Show first letter of email or display name
+                const initial = user.displayName ? 
+                    user.displayName[0].toUpperCase() : 
+                    user.email[0].toUpperCase();
+                profileInitial.textContent = initial;
+            } else {
+                profileInitial.textContent = '?';
+            }
+        });
+
+        // Toggle auth popup
+        function toggleAuthPopup() {
+            const popup = document.getElementById('authPopup');
+            const overlay = document.getElementById('overlay');
+            popup.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Sign in with Google
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then(() => {
+                    toggleAuthPopup(); // Close popup after successful sign-in
+                })
+                .catch((error) => {
+                    console.error('Error signing in:', error);
+                });
+        }
+
+        // Close popup when clicking overlay
+        document.getElementById('overlay').addEventListener('click', toggleAuthPopup);
+    </script>
     </script>
 </body>
 </html>
