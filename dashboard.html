@@ -227,6 +227,31 @@
                         <button id="loginBtn" class="nav-link text-sm">Login</button>
                         <button id="signupBtn" class="nav-link text-sm">Signup</button>
                       </div>
+
+                    <!-- Authentication Section -->
+                        <section id="auth-section" class="pt-32 pb-20 px-6">
+                            <div class="max-w-7xl mx-auto">
+                                <h2 class="text-3xl font-semibold mb-12">Authentication</h2>
+                                <div id="auth-container">
+                                    <div id="user-info" class="hidden">
+                                        <p id="user-email"></p>
+                                        <button id="logout-btn" class="btn">Logout</button>
+                                    </div>
+                                    <div id="auth-forms">
+                                        <form id="login-form" class="mb-4">
+                                            <input type="email" id="login-email" placeholder="Email" required>
+                                            <input type="password" id="login-password" placeholder="Password" required>
+                                            <button type="submit" class="btn">Login</button>
+                                        </form>
+                                        <form id="signup-form">
+                                            <input type="email" id="signup-email" placeholder="Email" required>
+                                            <input type="password" id="signup-password" placeholder="Password" required>
+                                            <button type="submit" class="btn">Signup</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     <!-- Dark Mode Toggle -->
                     <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
                         <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1464,7 +1489,7 @@ window.addEventListener('resize', () => {
         mobileMenu.classList.add('hidden');
     }
 });
-        const auth = firebase.auth();
+const auth = firebase.auth();
 
   // Elements
   const profileDropdown = document.getElementById('profileDropdown');
