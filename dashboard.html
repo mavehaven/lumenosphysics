@@ -5,26 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physics Hub</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js"></script>
-    <!-- Firebase Authentication -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js"></script>
-    <!-- Firebase Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js"></script>
-    <script>
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-            authDomain: "lumenos-749a1.firebaseapp.com",
-            projectId: "lumenos-749a1",
-            storageBucket: "lumenos-749a1.firebasestorage.app",
-            messagingSenderId: "857410556058",
-            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-            measurementId: "G-CEZ4PHV9GE"
-        };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
         
@@ -209,49 +189,6 @@
                         </div>
                     </div>
 
-                    <!-- Profile Dropdown (Visible to logged-in users) -->
-                      <div id="profileDropdown" class="relative hidden">
-                        <button class="nav-link text-sm flex items-center">
-                          Profile
-                          <svg class="w-4 h-4 ml-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                          </svg>
-                        </button>
-                        <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50">
-                          <a href="#" id="logoutBtn" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
-                        </div>
-                      </div>
-                    
-                      <!-- Login/Signup Buttons (Visible to non-logged-in users) -->
-                      <div id="authButtons">
-                        <button id="loginBtn" class="nav-link text-sm">Login</button>
-                        <button id="signupBtn" class="nav-link text-sm">Signup</button>
-                      </div>
-
-                    <!-- Authentication Section -->
-                        <section id="auth-section" class="pt-32 pb-20 px-6">
-                            <div class="max-w-7xl mx-auto">
-                                <h2 class="text-3xl font-semibold mb-12">Authentication</h2>
-                                <div id="auth-container">
-                                    <div id="user-info" class="hidden">
-                                        <p id="user-email"></p>
-                                        <button id="logout-btn" class="btn">Logout</button>
-                                    </div>
-                                    <div id="auth-forms">
-                                        <form id="login-form" class="mb-4">
-                                            <input type="email" id="login-email" placeholder="Email" required>
-                                            <input type="password" id="login-password" placeholder="Password" required>
-                                            <button type="submit" class="btn">Login</button>
-                                        </form>
-                                        <form id="signup-form">
-                                            <input type="email" id="signup-email" placeholder="Email" required>
-                                            <input type="password" id="signup-password" placeholder="Password" required>
-                                            <button type="submit" class="btn">Signup</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
                     <!-- Dark Mode Toggle -->
                     <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
                         <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1489,52 +1426,6 @@ window.addEventListener('resize', () => {
         mobileMenu.classList.add('hidden');
     }
 });
-const auth = firebase.auth();
-
-  // Elements
-  const profileDropdown = document.getElementById('profileDropdown');
-  const authButtons = document.getElementById('authButtons');
-  const loginBtn = document.getElementById('loginBtn');
-  const signupBtn = document.getElementById('signupBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-
-  // Show/hide elements based on user authentication state
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      // User is logged in
-      profileDropdown.classList.remove('hidden');
-      authButtons.classList.add('hidden');
-    } else {
-      // User is logged out
-      profileDropdown.classList.add('hidden');
-      authButtons.classList.remove('hidden');
-    }
-  });
-
-  // Login
-  loginBtn.addEventListener('click', () => {
-    const email = prompt('Enter email:');
-    const password = prompt('Enter password:');
-    auth.signInWithEmailAndPassword(email, password).catch(err => {
-      alert('Login error: ' + err.message);
-    });
-  });
-
-  // Signup
-  signupBtn.addEventListener('click', () => {
-    const email = prompt('Enter email:');
-    const password = prompt('Enter password:');
-    auth.createUserWithEmailAndPassword(email, password).catch(err => {
-      alert('Signup error: ' + err.message);
-    });
-  });
-
-  // Logout
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut().catch(err => {
-      alert('Logout error: ' + err.message);
-    });
-  });
     </script>
 </body>
 </html>
