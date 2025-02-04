@@ -5,13 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physics Hub</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <!-- Firebase Scripts -->
-      <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  
-  <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
         
         /* Dark mode styles */
         .dark {
@@ -152,42 +147,11 @@
         .dark .text-gray-600 {
             color: #d1d5db;
         }
-
-        /* Paywall overlay */
-        #paywall {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(17, 24, 39, 0.95);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        /* Settings slide menu */
-        #settingsMenu {
-            position: fixed;
-            right: -300px; /* hidden by default */
-            top: 0;
-            width: 300px;
-            height: 100%;
-            background: #fff;
-            border-left: 1px solid #e5e7eb;
-            z-index: 1001;
-            transition: right 0.3s ease-in-out;
-            padding: 1rem;
-        }
-        #settingsMenu.active {
-            right: 0;
-        }
-       
     </style>
 </head>
-    <body class="bg-white text-gray-900">             
+                  <body class="bg-white text-gray-900">
+                      <!-- Navigation -->
+                     <body class="bg-white text-gray-900">
     <!-- Navigation -->
     <header class="fixed w-full bg-white border-b border-gray-200 z-50">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -224,50 +188,6 @@
                             <!-- [Your existing dropdown content stays the same] -->
                         </div>
                     </div>
-
-                    <!-- Firebase Paywall (shown if user is not logged in or not subscribed) -->
-              <div id="paywall" class="hidden">
-                <div class="text-center">
-                  <h2 class="text-2xl font-bold mb-4">Access Restricted</h2>
-                  <p class="mb-6">You must be logged in and have an active subscription to access this content.</p>
-                  <button id="loginButton" class="px-4 py-2 bg-blue-600 text-white rounded">Login Now</button>
-                </div>
-              </div>
-            
-              <!-- Settings Slide Menu -->
-              <div id="settingsMenu">
-                <h3 class="text-xl font-bold mb-4">Settings</h3>
-                <ul>
-                  <li><a href="#" class="block py-2 border-b">Profile</a></li>
-                  <li><a href="#" class="block py-2 border-b">Account</a></li>
-                  <li><a href="#" class="block py-2 border-b">Billing</a></li>
-                  <li><a href="#" class="block py-2">Logout</a></li>
-                </ul>
-              </div>
-            
-              <!-- Navigation -->
-              <header class="fixed w-full bg-white border-b border-gray-200 z-50">
-                <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div class="flex items-center justify-between h-16">
-                    <!-- Logo -->
-                    <div class="flex items-center">
-                      <a href="/" class="flex items-center space-x-3">
-                        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" alt="Physics Hub Logo" class="h-12 w-12">
-                      </a>
-                    </div>
-            
-                    <!-- Desktop Navigation -->
-                    <div class="hidden md:flex items-center space-x-8">
-                      <!-- Search Bar (existing) -->
-                      <div class="relative">
-                        <input type="text" id="search" placeholder="Search..." class="w-48 px-4 py-2 rounded-lg text-sm bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <div id="searchResults" class="search-results hidden absolute top-full left-0 right-0 mt-2 bg-white/90 dark:bg-gray-800/90 rounded-lg shadow-lg z-50"></div>
-                      </div>
-            
-                      <!-- Profile & Settings Icon -->
-                      <button id="profileButton" class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-full">
-                      </button>
 
                     <!-- Dark Mode Toggle -->
                     <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -1443,65 +1363,6 @@
                 searchResults.classList.add('hidden');
             }
         });
-
-        // Firebase configuration (replace with your own)
-    const firebaseConfig = {
-            apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-            authDomain: "lumenos-749a1.firebaseapp.com",
-            projectId: "lumenos-749a1",
-            storageBucket: "lumenos-749a1.firebasestorage.app",
-            messagingSenderId: "857410556058",
-            appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-            measurementId: "G-CEZ4PHV9GE"
-        };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Check Authentication State and Paywall Logic
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        // You can check subscription status from Firestore
-        db.collection('users').doc(user.uid).get().then((doc) => {
-          const data = doc.data();
-          // Assume a boolean 'activeSubscription' field determines paywall access
-          if (data && data.activeSubscription) {
-            document.getElementById('paywall').classList.add('hidden');
-          } else {
-            // Block content if not subscribed
-            document.getElementById('paywall').classList.remove('hidden');
-          }
-        });
-      } else {
-        // No user is signed in: show paywall
-        document.getElementById('paywall').classList.remove('hidden');
-      }
-    });
-
-    // Login button (for demonstration, uses signInAnonymously)
-    document.getElementById('loginButton').addEventListener('click', () => {
-      // In a real-world scenario, redirect to a login page or use a proper login form.
-      auth.signInAnonymously().catch((error) => {
-        console.error("Login error:", error);
-      });
-    });
-
-    // Toggle Settings Menu when Profile Button is clicked
-    document.getElementById('profileButton').addEventListener('click', () => {
-      const menu = document.getElementById('settingsMenu');
-      menu.classList.toggle('active');
-    });
-
-    // Optional: Add logout functionality
-    document.querySelector('#settingsMenu a:last-child').addEventListener('click', (e) => {
-      e.preventDefault();
-      auth.signOut().then(() => {
-        // After signing out, the onAuthStateChanged listener will show the paywall.
-        console.log("Signed out successfully.");
-      });
-    });
 
         // Dark mode toggle
         const themeToggle = document.getElementById('themeToggle');
