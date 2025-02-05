@@ -133,7 +133,7 @@
       // Example: Use an API call to your email service to send a verification email.
     }
 
-    // Listen for auth state changes
+    // Listen for authentication state changes
     onAuthStateChanged(auth, user => {
       if (user) {
         const profileRef = doc(db, "users", user.uid);
@@ -215,6 +215,8 @@
       try {
         await setDoc(doc(db, "users", user.uid), profileData, { merge: true });
         alert("Profile updated successfully!");
+        // Redirect to dashboard.html after success
+        window.location.href = "dashboard.html";
       } catch (error) {
         console.error("Error updating profile:", error);
         alert("Error updating profile. Please try again.");
