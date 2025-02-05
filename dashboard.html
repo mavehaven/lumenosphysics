@@ -813,14 +813,17 @@
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     // TODO: Replace with your Firebase project configuration
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+    const config = {
+            firebase: {
+                apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+                authDomain: "lumenos-749a1.firebaseapp.com",
+                projectId: "lumenos-749a1",
+                storageBucket: "lumenos-749a1.firebasestorage.app",
+                messagingSenderId: "857410556058",
+                appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+                measurementId: "G-CEZ4PHV9GE"
+            }
+        };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
