@@ -1,117 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Physics Simulator Login">
-    <title>Login - Physics Simulator</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Physics Simulator Login">
+  <title>Login - Physics Simulator</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50">
-    <div class="flex justify-center items-center min-h-screen p-4">
-        <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
-            <h1 class="text-2xl font-bold mb-4 text-center">Physics Simulator Login</h1>
-            <div id="error-message" class="hidden mb-4 p-4 text-red-700 bg-red-100 rounded" role="alert"></div>
-            <button 
-                id="google-signin" 
-                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center transition-colors duration-200"
-                aria-label="Sign in with Google">
-                <svg class="h-6 w-6 mr-2" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-                </svg>
-                Sign in with Google
-            </button>
-            <div id="loading" class="hidden mt-4 text-center" role="status">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                <p class="mt-2 text-gray-600">Signing you in...</p>
-            </div>
+  <div class="flex justify-center items-center min-h-screen p-4">
+    <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
+      <h1 class="text-2xl font-bold mb-4 text-center">Physics Simulator Login</h1>
+      <div id="error-message" class="hidden mb-4 p-4 text-red-700 bg-red-100 rounded" role="alert"></div>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" id="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
         </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <button type="submit" id="email-signin" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200">
+          Sign in with Email
+        </button>
+      </form>
+      <div id="loading" class="hidden mt-4 text-center" role="status">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+        <p class="mt-2 text-gray-600">Signing you in...</p>
+      </div>
     </div>
+  </div>
 
-    <!-- Load Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <!-- Load Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-    <!-- Configuration and Authentication Logic -->
-    <script>
-        // Configuration
-        const config = {
-            firebase: {
-                apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-                authDomain: "lumenos-749a1.firebaseapp.com",
-                projectId: "lumenos-749a1",
-                storageBucket: "lumenos-749a1.firebasestorage.app",
-                messagingSenderId: "857410556058",
-                appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-                measurementId: "G-CEZ4PHV9GE"
-            }
-        };
+  <!-- Configuration and Authentication Logic -->
+  <script>
+    // Firebase configuration
+    const config = {
+      firebase: {
+        apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+        authDomain: "lumenos-749a1.firebaseapp.com",
+        projectId: "lumenos-749a1",
+        storageBucket: "lumenos-749a1.firebasestorage.app",
+        messagingSenderId: "857410556058",
+        appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+        measurementId: "G-CEZ4PHV9GE"
+      }
+    };
 
-        // Initialize Firebase
-        firebase.initializeApp(config.firebase);
+    // Initialize Firebase
+    firebase.initializeApp(config.firebase);
 
-        // UI elements
-        const errorMessage = document.getElementById('error-message');
-        const loading = document.getElementById('loading');
-        const googleSigninButton = document.getElementById('google-signin');
+    // UI elements
+    const errorMessage = document.getElementById('error-message');
+    const loading = document.getElementById('loading');
+    const loginForm = document.getElementById('login-form');
 
-        // Helper functions
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-            loading.classList.add('hidden');
-            googleSigninButton.disabled = false;
-        }
+    // Helper function to display errors
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.remove('hidden');
+      loading.classList.add('hidden');
+    }
 
-        // Handle authenticated user
-        function handleAuthenticatedUser(user) {
-            if (!user) return;
-            
-            // Get the current path and check if we're on the login page
-            const path = window.location.pathname;
-            const currentPage = path.split('/').pop().toLowerCase();
-            
-            // If we're on login.html, index.html, or root path, redirect to dashboard
-            if (!currentPage || 
-                currentPage === 'login.html' || 
-                currentPage === 'index.html' || 
-                currentPage === '/') {
-                window.location.href = 'dashboard.html';
-            }
-        }
+    // Redirect authenticated users away from the login page
+    function handleAuthenticatedUser(user) {
+      if (!user) return;
+      const path = window.location.pathname;
+      const currentPage = path.split('/').pop().toLowerCase();
+      if (!currentPage || currentPage === 'login.html' || currentPage === 'index.html' || currentPage === '/') {
+        window.location.href = 'dashboard.html';
+      }
+    }
 
-        // Check if user is already logged in
-        firebase.auth().onAuthStateChanged(handleAuthenticatedUser);
+    // Monitor authentication state
+    firebase.auth().onAuthStateChanged(handleAuthenticatedUser);
 
-        // Check for redirect result on page load
-        firebase.auth().getRedirectResult()
-            .then((result) => {
-                if (result.user) {
-                    handleAuthenticatedUser(result.user);
-                }
-            })
-            .catch((error) => {
-                if (error.message) {
-                    showError(error.message);
-                }
-            });
+    // Email sign-in form handler
+    loginForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      errorMessage.classList.add('hidden');
+      loading.classList.remove('hidden');
 
-        // Handle Google sign-in
-        googleSigninButton.addEventListener('click', () => {
-            loading.classList.remove('hidden');
-            googleSigninButton.disabled = true;
-            errorMessage.classList.add('hidden');
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.setCustomParameters({
-                prompt: 'select_account'
-            });
-
-            firebase.auth().signInWithRedirect(provider)
-                .catch((error) => {
-                    showError('Error starting sign-in: ' + error.message);
-                });
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          handleAuthenticatedUser(userCredential.user);
+        })
+        .catch((error) => {
+          showError('Error signing in: ' + error.message);
         });
-    </script>
+    });
+  </script>
 </body>
 </html>
