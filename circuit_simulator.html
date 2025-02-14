@@ -1,532 +1,630 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Circuit Simulator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            overflow: hidden;
-            background: #f0f0f0;
-        }
-        #controlPanel {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-            max-width: 300px;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-        }
-        input[type="number"], select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-top: 2px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #measurements {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-        .measurement {
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #666;
-        }
-        #ammeterPanel {
-            background-color: #f8f8f8;
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        #currentReading {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2196F3;
-            text-align: center;
-            margin: 10px 0;
-            font-family: monospace;
-        }
-        .ammeter-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .ammeter-controls button {
-            flex: 1;
-            margin: 0;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced 3D Circuit Simulator</title>
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- OrbitControls for click and drag rotation -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- MathJax for LaTeX rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      overflow: hidden;
+      background: #eaeaea;
+    }
+    #controlPanel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+      max-width: 320px;
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+    #controlPanel h3 {
+      margin: 0;
+      color: #222;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 2px;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #measurements {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      color: #555;
+    }
+    .measurement {
+      margin-bottom: 8px;
+    }
+    #ammeterPanel {
+      background-color: #f8f8f8;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    #currentReading {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2196f3;
+      text-align: center;
+      margin: 10px 0;
+      font-family: monospace;
+    }
+    .ammeter-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .ammeter-controls button {
+      flex: 1;
+      margin: 0;
+    }
+    /* Container for dynamic extra component parameters */
+    #componentParameters {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #ccc;
+    }
+    #componentParameters h4 {
+      margin-bottom: 5px;
+      font-size: 16px;
+      color: #333;
+    }
+    /* Info panel styling */
+    #infoPanel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      max-width: 400px;
+      z-index: 20;
+      display: none;
+      font-size: 14px;
+      color: #333;
+    }
+    #infoPanel h4 {
+      margin-top: 0;
+    }
+    #infoPanel p {
+      margin: 10px 0;
+    }
+    /* "i" button styling */
+    #infoToggle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-weight: bold;
+      border: none;
+      background-color: #2196f3;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-<div id="controlPanel">
-    <h3>3D Circuit Simulator</h3>
-    <div class="input-group">
-        <label for="voltage">Battery Voltage (V):</label>
-        <input type="number" id="voltage" value="12" min="1" max="24" step="0.1">
+  <div id="controlPanel">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>Advanced 3D Circuit Simulator</h3>
+      <button id="infoToggle" onclick="toggleInfo()">i</button>
     </div>
     <div class="input-group">
-        <label for="resistor1">Resistor 1 (Ω):</label>
-        <input type="number" id="resistor1" value="10" min="1" max="100" step="0.1">
+      <label for="voltage">Battery Voltage (V):</label>
+      <input type="number" id="voltage" value="12" min="1" max="24" step="0.1">
     </div>
     <div class="input-group">
-        <label for="resistor2">Resistor 2 (Ω):</label>
-        <input type="number" id="resistor2" value="10" min="1" max="100" step="0.1">
+      <label for="batteryInternal">Battery Internal Resistance (Ω):</label>
+      <input type="number" id="batteryInternal" value="0.5" min="0" max="5" step="0.1">
     </div>
     <div class="input-group">
-        <label for="circuitType">Circuit Type:</label>
-        <select id="circuitType">
-            <option value="series">Series</option>
-            <option value="parallel">Parallel</option>
-        </select>
+      <label for="resistor1">Resistor 1 (Ω):</label>
+      <input type="number" id="resistor1" value="10" min="1" max="500" step="0.1">
+    </div>
+    <div class="input-group">
+      <label for="resistor2">Resistor 2 (Ω):</label>
+      <input type="number" id="resistor2" value="10" min="1" max="500" step="0.1">
+    </div>
+    <div class="input-group">
+      <label for="circuitType">Circuit Type:</label>
+      <select id="circuitType">
+        <option value="series">Series</option>
+        <option value="parallel">Parallel</option>
+      </select>
     </div>
     <button onclick="updateCircuit()">Update Circuit</button>
     
+    <!-- Extra Components Section -->
+    <div class="input-group">
+      <label for="newComponent">Add Component:</label>
+      <select id="newComponent">
+         <option value="resistor">Resistor</option>
+         <option value="capacitor">Capacitor</option>
+         <option value="inductor">Inductor</option>
+      </select>
+      <button onclick="addComponent()">Add Component</button>
+    </div>
+    
+    <!-- Dynamic Parameters for extra components -->
+    <div id="componentParameters">
+      <h4>Component Parameters</h4>
+      <!-- New component parameter panels will be appended here -->
+    </div>
+    
     <div id="measurements">
-        <div class="measurement">Total Resistance: <span id="totalResistance">20 Ω</span></div>
-        <div class="measurement">Total Current: <span id="totalCurrent">0.6 A</span></div>
-        <div class="measurement">Power Dissipation: <span id="powerDissipation">7.2 W</span></div>
+      <div class="measurement">Total Resistance: <span id="totalResistance">0 Ω</span></div>
+      <div class="measurement">Total Current: <span id="totalCurrent">0 A</span></div>
+      <div class="measurement">Battery Drop: <span id="batteryDrop">0 V</span></div>
+      <div class="measurement">V<sub>R1</sub>: <span id="voltageR1">0 V</span></div>
+      <div class="measurement">V<sub>R2</sub>: <span id="voltageR2">0 V</span></div>
+      <div class="measurement">P<sub>R1</sub>: <span id="powerR1">0 W</span></div>
+      <div class="measurement">P<sub>R2</sub>: <span id="powerR2">0 W</span></div>
+      <div class="measurement">Total Power: <span id="totalPower">0 W</span></div>
     </div>
 
     <div id="ammeterPanel">
-        <h4 style="margin-top: 0">Ammeter</h4>
-        <div id="currentReading">0.00 A</div>
-        <div class="input-group">
-            <label for="ammeterPosition">Measurement Point:</label>
-            <select id="ammeterPosition" onchange="updateAmmeterPosition()">
-                <option value="main">Main Line</option>
-                <option value="r1">After Resistor 1</option>
-                <option value="r2">After Resistor 2</option>
-            </select>
-        </div>
-        <div class="ammeter-controls">
-            <button onclick="toggleAmmeter()" id="ammeterToggle">Show Ammeter</button>
-        </div>
+      <h4 style="margin-top: 0">Ammeter</h4>
+      <div id="currentReading">0.00 A</div>
+      <div class="input-group">
+        <label for="ammeterPosition">Measurement Point:</label>
+        <select id="ammeterPosition" onchange="updateAmmeterPosition()">
+          <option value="main">Main Line</option>
+          <option value="r1">After Resistor 1</option>
+          <option value="r2">After Resistor 2</option>
+        </select>
+      </div>
+      <div class="ammeter-controls">
+        <button onclick="toggleAmmeter()" id="ammeterToggle">Show Ammeter</button>
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
+  <!-- Info Panel with Theory & Formulas rendered in LaTeX -->
+  <div id="infoPanel">
+    <h4>Theory &amp; Formulas</h4>
+    <p>Ohm's Law: \( V = IR \)</p>
+    <p>Kirchhoff's Voltage Law: \( \sum_{i=1}^{n} V_i = 0 \)</p>
+    <p>Kirchhoff's Current Law: \( \sum_{i=1}^{n} I_i = 0 \)</p>
+    <p>Total Resistance in Series: \( R_{total} = R_1 + R_2 + \cdots \)</p>
+    <p>Total Resistance in Parallel: \( \frac{1}{R_{total}} = \frac{1}{R_1} + \frac{1}{R_2} + \cdots \)</p>
+    <p>Power Dissipation: \( P = IV = I^2R = \frac{V^2}{R} \)</p>
+    <button onclick="toggleInfo()">Close</button>
+  </div>
+
+  <script>
+    // Global Three.js variables and simulation parameters
     let scene, camera, renderer, controls;
-    let battery, resistor1, resistor2, wireGroup, ammeter;
+    let battery, resistor1, resistor2, ammeter;
+    let wireGroup, wireCurves = [];
     let electrons = [];
-    const ELECTRON_COUNT = 20;
-    let animationSpeed = 0.1;
+    let extraComponents = [];
     let ammeterVisible = false;
-    let currentMeasurements = {
-        main: 0,
-        r1: 0,
-        r2: 0
-    };
+    let animationSpeed = 0.002; // Base electron flow speed
+    let currentMeasurements = { main: 0, r1: 0, r2: 0 };
 
+    // Initialization
     init();
-    createElectrons();
     updateCircuit();
 
     function init() {
-        // Scene setup
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xf0f0f0);
-        
-        // Camera setup
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 30);
-        
-        // Renderer setup
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        document.body.appendChild(renderer.domElement);
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(10, 10, 10);
-        scene.add(ambientLight, directionalLight);
-
-        // Circuit components
-        wireGroup = new THREE.Group();
-        scene.add(wireGroup);
-        
-        battery = createBattery();
-        resistor1 = createResistor(0xff4444);
-        resistor2 = createResistor(0xff4444);
-        ammeter = createAmmeter();
-        scene.add(battery, resistor1, resistor2);
-
-        // Add subtle rotation
-        scene.rotation.x = -0.2;
-        animate();
+      // Scene Setup
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xeaeaea);
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 40);
+      
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      document.body.appendChild(renderer.domElement);
+      
+      // OrbitControls: enables click-and-drag rotation
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 10, 10);
+      scene.add(ambientLight, directionalLight);
+      
+      // Group for wires (for dynamic updates)
+      wireGroup = new THREE.Group();
+      scene.add(wireGroup);
+      
+      // Create base components
+      battery = createBattery();
+      resistor1 = createResistor(0xff4444);
+      resistor2 = createResistor(0xff4444);
+      ammeter = createAmmeter();
+      
+      scene.add(battery, resistor1, resistor2);
+      
+      animate();
     }
-
-    function createAmmeter() {
-        const group = new THREE.Group();
-        
-        // Ammeter body
-        const bodyGeometry = new THREE.BoxGeometry(2, 2, 1);
-        const bodyMaterial = new THREE.MeshPhongMaterial({
-            color: 0x2196F3,
-            shininess: 100
-        });
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        
-        // Display screen
-        const screenGeometry = new THREE.BoxGeometry(1.6, 0.8, 1.1);
-        const screenMaterial = new THREE.MeshPhongMaterial({
-            color: 0x000000,
-            shininess: 30
-        });
-        const screen = new THREE.Mesh(screenGeometry, screenMaterial);
-        screen.position.z = 0.1;
-        
-        // Connectors
-        const connectorGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.5, 16);
-        const connectorMaterial = new THREE.MeshPhongMaterial({
-            color: 0x888888,
-            shininess: 100
-        });
-        const connector1 = new THREE.Mesh(connectorGeometry, connectorMaterial);
-        const connector2 = new THREE.Mesh(connectorGeometry, connectorMaterial);
-        
-        connector1.rotation.z = Math.PI / 2;
-        connector2.rotation.z = Math.PI / 2;
-        connector1.position.x = -1.25;
-        connector2.position.x = 1.25;
-        
-        group.add(body, screen, connector1, connector2);
-        return group;
-    }
-
-    function toggleAmmeter() {
-        ammeterVisible = !ammeterVisible;
-        if (ammeterVisible) {
-            scene.add(ammeter);
-            document.getElementById('ammeterToggle').textContent = 'Hide Ammeter';
-        } else {
-            scene.remove(ammeter);
-            document.getElementById('ammeterToggle').textContent = 'Show Ammeter';
-        }
-        updateAmmeterPosition();
-    }
-
-    function updateAmmeterPosition() {
-        if (!ammeterVisible) return;
-        
-        const position = document.getElementById('ammeterPosition').value;
-        const circuitType = document.getElementById('circuitType').value;
-        
-        if (circuitType === 'series') {
-            switch(position) {
-                case 'main':
-                    ammeter.position.set(-6, 0, 0);
-                    break;
-                case 'r1':
-                    ammeter.position.set(0, 0, 0);
-                    break;
-                case 'r2':
-                    ammeter.position.set(6, 0, 0);
-                    break;
-            }
-        } else {
-            switch(position) {
-                case 'main':
-                    ammeter.position.set(-6, 0, 0);
-                    ammeter.rotation.z = 0;
-                    break;
-                case 'r1':
-                    ammeter.position.set(0, 3, 0);
-                    ammeter.rotation.z = 0;
-                    break;
-                case 'r2':
-                    ammeter.position.set(0, -3, 0);
-                    ammeter.rotation.z = 0;
-                    break;
-            }
-        }
-        updateCurrentReadings();
-    }
-
-    function updateCurrentReadings() {
-        const voltage = parseFloat(document.getElementById('voltage').value);
-        const r1 = parseFloat(document.getElementById('resistor1').value);
-        const r2 = parseFloat(document.getElementById('resistor2').value);
-        const circuitType = document.getElementById('circuitType').value;
-        const position = document.getElementById('ammeterPosition').value;
-        
-        let current;
-        if (circuitType === 'series') {
-            const totalResistance = r1 + r2;
-            current = voltage / totalResistance;
-            currentMeasurements.main = current;
-            currentMeasurements.r1 = current;
-            currentMeasurements.r2 = current;
-        } else {
-            const totalResistance = 1 / (1/r1 + 1/r2);
-            const totalCurrent = voltage / totalResistance;
-            const current1 = voltage / r1;
-            const current2 = voltage / r2;
-            currentMeasurements.main = totalCurrent;
-            currentMeasurements.r1 = current1;
-            currentMeasurements.r2 = current2;
-        }
-        
-        document.getElementById('currentReading').textContent = 
-            `${currentMeasurements[position].toFixed(2)} A`;
-    }
-
+    
+    // Component Creation Functions
     function createBattery() {
-        const group = new THREE.Group();
-        
-        // Battery body
-        const bodyGeometry = new THREE.CylinderGeometry(1.2, 1.2, 5, 32);
-        const bodyMaterial = new THREE.MeshPhongMaterial({ 
-            color: 0x4444ff,
-            shininess: 100
-        });
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        
-        // Battery terminals
-        const terminalGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.5, 32);
-        const terminalMaterial = new THREE.MeshPhongMaterial({ 
-            color: 0x888888,
-            shininess: 100
-        });
-        const posTerminal = new THREE.Mesh(terminalGeometry, terminalMaterial);
-        const negTerminal = new THREE.Mesh(terminalGeometry, terminalMaterial);
-        
-        posTerminal.position.y = 2.75;
-        negTerminal.position.y = -2.75;
-        
-        group.add(body, posTerminal, negTerminal);
-        group.rotation.z = Math.PI / 2;
-        return group;
+      const group = new THREE.Group();
+      const bodyGeom = new THREE.CylinderGeometry(1.2, 1.2, 6, 32);
+      const bodyMat = new THREE.MeshPhongMaterial({ color: 0x4444ff, shininess: 100 });
+      const body = new THREE.Mesh(bodyGeom, bodyMat);
+      const termGeom = new THREE.CylinderGeometry(0.6, 0.6, 0.7, 32);
+      const termMat = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 100 });
+      const posTerm = new THREE.Mesh(termGeom, termMat);
+      const negTerm = new THREE.Mesh(termGeom, termMat);
+      posTerm.position.y = 3.5;
+      negTerm.position.y = -3.5;
+      group.add(body, posTerm, negTerm);
+      group.rotation.z = Math.PI / 2;
+      return group;
     }
-
+    
     function createResistor(color) {
-        const group = new THREE.Group();
-        
-        // Resistor body
-        const bodyGeometry = new THREE.BoxGeometry(4, 1, 1);
-        const bodyMaterial = new THREE.MeshPhongMaterial({ 
-            color: color,
-            shininess: 50
-        });
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        
-        // Resistor bands
-        const bandGeometry = new THREE.BoxGeometry(0.2, 1.1, 1.1);
-        const bandMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
-        
-        for (let i = 0; i < 3; i++) {
-            const band = new THREE.Mesh(bandGeometry, bandMaterial);
-            band.position.x = -1 + i;
-            group.add(band);
-        }
-        
-        group.add(body);
-        return group;
+      const group = new THREE.Group();
+      const bodyGeom = new THREE.BoxGeometry(5, 1.2, 1.2);
+      const bodyMat = new THREE.MeshPhongMaterial({ color: color, shininess: 50 });
+      const body = new THREE.Mesh(bodyGeom, bodyMat);
+      // Simulate color bands
+      const bandGeom = new THREE.BoxGeometry(0.3, 1.4, 1.4);
+      const bandMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
+      for (let i = -1; i <= 1; i++) {
+        const band = new THREE.Mesh(bandGeom, bandMat);
+        band.position.x = i;
+        group.add(band);
+      }
+      group.add(body);
+      return group;
     }
-
-    function createWire(start, end, color = 0x444444) {
-        const direction = new THREE.Vector3().subVectors(end, start);
-        const length = direction.length();
-        
-        const wireGeometry = new THREE.CylinderGeometry(0.2, 0.2, length, 16);
-        const wireMaterial = new THREE.MeshPhongMaterial({ 
-            color: color,
-            shininess: 30
-        });
-        const wire = new THREE.Mesh(wireGeometry, wireMaterial);
-        
-        // Position and rotate wire to connect points
-        wire.position.copy(start);
-        wire.position.add(direction.multiplyScalar(0.5));
-        wire.lookAt(end);
-        wire.rotateX(Math.PI / 2);
-        
-        return wire;
+    
+    function createAmmeter() {
+      const group = new THREE.Group();
+      const bodyGeom = new THREE.BoxGeometry(2.5, 2.5, 1.2);
+      const bodyMat = new THREE.MeshPhongMaterial({ color: 0x2196f3, shininess: 100 });
+      const body = new THREE.Mesh(bodyGeom, bodyMat);
+      const screenGeom = new THREE.BoxGeometry(2, 1, 1.3);
+      const screenMat = new THREE.MeshPhongMaterial({ color: 0x000000, shininess: 30 });
+      const screen = new THREE.Mesh(screenGeom, screenMat);
+      screen.position.z = 0.15;
+      const connGeom = new THREE.CylinderGeometry(0.25, 0.25, 0.6, 16);
+      const connMat = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 100 });
+      const conn1 = new THREE.Mesh(connGeom, connMat);
+      const conn2 = new THREE.Mesh(connGeom, connMat);
+      conn1.rotation.z = Math.PI / 2;
+      conn2.rotation.z = Math.PI / 2;
+      conn1.position.x = -1.5;
+      conn2.position.x = 1.5;
+      group.add(body, screen, conn1, conn2);
+      return group;
     }
-
-    function createElectrons() {
-        // Clear existing electrons
-        electrons.forEach(electron => scene.remove(electron));
-        electrons = [];
-        
-        const electronGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-        const electronMaterial = new THREE.MeshPhongMaterial({ 
-            color: 0xffff00,
-            emissive: 0xffff00,
-            emissiveIntensity: 0.5
-        });
-        
-        for (let i = 0; i < ELECTRON_COUNT; i++) {
-            const electron = new THREE.Mesh(electronGeometry, electronMaterial);
-            electrons.push(electron);
-            scene.add(electron);
-        }
+    
+    // Extra Components: Capacitor & Inductor
+    function createCapacitor() {
+      const group = new THREE.Group();
+      const plateGeom = new THREE.BoxGeometry(2, 0.1, 1);
+      const plateMat = new THREE.MeshPhongMaterial({ color: 0x00ccff });
+      const plate1 = new THREE.Mesh(plateGeom, plateMat);
+      const plate2 = new THREE.Mesh(plateGeom, plateMat);
+      plate1.position.set(0, 0.6, 0);
+      plate2.position.set(0, -0.6, 0);
+      group.add(plate1, plate2);
+      return group;
     }
-
-
+    
+    function createInductor() {
+      const group = new THREE.Group();
+      const coilGeom = new THREE.TorusGeometry(1, 0.2, 16, 100);
+      const coilMat = new THREE.MeshPhongMaterial({ color: 0xffaa00 });
+      const coil = new THREE.Mesh(coilGeom, coilMat);
+      group.add(coil);
+      return group;
+    }
+    
+    // Add extra component to the scene and create dynamic parameter inputs
+    function addComponent() {
+      const type = document.getElementById("newComponent").value;
+      let component;
+      if (type === "resistor") {
+        component = createResistor(0x00aa00);
+      } else if (type === "capacitor") {
+        component = createCapacitor();
+      } else if (type === "inductor") {
+        component = createInductor();
+      }
+      // Set default position; you can later adjust these via the dynamic panel
+      component.position.set(0, Math.random() * 10 - 5, 0);
+      scene.add(component);
+      extraComponents.push({ type: type, object: component });
+      addComponentParameterUI(extraComponents.length - 1, type, component.position);
+    }
+    
+    // Create dynamic UI inputs for extra component parameters
+    function addComponentParameterUI(index, type, position) {
+      const container = document.getElementById("componentParameters");
+      const div = document.createElement("div");
+      div.id = "componentParam" + index;
+      div.style.border = "1px solid #ddd";
+      div.style.padding = "5px";
+      div.style.marginBottom = "8px";
+      div.innerHTML = `<h4>Component ${index + 1} (${type})</h4>
+        <label>X: <input type="number" value="${position.x.toFixed(2)}" step="0.1" onchange="updateComponentPosition(${index}, 'x', this.value)" /></label>
+        <label>Y: <input type="number" value="${position.y.toFixed(2)}" step="0.1" onchange="updateComponentPosition(${index}, 'y', this.value)" /></label>
+        <label>Z: <input type="number" value="${position.z.toFixed(2)}" step="0.1" onchange="updateComponentPosition(${index}, 'z', this.value)" /></label>`;
+      container.appendChild(div);
+    }
+    
+    // Update the position of an extra component based on dynamic UI input
+    function updateComponentPosition(index, axis, value) {
+      const comp = extraComponents[index].object;
+      comp.position[axis] = parseFloat(value);
+    }
+    
+    // Create wire curves and meshes
+    function createWireCurve(start, end, controlOffset = new THREE.Vector3(0, 0, 0)) {
+      const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5).add(controlOffset);
+      return new THREE.CatmullRomCurve3([start, mid, end]);
+    }
+    
+    function createWireMesh(curve, color = 0x444444) {
+      const tubeGeom = new THREE.TubeGeometry(curve, 20, 0.2, 8, false);
+      const tubeMat = new THREE.MeshPhongMaterial({ color: color, shininess: 30 });
+      return new THREE.Mesh(tubeGeom, tubeMat);
+    }
+    
+    // Update the circuit: recalc measurements, reposition components, update electrons
     function updateCircuit() {
-        const voltage = parseFloat(document.getElementById("voltage").value);
-        const r1 = parseFloat(document.getElementById("resistor1").value);
-        const r2 = parseFloat(document.getElementById("resistor2").value);
-        const circuitType = document.getElementById("circuitType").value;
-
-        // Update component positions
-        if (circuitType === "series") {
-            arrangeSeriesCircuit();
-        } else {
-            arrangeParallelCircuit();
-        }
-
-        // Calculate circuit measurements
-        let totalResistance, totalCurrent, powerDissipation;
-        
-        if (circuitType === "series") {
-            totalResistance = r1 + r2;
-            totalCurrent = voltage / totalResistance;
-            powerDissipation = voltage * totalCurrent;
-        } else {
-            totalResistance = 1 / (1/r1 + 1/r2);
-            totalCurrent = voltage / totalResistance;
-            powerDissipation = voltage * totalCurrent;
-        }
-
-        // Update measurements display
-        document.getElementById("totalResistance").textContent = `${totalResistance.toFixed(1)} Ω`;
-        document.getElementById("totalCurrent").textContent = `${totalCurrent.toFixed(2)} A`;
-        document.getElementById("powerDissipation").textContent = `${powerDissipation.toFixed(1)} W`;
-
-        // Update animation speed based on current
-        animationSpeed = 0.05 + (totalCurrent / 20);
-        
-        // Update ammeter readings and position
-        updateCurrentReadings();
-        updateAmmeterPosition();
+      const voltage = parseFloat(document.getElementById("voltage").value);
+      const batteryInternal = parseFloat(document.getElementById("batteryInternal").value);
+      const r1 = parseFloat(document.getElementById("resistor1").value);
+      const r2 = parseFloat(document.getElementById("resistor2").value);
+      const circuitType = document.getElementById("circuitType").value;
+      
+      // Clear wires and stored curves
+      while (wireGroup.children.length) {
+        wireGroup.remove(wireGroup.children[0]);
+      }
+      wireCurves = [];
+      
+      let totalResistance, totalCurrent, voltageDropBattery, voltageR1, voltageR2;
+      let powerR1, powerR2, totalPower;
+      
+      if (circuitType === "series") {
+        arrangeSeriesCircuit();
+        totalResistance = batteryInternal + r1 + r2;
+        totalCurrent = voltage / totalResistance;
+        voltageDropBattery = totalCurrent * batteryInternal;
+        voltageR1 = totalCurrent * r1;
+        voltageR2 = totalCurrent * r2;
+        powerR1 = voltageR1 * totalCurrent;
+        powerR2 = voltageR2 * totalCurrent;
+        totalPower = voltage * totalCurrent;
+        currentMeasurements.main = totalCurrent;
+        currentMeasurements.r1 = totalCurrent;
+        currentMeasurements.r2 = totalCurrent;
+      } else {
+        arrangeParallelCircuit();
+        const parallelResistance = 1 / (1 / r1 + 1 / r2);
+        totalResistance = batteryInternal + parallelResistance;
+        totalCurrent = voltage / totalResistance;
+        const voltageParallel = voltage - (totalCurrent * batteryInternal);
+        const currentR1 = voltageParallel / r1;
+        const currentR2 = voltageParallel / r2;
+        voltageR1 = currentR1 * r1;
+        voltageR2 = currentR2 * r2;
+        powerR1 = voltageR1 * currentR1;
+        powerR2 = voltageR2 * currentR2;
+        totalPower = voltage * totalCurrent;
+        currentMeasurements.main = totalCurrent;
+        currentMeasurements.r1 = currentR1;
+        currentMeasurements.r2 = currentR2;
+        voltageDropBattery = totalCurrent * batteryInternal;
+      }
+      
+      document.getElementById("totalResistance").textContent = `${totalResistance.toFixed(2)} Ω`;
+      document.getElementById("totalCurrent").textContent = `${totalCurrent.toFixed(3)} A`;
+      document.getElementById("batteryDrop").textContent = `${voltageDropBattery.toFixed(2)} V`;
+      document.getElementById("voltageR1").textContent = `${voltageR1.toFixed(2)} V`;
+      document.getElementById("voltageR2").textContent = `${voltageR2.toFixed(2)} V`;
+      document.getElementById("powerR1").textContent = `${powerR1.toFixed(2)} W`;
+      document.getElementById("powerR2").textContent = `${powerR2.toFixed(2)} W`;
+      document.getElementById("totalPower").textContent = `${totalPower.toFixed(2)} W`;
+      
+      // Adjust electron flow speed based on current magnitude
+      animationSpeed = 0.002 + (totalCurrent / 100);
+      
+      resetElectrons();
+      updateAmmeterPosition();
     }
-
-   function arrangeSeriesCircuit() {
-        // Clear existing wires
-        wireGroup.clear();
-        
-        // Position components
-        battery.position.set(-10, 0, 0);
-        resistor1.position.set(-3, 0, 0);
-        resistor2.position.set(4, 0, 0);
-        
-        // Create wires
-        const wire1 = createWire(
-            new THREE.Vector3(-7.5, 0, 0),
-            new THREE.Vector3(-5, 0, 0)
-        );
-        const wire2 = createWire(
-            new THREE.Vector3(-1, 0, 0),
-            new THREE.Vector3(2, 0, 0)
-        );
-        const wire3 = createWire(
-            new THREE.Vector3(6, 0, 0),
-            new THREE.Vector3(8.5, 0, 0)
-        );
-        
-        wireGroup.add(wire1, wire2, wire3);
+    
+    // For series, calculate connection points from component dimensions
+    function arrangeSeriesCircuit() {
+      // Position base components
+      battery.position.set(-12, 0, 0);
+      resistor1.position.set(-3, 0, 0);
+      resistor2.position.set(6, 0, 0);
+      
+      // Determine connection points based on component dimensions:
+      // Battery: 6 height, so positive terminal is at battery.position.x + (6/2) = -12 + 3 = -9
+      let batteryPos = new THREE.Vector3(-9, 0, 0);
+      // Resistor: width 5 so left edge = resistor1.position.x - 2.5 and right edge = resistor1.position.x + 2.5
+      let resistor1Left = new THREE.Vector3(-3 - 2.5, 0, 0);   // (-5.5, 0, 0)
+      let resistor1Right = new THREE.Vector3(-3 + 2.5, 0, 0);  // (-0.5, 0, 0)
+      let resistor2Left = new THREE.Vector3(6 - 2.5, 0, 0);    // (3.5, 0, 0)
+      let resistor2Right = new THREE.Vector3(6 + 2.5, 0, 0);   // (8.5, 0, 0)
+      // Define an output terminal (for example)
+      let outputPoint = new THREE.Vector3(8.5 + 2, 0, 0);       // (10.5, 0, 0)
+      
+      // Create wires that connect these calculated endpoints:
+      let curve1 = createWireCurve(batteryPos, resistor1Left, new THREE.Vector3(0, 1, 0));
+      let wire1 = createWireMesh(curve1);
+      
+      let curve2 = createWireCurve(resistor1Right, resistor2Left, new THREE.Vector3(0, -1, 0));
+      let wire2 = createWireMesh(curve2);
+      
+      let curve3 = createWireCurve(resistor2Right, outputPoint, new THREE.Vector3(0, 1, 0));
+      let wire3 = createWireMesh(curve3);
+      
+      wireGroup.add(wire1, wire2, wire3);
+      wireCurves.push(curve1, curve2, curve3);
     }
-
+    
     function arrangeParallelCircuit() {
-        // Clear existing wires
-        wireGroup.clear();
-        
-        // Position components
-        battery.position.set(-10, 0, 0);
-        resistor1.position.set(0, 3, 0);
-        resistor2.position.set(0, -3, 0);
-        
-        // Create wires
-        const wire1 = createWire(
-            new THREE.Vector3(-7.5, 0, 0),
-            new THREE.Vector3(-4, 3, 0)
-        );
-        const wire2 = createWire(
-            new THREE.Vector3(-7.5, 0, 0),
-            new THREE.Vector3(-4, -3, 0)
-        );
-        const wire3 = createWire(
-            new THREE.Vector3(4, 3, 0),
-            new THREE.Vector3(7.5, 0, 0)
-        );
-        const wire4 = createWire(
-            new THREE.Vector3(4, -3, 0),
-            new THREE.Vector3(7.5, 0, 0)
-        );
-        
-        wireGroup.add(wire1, wire2, wire3, wire4);
+      battery.position.set(-12, 0, 0);
+      resistor1.position.set(2, 4, 0);
+      resistor2.position.set(2, -4, 0);
+      
+      let curve1 = createWireCurve(new THREE.Vector3(-8, 0, 0), new THREE.Vector3(0, 4, 0), new THREE.Vector3(-2, 2, 0));
+      let wire1 = createWireMesh(curve1);
+      
+      let curve2 = createWireCurve(new THREE.Vector3(-8, 0, 0), new THREE.Vector3(0, -4, 0), new THREE.Vector3(-2, -2, 0));
+      let wire2 = createWireMesh(curve2);
+      
+      let curve3 = createWireCurve(new THREE.Vector3(5, 4, 0), new THREE.Vector3(10, 0, 0), new THREE.Vector3(7, 2, 0));
+      let wire3 = createWireMesh(curve3);
+      
+      let curve4 = createWireCurve(new THREE.Vector3(5, -4, 0), new THREE.Vector3(10, 0, 0), new THREE.Vector3(7, -2, 0));
+      let wire4 = createWireMesh(curve4);
+      
+      wireGroup.add(wire1, wire2, wire3, wire4);
+      wireCurves.push(curve1, curve2, curve3, curve4);
     }
-
+    
+    // Electron flow visualization along wire curves
+    function resetElectrons() {
+      electrons.forEach(e => scene.remove(e.mesh));
+      electrons = [];
+      const electronsPerCurve = 5;
+      wireCurves.forEach(curve => {
+        for (let i = 0; i < electronsPerCurve; i++) {
+          const electronGeom = new THREE.SphereGeometry(0.15, 12, 12);
+          const electronMat = new THREE.MeshPhongMaterial({ 
+            color: 0xffff00, 
+            emissive: 0xffff00,
+            emissiveIntensity: 0.7 
+          });
+          const electronMesh = new THREE.Mesh(electronGeom, electronMat);
+          const progress = Math.random();
+          electronMesh.position.copy(curve.getPoint(progress));
+          scene.add(electronMesh);
+          electrons.push({ mesh: electronMesh, curve: curve, progress: progress, speed: animationSpeed });
+        }
+      });
+    }
+    
     function updateElectrons() {
-        const circuitType = document.getElementById("circuitType").value;
-        const time = Date.now() * 0.001;
-        
-        electrons.forEach((electron, i) => {
-            const offset = (i / ELECTRON_COUNT) * Math.PI * 2;
-            
-            if (circuitType === "series") {
-                // Series circuit animation
-                const angle = time * animationSpeed + offset;
-                electron.position.x = 8 * Math.cos(angle);
-                electron.position.y = 3 * Math.sin(angle * 2);
-            } else {
-                // Parallel circuit animation
-                const angle = time * animationSpeed + offset;
-                const path = i < ELECTRON_COUNT/2 ? 1 : -1; // Split electrons between paths
-                electron.position.x = 8 * Math.cos(angle);
-                electron.position.y = path * (3 + Math.sin(angle * 2));
-            }
-        });
+      electrons.forEach(electron => {
+        electron.progress += electron.speed;
+        if (electron.progress > 1) electron.progress = 0;
+        electron.mesh.position.copy(electron.curve.getPoint(electron.progress));
+      });
     }
-
+    
+    // Ammeter functions
+    function toggleAmmeter() {
+      ammeterVisible = !ammeterVisible;
+      if (ammeterVisible) {
+        scene.add(ammeter);
+        document.getElementById('ammeterToggle').textContent = 'Hide Ammeter';
+      } else {
+        scene.remove(ammeter);
+        document.getElementById('ammeterToggle').textContent = 'Show Ammeter';
+      }
+      updateAmmeterPosition();
+    }
+    
+    function updateAmmeterPosition() {
+      if (!ammeterVisible) return;
+      const pos = document.getElementById('ammeterPosition').value;
+      const type = document.getElementById('circuitType').value;
+      if (type === 'series') {
+        if (pos === 'main') ammeter.position.set(-6, 0, 0);
+        else if (pos === 'r1') ammeter.position.set(0, 0, 0);
+        else if (pos === 'r2') ammeter.position.set(6, 0, 0);
+      } else {
+        if (pos === 'main') ammeter.position.set(-6, 0, 0);
+        else if (pos === 'r1') ammeter.position.set(2, 4, 0);
+        else if (pos === 'r2') ammeter.position.set(2, -4, 0);
+      }
+      updateCurrentReadings();
+    }
+    
+    function updateCurrentReadings() {
+      const pos = document.getElementById('ammeterPosition').value;
+      document.getElementById('currentReading').textContent = `${currentMeasurements[pos].toFixed(3)} A`;
+    }
+    
+    // Visual enhancement: Adjust wire emissive intensity based on current magnitude
+    function updateCurrentVisualization() {
+      const intensity = Math.min(currentMeasurements.main / 5, 1);
+      wireGroup.children.forEach(wire => {
+        if (wire.material) {
+          wire.material.emissive = new THREE.Color(0x00ff00).multiplyScalar(intensity);
+        }
+      });
+    }
+    
+    // Toggle Info Panel (Theory & Formulas)
+    function toggleInfo() {
+      const infoPanel = document.getElementById("infoPanel");
+      infoPanel.style.display = infoPanel.style.display === "none" ? "block" : "none";
+    }
+    
+    // Animation loop
     function animate() {
-        requestAnimationFrame(animate);
-        updateElectrons();
-        scene.rotation.y += 0.001;
-        renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+      controls.update(); // Update OrbitControls
+      updateElectrons();
+      updateCurrentVisualization();
+      renderer.render(scene, camera);
     }
-
+    
+    // Handle resizing
     window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     });
-    // Make sure to include all the previous circuit layout and animation functions
-</script>
+  </script>
 </body>
 </html>
