@@ -127,19 +127,23 @@
     #infoPanel h4 {
       margin-top: 0;
     }
-    #infoPanel p {
+    #infoPanel p, #infoPanel ul {
       margin: 10px 0;
     }
-    /* "i" button styling */
+    /* Sleek "I" button styling */
     #infoToggle {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       font-weight: bold;
       border: none;
       background-color: #2196f3;
       color: #fff;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
   </style>
 </head>
@@ -147,7 +151,7 @@
   <div id="controlPanel">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h3>Advanced 3D Circuit Simulator</h3>
-      <button id="infoToggle" onclick="toggleInfo()">i</button>
+      <button id="infoToggle" onclick="toggleInfo()">I</button>
     </div>
     <div class="input-group">
       <label for="voltage">Battery Voltage (V):</label>
@@ -219,15 +223,39 @@
     </div>
   </div>
 
-  <!-- Info Panel with Theory & Formulas rendered in LaTeX -->
+  <!-- Info Panel with detailed explanations, theory, and an inline 2D SVG circuit diagram -->
   <div id="infoPanel">
-    <h4>Theory &amp; Formulas</h4>
-    <p>Ohm's Law: \( V = IR \)</p>
-    <p>Kirchhoff's Voltage Law: \( \sum_{i=1}^{n} V_i = 0 \)</p>
-    <p>Kirchhoff's Current Law: \( \sum_{i=1}^{n} I_i = 0 \)</p>
-    <p>Total Resistance in Series: \( R_{total} = R_1 + R_2 + \cdots \)</p>
-    <p>Total Resistance in Parallel: \( \frac{1}{R_{total}} = \frac{1}{R_1} + \frac{1}{R_2} + \cdots \)</p>
-    <p>Power Dissipation: \( P = IV = I^2R = \frac{V^2}{R} \)</p>
+    <h4>Theoretical Overview &amp; Component Explanations</h4>
+    <p><strong>Battery:</strong> Supplies the electromotive force (voltage) that drives current. Its internal resistance (even if small) influences the overall circuit performance.</p>
+    <p><strong>Resistor:</strong> Limits current and drops voltage. Governed by Ohm's Law: \( V = IR \). Resistors are critical for controlling current in a circuit.</p>
+    <p><strong>Capacitor:</strong> Stores electrical energy in an electric field. Capacitors smooth out voltage fluctuations and can be used in filtering applications. Their storage capacity is measured in farads (F).</p>
+    <p><strong>Inductor:</strong> Stores energy in a magnetic field and opposes changes in current. They are used in filtering and oscillatory circuits and are measured in henries (H).</p>
+    <p><strong>Ammeter:</strong> Measures the current flowing through a circuit. In this simulator, the ammeter reading updates dynamically as the circuit's current changes.</p>
+    <p><strong>How the Circuit Works:</strong> In a <em>series circuit</em>, the same current flows through each component and the total resistance is the sum of individual resistances. In a <em>parallel circuit</em>, the voltage across each branch is identical, though currents may differ according to each branch's resistance. Kirchhoff’s Laws dictate the conservation of current and energy throughout the circuit.</p>
+    <p><strong>Examples of Circuit Structures:</strong></p>
+    <ul>
+      <li><em>Series Circuit:</em> A battery connected in series with a resistor, where the current is uniform throughout.</li>
+      <li><em>Parallel Circuit:</em> A battery connected to multiple resistors in parallel, sharing the same voltage but dividing the current.</li>
+      <li><em>Complex Circuit:</em> Combinations of series and parallel components (including capacitors and inductors) form the basis of filters, oscillators, and power management systems.</li>
+    </ul>
+    <p>Below is a sample 2D circuit diagram (SVG) reflecting a theoretical circuit setup:</p>
+    <div style="text-align: center;">
+      <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+        <!-- Battery -->
+        <rect x="10" y="50" width="20" height="50" fill="#4444ff" />
+        <line x1="30" y1="65" x2="50" y2="65" stroke="black" stroke-width="2" />
+        <!-- Resistor -->
+        <rect x="50" y="60" width="40" height="30" fill="#ff4444" />
+        <line x1="90" y1="75" x2="110" y2="75" stroke="black" stroke-width="2" />
+        <!-- Ammeter -->
+        <circle cx="140" cy="75" r="15" fill="#2196f3" />
+        <text x="140" y="80" text-anchor="middle" fill="white" font-size="12">A</text>
+        <line x1="155" y1="75" x2="175" y2="75" stroke="black" stroke-width="2" />
+        <!-- Ground -->
+        <line x1="175" y1="75" x2="175" y2="100" stroke="black" stroke-width="2" />
+        <line x1="165" y1="100" x2="185" y2="100" stroke="black" stroke-width="2" />
+      </svg>
+    </div>
     <button onclick="toggleInfo()">Close</button>
   </div>
 
@@ -485,7 +513,7 @@
       resistor2.position.set(6, 0, 0);
       
       // Determine connection points based on component dimensions:
-      // Battery: 6 height, so positive terminal is at battery.position.x + (6/2) = -12 + 3 = -9
+      // Battery: assume its right (positive) terminal is at x = battery.position.x + (6/2) = -12 + 3 = -9
       let batteryPos = new THREE.Vector3(-9, 0, 0);
       // Resistor: width 5 so left edge = resistor1.position.x - 2.5 and right edge = resistor1.position.x + 2.5
       let resistor1Left = new THREE.Vector3(-3 - 2.5, 0, 0);   // (-5.5, 0, 0)
@@ -495,7 +523,7 @@
       // Define an output terminal (for example)
       let outputPoint = new THREE.Vector3(8.5 + 2, 0, 0);       // (10.5, 0, 0)
       
-      // Create wires that connect these calculated endpoints:
+      // Create wires connecting these points:
       let curve1 = createWireCurve(batteryPos, resistor1Left, new THREE.Vector3(0, 1, 0));
       let wire1 = createWireMesh(curve1);
       
