@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Advanced 3D Circuit Simulator</title>
+  <title>AC vs. DC Circuits Simulator</title>
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- OrbitControls for click and drag rotation -->
+  <!-- OrbitControls for click-and-drag rotation -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <!-- MathJax for LaTeX rendering -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -24,7 +24,7 @@
       background-color: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
       z-index: 10;
       max-width: 320px;
       overflow-y: auto;
@@ -109,6 +109,17 @@
       font-size: 16px;
       color: #333;
     }
+    /* Analytics panel */
+    #componentAnalytics {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #ccc;
+    }
+    #componentAnalytics h4 {
+      margin-bottom: 5px;
+      font-size: 16px;
+      color: #333;
+    }
     /* Info panel styling */
     #infoPanel {
       position: absolute;
@@ -145,13 +156,28 @@
       justify-content: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+    /* AC Parameters group (visible only when AC mode is selected) */
+    #acParameters {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div id="controlPanel">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3>Advanced 3D Circuit Simulator</h3>
+      <h3>AC vs. DC Circuits Simulator</h3>
       <button id="infoToggle" onclick="toggleInfo()">I</button>
+    </div>
+    <div class="input-group">
+      <label for="operationMode">Operation Mode:</label>
+      <select id="operationMode" onchange="toggleACParams()">
+        <option value="dc">DC</option>
+        <option value="ac">AC</option>
+      </select>
+    </div>
+    <div class="input-group" id="acParameters">
+      <label for="frequency">Frequency (Hz):</label>
+      <input type="number" id="frequency" value="60" min="1" max="1000" step="1">
     </div>
     <div class="input-group">
       <label for="voltage">Battery Voltage (V):</label>
@@ -162,6 +188,13 @@
       <input type="number" id="batteryInternal" value="0.5" min="0" max="5" step="0.1">
     </div>
     <div class="input-group">
+      <label for="circuitType">Circuit Type:</label>
+      <select id="circuitType">
+        <option value="series">Series</option>
+        <option value="parallel">Parallel</option>
+      </select>
+    </div>
+    <div class="input-group">
       <label for="resistor1">Resistor 1 (Ω):</label>
       <input type="number" id="resistor1" value="10" min="1" max="500" step="0.1">
     </div>
@@ -169,18 +202,11 @@
       <label for="resistor2">Resistor 2 (Ω):</label>
       <input type="number" id="resistor2" value="10" min="1" max="500" step="0.1">
     </div>
-    <div class="input-group">
-      <label for="circuitType">Circuit Type:</label>
-      <select id="circuitType">
-        <option value="series">Series</option>
-        <option value="parallel">Parallel</option>
-      </select>
-    </div>
     <button onclick="updateCircuit()">Update Circuit</button>
     
     <!-- Extra Components Section -->
     <div class="input-group">
-      <label for="newComponent">Add Component:</label>
+      <label for="newComponent">Add Extra Component:</label>
       <select id="newComponent">
          <option value="resistor">Resistor</option>
          <option value="capacitor">Capacitor</option>
@@ -192,7 +218,13 @@
     <!-- Dynamic Parameters for extra components -->
     <div id="componentParameters">
       <h4>Component Parameters</h4>
-      <!-- New component parameter panels will be appended here -->
+      <!-- Dynamic parameter panels will be appended here -->
+    </div>
+    
+    <!-- Component Analytics Panel -->
+    <div id="componentAnalytics">
+      <h4>Component Analytics</h4>
+      <!-- Analytics will be updated here -->
     </div>
     
     <div id="measurements">
@@ -221,24 +253,25 @@
         <button onclick="toggleAmmeter()" id="ammeterToggle">Show Ammeter</button>
       </div>
     </div>
+    
+    <!-- Reset Button -->
+    <button onclick="resetSimulator()" style="background-color:#d32f2f;">Reset Simulation</button>
   </div>
 
-  <!-- Info Panel with detailed explanations, theory, and an inline 2D SVG circuit diagram -->
+  <!-- Info Panel with detailed explanations, theory, and an inline 2D SVG diagram -->
   <div id="infoPanel">
-    <h4>Theoretical Overview &amp; Component Explanations</h4>
-    <p><strong>Battery:</strong> Supplies the electromotive force (voltage) that drives current. Its internal resistance (even if small) influences the overall circuit performance.</p>
-    <p><strong>Resistor:</strong> Limits current and drops voltage. Governed by Ohm's Law: \( V = IR \). Resistors are critical for controlling current in a circuit.</p>
-    <p><strong>Capacitor:</strong> Stores electrical energy in an electric field. Capacitors smooth out voltage fluctuations and can be used in filtering applications. Their storage capacity is measured in farads (F).</p>
-    <p><strong>Inductor:</strong> Stores energy in a magnetic field and opposes changes in current. They are used in filtering and oscillatory circuits and are measured in henries (H).</p>
-    <p><strong>Ammeter:</strong> Measures the current flowing through a circuit. In this simulator, the ammeter reading updates dynamically as the circuit's current changes.</p>
-    <p><strong>How the Circuit Works:</strong> In a <em>series circuit</em>, the same current flows through each component and the total resistance is the sum of individual resistances. In a <em>parallel circuit</em>, the voltage across each branch is identical, though currents may differ according to each branch's resistance. Kirchhoff’s Laws dictate the conservation of current and energy throughout the circuit.</p>
-    <p><strong>Examples of Circuit Structures:</strong></p>
+    <h4>Theoretical Overview &amp; AC vs. DC</h4>
+    <p><strong>DC (Direct Current):</strong> In a DC circuit the voltage is constant, so the current flows steadily in one direction. The electron flow is unidirectional, and Ohm’s Law (\( V = IR \)) directly governs the behavior of the circuit.</p>
+    <p><strong>AC (Alternating Current):</strong> In an AC circuit the voltage varies sinusoidally with time, causing the current to alternate its direction periodically. The effective voltage at any moment is given by \( V_{\mathrm{eff}} = V_0 \sin(2\pi f t) \), where \( V_0 \) is the amplitude and \( f \) is the frequency.</p>
+    <p><strong>Components:</strong></p>
     <ul>
-      <li><em>Series Circuit:</em> A battery connected in series with a resistor, where the current is uniform throughout.</li>
-      <li><em>Parallel Circuit:</em> A battery connected to multiple resistors in parallel, sharing the same voltage but dividing the current.</li>
-      <li><em>Complex Circuit:</em> Combinations of series and parallel components (including capacitors and inductors) form the basis of filters, oscillators, and power management systems.</li>
+      <li><em>Battery:</em> Supplies the driving voltage (DC or AC amplitude).</li>
+      <li><em>Resistor:</em> Limits current and drops voltage (\( V = IR \)).</li>
+      <li><em>Capacitor:</em> Stores energy in an electric field; its capacitive reactance \( X_C = \frac{1}{2\pi f C} \) determines its behavior in AC circuits.</li>
+      <li><em>Inductor:</em> Stores energy in a magnetic field; its inductive reactance \( X_L = 2\pi f L \) affects current in AC circuits.</li>
+      <li><em>Ammeter:</em> Measures current; in AC circuits it shows RMS or instantaneous values.</li>
     </ul>
-    <p>Below is a sample 2D circuit diagram (SVG) reflecting a theoretical circuit setup:</p>
+    <p><strong>2D Circuit Diagram Example:</strong></p>
     <div style="text-align: center;">
       <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
         <!-- Battery -->
@@ -260,19 +293,29 @@
   </div>
 
   <script>
-    // Global Three.js variables and simulation parameters
+    // Global variables and simulation parameters
     let scene, camera, renderer, controls;
     let battery, resistor1, resistor2, ammeter;
     let wireGroup, wireCurves = [];
     let electrons = [];
-    let extraComponents = [];
+    let extraComponents = []; // Each entry: { id, type, object, value, pos }
     let ammeterVisible = false;
-    let animationSpeed = 0.002; // Base electron flow speed
+    let animationSpeed = 0.002; // Base electron flow speed for DC
     let currentMeasurements = { main: 0, r1: 0, r2: 0 };
+    let extraComponentIdCounter = 0;
 
     // Initialization
     init();
     updateCircuit();
+    // For demo: add one extra component to show dynamic parameters
+    addComponent();
+
+    // Toggle display of AC parameters based on operation mode
+    function toggleACParams() {
+      const mode = document.getElementById("operationMode").value;
+      document.getElementById("acParameters").style.display = (mode === "ac") ? "block" : "none";
+      updateComponentAnalytics();
+    }
 
     function init() {
       // Scene Setup
@@ -286,7 +329,7 @@
       renderer.setPixelRatio(window.devicePixelRatio);
       document.body.appendChild(renderer.domElement);
       
-      // OrbitControls: enables click-and-drag rotation
+      // OrbitControls for click-and-drag rotation
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
@@ -389,46 +432,125 @@
       return group;
     }
     
-    // Add extra component to the scene and create dynamic parameter inputs
+    // --- Extra Component Management ---
     function addComponent() {
       const type = document.getElementById("newComponent").value;
       let component;
+      let defaultValue;
       if (type === "resistor") {
         component = createResistor(0x00aa00);
+        defaultValue = 10; // Ohms
       } else if (type === "capacitor") {
         component = createCapacitor();
+        defaultValue = 1e-6; // Farads
       } else if (type === "inductor") {
         component = createInductor();
+        defaultValue = 1e-3; // Henries
       }
-      // Set default position; you can later adjust these via the dynamic panel
+      // Default random position
       component.position.set(0, Math.random() * 10 - 5, 0);
       scene.add(component);
-      extraComponents.push({ type: type, object: component });
-      addComponentParameterUI(extraComponents.length - 1, type, component.position);
+      let compEntry = {
+        id: extraComponentIdCounter++,
+        type: type,
+        object: component,
+        value: defaultValue,
+        pos: { x: component.position.x, y: component.position.y, z: component.position.z }
+      };
+      extraComponents.push(compEntry);
+      refreshExtraComponentsUI();
+      updateComponentAnalytics();
     }
     
-    // Create dynamic UI inputs for extra component parameters
-    function addComponentParameterUI(index, type, position) {
+    function refreshExtraComponentsUI() {
       const container = document.getElementById("componentParameters");
-      const div = document.createElement("div");
-      div.id = "componentParam" + index;
-      div.style.border = "1px solid #ddd";
-      div.style.padding = "5px";
-      div.style.marginBottom = "8px";
-      div.innerHTML = `<h4>Component ${index + 1} (${type})</h4>
-        <label>X: <input type="number" value="${position.x.toFixed(2)}" step="0.1" onchange="updateComponentPosition(${index}, 'x', this.value)" /></label>
-        <label>Y: <input type="number" value="${position.y.toFixed(2)}" step="0.1" onchange="updateComponentPosition(${index}, 'y', this.value)" /></label>
-        <label>Z: <input type="number" value="${position.z.toFixed(2)}" step="0.1" onchange="updateComponentPosition(${index}, 'z', this.value)" /></label>`;
-      container.appendChild(div);
+      container.innerHTML = "<h4>Component Parameters</h4>";
+      extraComponents.forEach(comp => {
+        const div = document.createElement("div");
+        div.id = "componentParam" + comp.id;
+        div.style.border = "1px solid #ddd";
+        div.style.padding = "5px";
+        div.style.marginBottom = "8px";
+        let extraField = "";
+        if (comp.type === "resistor") {
+          extraField = `<label>Resistance (Ω): <input type="number" value="${comp.value}" step="0.1" onchange="updateComponentValue(${comp.id}, this.value)" /></label>`;
+        } else if (comp.type === "capacitor") {
+          extraField = `<label>Capacitance (F): <input type="number" value="${comp.value}" step="1e-7" onchange="updateComponentValue(${comp.id}, this.value)" /></label>`;
+        } else if (comp.type === "inductor") {
+          extraField = `<label>Inductance (H): <input type="number" value="${comp.value}" step="1e-4" onchange="updateComponentValue(${comp.id}, this.value)" /></label>`;
+        }
+        div.innerHTML = `<h4>Component ${comp.id} (${comp.type})</h4>
+          <label>X: <input type="number" value="${comp.pos.x.toFixed(2)}" step="0.1" onchange="updateComponentPositionUI(${comp.id}, 'x', this.value)" /></label>
+          <label>Y: <input type="number" value="${comp.pos.y.toFixed(2)}" step="0.1" onchange="updateComponentPositionUI(${comp.id}, 'y', this.value)" /></label>
+          <label>Z: <input type="number" value="${comp.pos.z.toFixed(2)}" step="0.1" onchange="updateComponentPositionUI(${comp.id}, 'z', this.value)" /></label>
+          ${extraField}
+          <button onclick="deleteComponent(${comp.id})" style="background-color:#d32f2f;">Delete Component</button>`;
+        container.appendChild(div);
+      });
     }
     
-    // Update the position of an extra component based on dynamic UI input
-    function updateComponentPosition(index, axis, value) {
-      const comp = extraComponents[index].object;
-      comp.position[axis] = parseFloat(value);
+    function updateComponentValue(id, newVal) {
+      extraComponents.forEach(comp => {
+        if (comp.id === id) {
+          comp.value = parseFloat(newVal);
+        }
+      });
+      updateComponentAnalytics();
     }
     
-    // Create wire curves and meshes
+    function updateComponentPositionUI(id, axis, newVal) {
+      extraComponents.forEach(comp => {
+        if (comp.id === id) {
+          comp.pos[axis] = parseFloat(newVal);
+          comp.object.position[axis] = parseFloat(newVal);
+        }
+      });
+    }
+    
+    function deleteComponent(id) {
+      extraComponents = extraComponents.filter(comp => {
+        if (comp.id === id) {
+          scene.remove(comp.object);
+          return false;
+        }
+        return true;
+      });
+      refreshExtraComponentsUI();
+      updateComponentAnalytics();
+    }
+    
+    function updateComponentAnalytics() {
+      const analyticsDiv = document.getElementById("componentAnalytics");
+      let mode = document.getElementById("operationMode").value;
+      let freq = parseFloat(document.getElementById("frequency").value);
+      let html = "<h4>Component Analytics</h4>";
+      if (extraComponents.length === 0) {
+        html += "<p>No extra components added.</p>";
+      } else {
+        extraComponents.forEach(comp => {
+          if (comp.type === "resistor") {
+            html += `<p>Resistor ${comp.id}: ${comp.value} Ω</p>`;
+          } else if (comp.type === "capacitor") {
+            if (mode === "ac") {
+              let Xc = 1 / (2 * Math.PI * freq * comp.value);
+              html += `<p>Capacitor ${comp.id}: ${comp.value} F, Capacitive Reactance: ${Xc.toFixed(2)} Ω</p>`;
+            } else {
+              html += `<p>Capacitor ${comp.id}: ${comp.value} F (DC: Blocks steady-state current)</p>`;
+            }
+          } else if (comp.type === "inductor") {
+            if (mode === "ac") {
+              let Xl = 2 * Math.PI * freq * comp.value;
+              html += `<p>Inductor ${comp.id}: ${comp.value} H, Inductive Reactance: ${Xl.toFixed(2)} Ω</p>`;
+            } else {
+              html += `<p>Inductor ${comp.id}: ${comp.value} H (DC: Acts as a short circuit)</p>`;
+            }
+          }
+        });
+      }
+      analyticsDiv.innerHTML = html;
+    }
+    
+    // --- Wire and Circuit Calculations ---
     function createWireCurve(start, end, controlOffset = new THREE.Vector3(0, 0, 0)) {
       const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5).add(controlOffset);
       return new THREE.CatmullRomCurve3([start, mid, end]);
@@ -440,15 +562,14 @@
       return new THREE.Mesh(tubeGeom, tubeMat);
     }
     
-    // Update the circuit: recalc measurements, reposition components, update electrons
     function updateCircuit() {
-      const voltage = parseFloat(document.getElementById("voltage").value);
+      const batteryVoltage = parseFloat(document.getElementById("voltage").value);
       const batteryInternal = parseFloat(document.getElementById("batteryInternal").value);
       const r1 = parseFloat(document.getElementById("resistor1").value);
       const r2 = parseFloat(document.getElementById("resistor2").value);
       const circuitType = document.getElementById("circuitType").value;
       
-      // Clear wires and stored curves
+      // Clear wires
       while (wireGroup.children.length) {
         wireGroup.remove(wireGroup.children[0]);
       }
@@ -460,29 +581,29 @@
       if (circuitType === "series") {
         arrangeSeriesCircuit();
         totalResistance = batteryInternal + r1 + r2;
-        totalCurrent = voltage / totalResistance;
+        totalCurrent = batteryVoltage / totalResistance;
         voltageDropBattery = totalCurrent * batteryInternal;
         voltageR1 = totalCurrent * r1;
         voltageR2 = totalCurrent * r2;
         powerR1 = voltageR1 * totalCurrent;
         powerR2 = voltageR2 * totalCurrent;
-        totalPower = voltage * totalCurrent;
+        totalPower = batteryVoltage * totalCurrent;
         currentMeasurements.main = totalCurrent;
         currentMeasurements.r1 = totalCurrent;
         currentMeasurements.r2 = totalCurrent;
       } else {
         arrangeParallelCircuit();
-        const parallelResistance = 1 / (1 / r1 + 1 / r2);
+        let parallelResistance = 1 / (1 / r1 + 1 / r2);
         totalResistance = batteryInternal + parallelResistance;
-        totalCurrent = voltage / totalResistance;
-        const voltageParallel = voltage - (totalCurrent * batteryInternal);
-        const currentR1 = voltageParallel / r1;
-        const currentR2 = voltageParallel / r2;
+        totalCurrent = batteryVoltage / totalResistance;
+        let voltageParallel = batteryVoltage - (totalCurrent * batteryInternal);
+        let currentR1 = voltageParallel / r1;
+        let currentR2 = voltageParallel / r2;
         voltageR1 = currentR1 * r1;
         voltageR2 = currentR2 * r2;
         powerR1 = voltageR1 * currentR1;
         powerR2 = voltageR2 * currentR2;
-        totalPower = voltage * totalCurrent;
+        totalPower = batteryVoltage * totalCurrent;
         currentMeasurements.main = totalCurrent;
         currentMeasurements.r1 = currentR1;
         currentMeasurements.r2 = currentR2;
@@ -498,32 +619,23 @@
       document.getElementById("powerR2").textContent = `${powerR2.toFixed(2)} W`;
       document.getElementById("totalPower").textContent = `${totalPower.toFixed(2)} W`;
       
-      // Adjust electron flow speed based on current magnitude
-      animationSpeed = 0.002 + (totalCurrent / 100);
-      
       resetElectrons();
       updateAmmeterPosition();
+      updateComponentAnalytics();
     }
     
-    // For series, calculate connection points from component dimensions
     function arrangeSeriesCircuit() {
-      // Position base components
       battery.position.set(-12, 0, 0);
       resistor1.position.set(-3, 0, 0);
       resistor2.position.set(6, 0, 0);
       
-      // Determine connection points based on component dimensions:
-      // Battery: assume its right (positive) terminal is at x = battery.position.x + (6/2) = -12 + 3 = -9
       let batteryPos = new THREE.Vector3(-9, 0, 0);
-      // Resistor: width 5 so left edge = resistor1.position.x - 2.5 and right edge = resistor1.position.x + 2.5
-      let resistor1Left = new THREE.Vector3(-3 - 2.5, 0, 0);   // (-5.5, 0, 0)
-      let resistor1Right = new THREE.Vector3(-3 + 2.5, 0, 0);  // (-0.5, 0, 0)
-      let resistor2Left = new THREE.Vector3(6 - 2.5, 0, 0);    // (3.5, 0, 0)
-      let resistor2Right = new THREE.Vector3(6 + 2.5, 0, 0);   // (8.5, 0, 0)
-      // Define an output terminal (for example)
-      let outputPoint = new THREE.Vector3(8.5 + 2, 0, 0);       // (10.5, 0, 0)
+      let resistor1Left = new THREE.Vector3(-5.5, 0, 0);
+      let resistor1Right = new THREE.Vector3(-0.5, 0, 0);
+      let resistor2Left = new THREE.Vector3(3.5, 0, 0);
+      let resistor2Right = new THREE.Vector3(8.5, 0, 0);
+      let outputPoint = new THREE.Vector3(10.5, 0, 0);
       
-      // Create wires connecting these points:
       let curve1 = createWireCurve(batteryPos, resistor1Left, new THREE.Vector3(0, 1, 0));
       let wire1 = createWireMesh(curve1);
       
@@ -558,7 +670,7 @@
       wireCurves.push(curve1, curve2, curve3, curve4);
     }
     
-    // Electron flow visualization along wire curves
+    // Electron flow visualization
     function resetElectrons() {
       electrons.forEach(e => scene.remove(e.mesh));
       electrons = [];
@@ -566,26 +678,39 @@
       wireCurves.forEach(curve => {
         for (let i = 0; i < electronsPerCurve; i++) {
           const electronGeom = new THREE.SphereGeometry(0.15, 12, 12);
-          const electronMat = new THREE.MeshPhongMaterial({ 
-            color: 0xffff00, 
+          const electronMat = new THREE.MeshPhongMaterial({
+            color: 0xffff00,
             emissive: 0xffff00,
-            emissiveIntensity: 0.7 
+            emissiveIntensity: 0.7
           });
           const electronMesh = new THREE.Mesh(electronGeom, electronMat);
           const progress = Math.random();
           electronMesh.position.copy(curve.getPoint(progress));
           scene.add(electronMesh);
-          electrons.push({ mesh: electronMesh, curve: curve, progress: progress, speed: animationSpeed });
+          electrons.push({ mesh: electronMesh, curve: curve, progress: progress });
         }
       });
     }
     
     function updateElectrons() {
-      electrons.forEach(electron => {
-        electron.progress += electron.speed;
-        if (electron.progress > 1) electron.progress = 0;
-        electron.mesh.position.copy(electron.curve.getPoint(electron.progress));
-      });
+      const mode = document.getElementById("operationMode").value;
+      let acTime = performance.now() / 1000;
+      if (mode === "ac") {
+        let freq = parseFloat(document.getElementById("frequency").value);
+        electrons.forEach(electron => {
+          if (electron.phase === undefined) {
+            electron.phase = Math.random() * 2 * Math.PI;
+          }
+          electron.progress = 0.5 * (1 + Math.sin(2 * Math.PI * freq * acTime + electron.phase));
+          electron.mesh.position.copy(electron.curve.getPoint(electron.progress));
+        });
+      } else {
+        electrons.forEach(electron => {
+          electron.progress += animationSpeed;
+          if (electron.progress > 1) electron.progress = 0;
+          electron.mesh.position.copy(electron.curve.getPoint(electron.progress));
+        });
+      }
     }
     
     // Ammeter functions
@@ -593,36 +718,36 @@
       ammeterVisible = !ammeterVisible;
       if (ammeterVisible) {
         scene.add(ammeter);
-        document.getElementById('ammeterToggle').textContent = 'Hide Ammeter';
+        document.getElementById("ammeterToggle").textContent = "Hide Ammeter";
       } else {
         scene.remove(ammeter);
-        document.getElementById('ammeterToggle').textContent = 'Show Ammeter';
+        document.getElementById("ammeterToggle").textContent = "Show Ammeter";
       }
       updateAmmeterPosition();
     }
     
     function updateAmmeterPosition() {
       if (!ammeterVisible) return;
-      const pos = document.getElementById('ammeterPosition').value;
-      const type = document.getElementById('circuitType').value;
-      if (type === 'series') {
-        if (pos === 'main') ammeter.position.set(-6, 0, 0);
-        else if (pos === 'r1') ammeter.position.set(0, 0, 0);
-        else if (pos === 'r2') ammeter.position.set(6, 0, 0);
+      const pos = document.getElementById("ammeterPosition").value;
+      const type = document.getElementById("circuitType").value;
+      if (type === "series") {
+        if (pos === "main") ammeter.position.set(-6, 0, 0);
+        else if (pos === "r1") ammeter.position.set(0, 0, 0);
+        else if (pos === "r2") ammeter.position.set(6, 0, 0);
       } else {
-        if (pos === 'main') ammeter.position.set(-6, 0, 0);
-        else if (pos === 'r1') ammeter.position.set(2, 4, 0);
-        else if (pos === 'r2') ammeter.position.set(2, -4, 0);
+        if (pos === "main") ammeter.position.set(-6, 0, 0);
+        else if (pos === "r1") ammeter.position.set(2, 4, 0);
+        else if (pos === "r2") ammeter.position.set(2, -4, 0);
       }
       updateCurrentReadings();
     }
     
     function updateCurrentReadings() {
-      const pos = document.getElementById('ammeterPosition').value;
-      document.getElementById('currentReading').textContent = `${currentMeasurements[pos].toFixed(3)} A`;
+      const pos = document.getElementById("ammeterPosition").value;
+      document.getElementById("currentReading").textContent = `${currentMeasurements[pos].toFixed(3)} A`;
     }
     
-    // Visual enhancement: Adjust wire emissive intensity based on current magnitude
+    // Visual enhancement: adjust wire emissive intensity
     function updateCurrentVisualization() {
       const intensity = Math.min(currentMeasurements.main / 5, 1);
       wireGroup.children.forEach(wire => {
@@ -632,24 +757,91 @@
       });
     }
     
-    // Toggle Info Panel (Theory & Formulas)
+    // In AC mode, update physics based on sinusoidal voltage.
+    function updateACPhysics() {
+      let batteryVoltage = parseFloat(document.getElementById("voltage").value);
+      let batteryInternal = parseFloat(document.getElementById("batteryInternal").value);
+      let r1 = parseFloat(document.getElementById("resistor1").value);
+      let r2 = parseFloat(document.getElementById("resistor2").value);
+      let circuitType = document.getElementById("circuitType").value;
+      let freq = parseFloat(document.getElementById("frequency").value);
+      let acTime = performance.now() / 1000;
+      let effectiveVoltage = batteryVoltage * Math.sin(2 * Math.PI * freq * acTime);
+      let totalResistance, totalCurrent, voltageDropBattery, voltageR1, voltageR2, powerR1, powerR2, totalPower;
+      if (circuitType === "series") {
+        totalResistance = batteryInternal + r1 + r2;
+        totalCurrent = effectiveVoltage / totalResistance;
+        voltageDropBattery = totalCurrent * batteryInternal;
+        voltageR1 = totalCurrent * r1;
+        voltageR2 = totalCurrent * r2;
+        powerR1 = voltageR1 * totalCurrent;
+        powerR2 = voltageR2 * totalCurrent;
+        totalPower = effectiveVoltage * totalCurrent;
+        currentMeasurements.main = totalCurrent;
+        currentMeasurements.r1 = totalCurrent;
+        currentMeasurements.r2 = totalCurrent;
+      } else {
+        let parallelResistance = 1 / (1 / r1 + 1 / r2);
+        totalResistance = batteryInternal + parallelResistance;
+        totalCurrent = effectiveVoltage / totalResistance;
+        let voltageParallel = effectiveVoltage - (totalCurrent * batteryInternal);
+        let currentR1 = voltageParallel / r1;
+        let currentR2 = voltageParallel / r2;
+        voltageR1 = currentR1 * r1;
+        voltageR2 = currentR2 * r2;
+        powerR1 = voltageR1 * currentR1;
+        powerR2 = voltageR2 * currentR2;
+        totalPower = effectiveVoltage * totalCurrent;
+        currentMeasurements.main = totalCurrent;
+        currentMeasurements.r1 = currentR1;
+        currentMeasurements.r2 = currentR2;
+        voltageDropBattery = totalCurrent * batteryInternal;
+      }
+      document.getElementById("totalResistance").textContent = `${totalResistance.toFixed(2)} Ω`;
+      document.getElementById("totalCurrent").textContent = `${totalCurrent.toFixed(3)} A`;
+      document.getElementById("batteryDrop").textContent = `${voltageDropBattery.toFixed(2)} V`;
+      document.getElementById("voltageR1").textContent = `${voltageR1.toFixed(2)} V`;
+      document.getElementById("voltageR2").textContent = `${voltageR2.toFixed(2)} V`;
+      document.getElementById("powerR1").textContent = `${powerR1.toFixed(2)} W`;
+      document.getElementById("powerR2").textContent = `${powerR2.toFixed(2)} W`;
+      document.getElementById("totalPower").textContent = `${totalPower.toFixed(2)} W`;
+    }
+    
+    // Toggle Info Panel
     function toggleInfo() {
       const infoPanel = document.getElementById("infoPanel");
-      infoPanel.style.display = infoPanel.style.display === "none" ? "block" : "none";
+      infoPanel.style.display = (infoPanel.style.display === "none") ? "block" : "none";
+    }
+    
+    // Reset Simulation: clear extra components and reset base circuit
+    function resetSimulator() {
+      // Remove extra components from scene
+      extraComponents.forEach(comp => {
+        scene.remove(comp.object);
+      });
+      extraComponents = [];
+      // Clear dynamic UI panels
+      document.getElementById("componentParameters").innerHTML = "<h4>Component Parameters</h4>";
+      document.getElementById("componentAnalytics").innerHTML = "<h4>Component Analytics</h4>";
+      // Recalculate base circuit
+      updateCircuit();
     }
     
     // Animation loop
     function animate() {
       requestAnimationFrame(animate);
-      controls.update(); // Update OrbitControls
+      controls.update();
+      let mode = document.getElementById("operationMode").value;
+      if (mode === "ac") {
+        updateACPhysics();
+      }
       updateElectrons();
       updateCurrentVisualization();
       renderer.render(scene, camera);
     }
     
-    // Handle resizing
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth/window.innerHeight;
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
