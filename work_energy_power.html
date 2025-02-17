@@ -123,50 +123,8 @@
 </head>
 <body>
   <h1>Work, Energy, and Power Simulator</h1>
-  <div class="container">
-    
-    <!-- Three.js Simulation Area -->
-    <div class="simulation">
-      <div id="threeContainer"></div>
-    </div>
-    
-    <!-- Control Panel -->
-    <div class="controls">
-      <div class="control-group">
-        <label for="force">Force (N):</label>
-        <input type="range" id="force" min="0" max="100" value="50" />
-        <div class="value-display" id="forceValue">50 N</div>
-      </div>
-      <div class="control-group">
-        <label for="mass">Mass (kg):</label>
-        <input type="range" id="mass" min="1" max="50" value="10" />
-        <div class="value-display" id="massValue">10 kg</div>
-      </div>
-      <div class="control-group">
-        <label for="duration">Simulation Duration (s):</label>
-        <input type="range" id="duration" min="1" max="20" value="10" />
-        <div class="value-display" id="durationValue">10 s</div>
-      </div>
-    </div>
-    
-    <!-- Buttons -->
-    <div class="buttons">
-      <button id="startBtn">Start Simulation</button>
-      <button id="resetBtn">Reset</button>
-    </div>
-    
-    <!-- Results Display -->
-    <div class="results">
-      <p id="timeDisplay">Time: 0 s</p>
-      <p id="displacementDisplay">Displacement: 0 m</p>
-      <p id="velocityDisplay">Velocity: 0 m/s</p>
-      <p id="accelerationDisplay">Acceleration: 0 m/s²</p>
-      <p id="workDisplay">Work: 0 J</p>
-      <p id="kineticEnergyDisplay">Kinetic Energy: 0 J</p>
-      <p id="powerDisplay">Power: 0 W</p>
-    </div>
-    
-    <!-- Detailed Explanations -->
+
+  <!-- Detailed Explanations -->
     <div class="explanations">
       <h2>How the Simulator Works</h2>
       <p>
@@ -218,6 +176,50 @@
           \]
         </li>
       </ul>
+      
+  <div class="container">
+    
+    <!-- Three.js Simulation Area -->
+    <div class="simulation">
+      <div id="threeContainer"></div>
+    </div>
+    
+    <!-- Control Panel -->
+    <div class="controls">
+      <div class="control-group">
+        <label for="force">Force (N):</label>
+        <input type="range" id="force" min="0" max="100" value="50" />
+        <div class="value-display" id="forceValue">50 N</div>
+      </div>
+      <div class="control-group">
+        <label for="mass">Mass (kg):</label>
+        <input type="range" id="mass" min="1" max="50" value="10" />
+        <div class="value-display" id="massValue">10 kg</div>
+      </div>
+      <div class="control-group">
+        <label for="duration">Simulation Duration (s):</label>
+        <input type="range" id="duration" min="1" max="20" value="10" />
+        <div class="value-display" id="durationValue">10 s</div>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <div class="buttons">
+      <button id="startBtn">Start Simulation</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    
+    <!-- Results Display -->
+    <div class="results">
+      <p id="timeDisplay">Time: 0 s</p>
+      <p id="displacementDisplay">Displacement: 0 m</p>
+      <p id="velocityDisplay">Velocity: 0 m/s</p>
+      <p id="accelerationDisplay">Acceleration: 0 m/s²</p>
+      <p id="workDisplay">Work: 0 J</p>
+      <p id="kineticEnergyDisplay">Kinetic Energy: 0 J</p>
+      <p id="powerDisplay">Power: 0 W</p>
+    </div>
+    
       <p>
         Use the sliders above to adjust the force, mass, and duration. When you click 
         <em>Start Simulation</em>, the block (rendered as a cube in the 3D scene) moves on the ground
