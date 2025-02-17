@@ -1,547 +1,634 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optical Physics Simulator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .container {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .controls {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-
-        .simulation {
-            flex-grow: 1;
-        }
-
-        .control-group {
-            margin-bottom: 20px;
-        }
-
-        .control-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        select, input[type="range"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        input[type="range"] {
-            padding: 0;
-        }
-
-        .value-display {
-            font-size: 0.9em;
-            color: #666;
-            text-align: right;
-        }
-
-        canvas {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        #steps {
-            margin-top: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .step {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-left: 3px solid #0077ff;
-            background: #f8f9fa;
-        }
-
-        .formula {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 10px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .formula-content {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.1em;
-        }
-
-        .formula-description {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        h1 {
-            color: #0077ff;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optical Physics Simulator</title>
+  <style>
+    /* --- Global Styles --- */
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #0077ff;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    /* --- Simulation Canvas --- */
+    .simulation {
+      margin-bottom: 20px;
+    }
+    canvas {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      width: 100%;
+      height: auto;
+    }
+    
+    /* --- Control Panel (Stacked in Columns) --- */
+    .controls {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .control-group {
+      flex: 1 1 calc(33.33% - 10px);
+      min-width: 200px;
+    }
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    select, input[type="range"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    input[type="range"] {
+      padding: 0;
+    }
+    .value-display {
+      font-size: 0.9em;
+      color: #666;
+      text-align: right;
+    }
+    
+    /* --- Explanation Steps --- */
+    #steps {
+      margin-top: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .step {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-left: 3px solid #0077ff;
+      background: #f8f9fa;
+    }
+    .formula {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 10px 0;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    .formula-content {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 1.1em;
+    }
+    .formula-description {
+      color: #666;
+      font-size: 0.9em;
+    }
+    
+    /* --- Detailed Optical Breakdown Section --- */
+    #optics-breakdown {
+      background: #fff;
+      padding: 10px 15px;
+      font-size: 14px;
+      line-height: 1.4;
+      max-width: 900px;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    #optics-breakdown h2,
+    #optics-breakdown h3,
+    #optics-breakdown h4 {
+      color: #0077ff;
+      margin: 10px 0 5px;
+    }
+    #optics-breakdown p {
+      color: #333;
+      margin: 5px 0;
+    }
+    #optics-breakdown section {
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    #optics-breakdown section:last-child {
+      border-bottom: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>Optical Physics Simulator</h1>
-    <div class="container">
-        <div class="controls">
-            <div class="control-group">
-                <label for="elementType">Optical Element:</label>
-                <select id="elementType">
-                    <option value="convexLens">Convex Lens</option>
-                    <option value="concaveLens">Concave Lens</option>
-                    <option value="refraction">Refraction Block</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="rayCount">Number of Rays:</label>
-                <input type="range" id="rayCount" min="1" max="10" value="5">
-                <div class="value-display" id="rayCountValue">5 rays</div>
-            </div>
-            
-            <div class="control-group">
-                <label for="focalLength">Focal Length (mm):</label>
-                <input type="range" id="focalLength" min="50" max="200" value="100">
-                <div class="value-display" id="focalLengthValue">100mm</div>
-            </div>
-            
-            <div class="control-group">
-                <label for="refractiveIndex">Refractive Index (x100):</label>
-                <input type="range" id="refractiveIndex" min="100" max="200" value="150">
-                <div class="value-display" id="refractiveIndexValue">n = 1.50</div>
-            </div>
-        </div>
-        
-        <div class="simulation">
-            <canvas id="canvas" width="800" height="400"></canvas>
-        </div>
-    </div>
+  <h1>Optical Physics Simulator</h1>
+  
+    <!-- Detailed Optical Breakdown & Applications -->
+  <div id="optics-breakdown">
+    <h2>Advanced Optics Breakdown & Applications</h2>
     
-    <div id="steps">
-        <!-- Explanation steps will be added here dynamically -->
-    </div>
-    <script>
-    const script = document.createElement('script');
-script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-svg.js';
-script.async = true;
-document.head.appendChild(script);
-
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const steps = document.getElementById('steps');
-
-// Input elements
-const elementTypeSelect = document.getElementById('elementType');
-const rayCountInput = document.getElementById('rayCount');
-const focalLengthInput = document.getElementById('focalLength');
-const refractiveIndexInput = document.getElementById('refractiveIndex');
-
-// Display elements
-const rayCountValue = document.getElementById('rayCountValue');
-const focalLengthValue = document.getElementById('focalLengthValue');
-const refractiveIndexValue = document.getElementById('refractiveIndexValue');
-
-// Constants
-const CENTER_X = canvas.width / 2;
-const CENTER_Y = canvas.height / 2;
-const LENS_HEIGHT = 200;
-
-// Physics formulas for LaTeX rendering
-const FORMULAS = {
-    snellsLaw: '$$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$',
-    lensEquation: '$$\\frac{1}{f} = \\frac{1}{u} + \\frac{1}{v}$$',
-    magnification: '$$m = -\\frac{v}{u} = \\frac{h_i}{h_o}$$'
-};
-
-// Utility functions
-function addExplanationStep(stepText) {
-    const stepDiv = document.createElement('div');
-    stepDiv.className = 'step';
-    stepDiv.innerHTML = stepText;
-    steps.appendChild(stepDiv);
+    <section>
+      <h3>1. Fundamentals of Optics</h3>
+      <article>
+        <h4>A. Light as a Ray</h4>
+        <p><strong>Ray Approximation:</strong> In many optical systems, light is modeled as a straight-line “ray.” This simplifies the analysis of how light interacts with different components.</p>
+        <p><strong>Why It Matters:</strong> This concept is key to designing robust optical systems and underpins imaging and laser applications.</p>
+      </article>
+      <article>
+        <h4>B. Snell’s Law: The Law of Refraction</h4>
+        <p><strong>The Equation:</strong>  
+          $$ n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2) $$  
+          where \( n_1 \) and \( n_2 \) are the refractive indices, and \( \\theta_1 \) and \( \\theta_2 \) are the angles of incidence and refraction.
+        </p>
+        <p><strong>Key Insight:</strong> This law governs how light bends when moving between media, critical for minimizing optical aberrations.</p>
+      </article>
+      <article>
+        <h4>C. Lenses: Converging and Diverging</h4>
+        <p><strong>Convex (Converging) Lenses:</strong> Focus parallel rays to a single focal point. The lens equation,  
+          $$ \\frac{1}{f} = \\frac{1}{u} + \\frac{1}{v} $$,  
+          relates object distance (\( u \)), image distance (\( v \)), and focal length (\( f \)).
+        </p>
+        <p><strong>Concave (Diverging) Lenses:</strong> Spread parallel rays to form a virtual image and are often used for image correction.</p>
+      </article>
+      <article>
+        <h4>D. Optical Measurements & Ray Behavior</h4>
+        <p>The simulator displays key parameters such as lens dimensions and ray trajectories, which help fine-tune optical designs for improved performance.</p>
+      </article>
+    </section>
     
-    // Render LaTeX if MathJax is available
-    if (window.MathJax) {
+    <section>
+      <h3>2. Leveraging Optical Principles for High-Grade Systems</h3>
+      <article>
+        <h4>A. Advanced Imaging Systems</h4>
+        <p>Use convex lens simulations to model light focusing onto sensors. Adjusting focal lengths, lens dimensions, and curvature optimizes the field-of-view and depth-of-field for cameras, telescopes, and microscopes.</p>
+      </article>
+      <article>
+        <h4>B. Laser and Beam-Shaping Technologies</h4>
+        <p>Precise control over ray paths is essential for designing systems with well-collimated beams or precise focusing. Simulation insights help optimize optical assemblies for laser applications.</p>
+      </article>
+      <article>
+        <h4>C. AR/VR Displays</h4>
+        <p>For advanced displays like autostereoscopic systems, optimizing lens arrays and waveguides is key to achieving high resolution with minimal distortion.</p>
+      </article>
+      <article>
+        <h4>D. Rapid Prototyping and Data-Driven Design</h4>
+        <p>Simulations enable quick iterations and informed design decisions, refining optical configurations for optimal performance and manufacturability.</p>
+      </article>
+    </section>
+    
+    <section>
+      <h3>3. Practical Examples</h3>
+      <article>
+        <h4>Example 1: High-Precision Camera Lens Design</h4>
+        <p><strong>Objective:</strong> Create a lens system that minimizes aberrations and enhances image clarity.</p>
+        <p><strong>Approach:</strong> Start with a convex lens simulation; adjust focal length, dimensions, and curvature for a well-focused image on the sensor.</p>
+      </article>
+      <article>
+        <h4>Example 2: Optimizing a Laser Collimator</h4>
+        <p><strong>Objective:</strong> Maintain a highly collimated beam over long distances.</p>
+        <p><strong>Approach:</strong> Simulate ray propagation with varied lens parameters and adjust curvature and refractive indices to reduce divergence.</p>
+      </article>
+      <article>
+        <h4>Example 3: Enhancing AR/VR Display Systems</h4>
+        <p><strong>Objective:</strong> Develop an autostereoscopic display with high resolution and minimal distortion.</p>
+        <p><strong>Approach:</strong> Design custom lens arrays and optimize ray paths using simulation insights to improve display quality.</p>
+      </article>
+    </section>
+    
+    <section>
+      <h3>Conclusion</h3>
+      <p>Mastering these optical principles and simulation insights transforms theoretical knowledge into practical tools for designing advanced optical systems. Precision and careful analysis lead to innovative designs and successful applications in imaging, laser technology, and display systems.</p>
+    </section>
+  </div>
+  
+  <!-- Simulation Canvas -->
+  <div class="simulation">
+    <canvas id="canvas" width="800" height="400"></canvas>
+  </div>
+  
+  <!-- Control Panel (Horizontal Columns) -->
+  <div class="controls">
+    <div class="control-group">
+      <label for="elementType">Optical Element:</label>
+      <select id="elementType">
+        <option value="convexLens">Convex Lens</option>
+        <option value="concaveLens">Concave Lens</option>
+        <option value="refraction">Refraction Block</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="rayCount">Number of Rays:</label>
+      <input type="range" id="rayCount" min="1" max="10" value="5" />
+      <div class="value-display" id="rayCountValue">5 rays</div>
+    </div>
+    <div class="control-group">
+      <label for="focalLength">Focal Length (mm):</label>
+      <input type="range" id="focalLength" min="50" max="200" value="100" />
+      <div class="value-display" id="focalLengthValue">100mm</div>
+    </div>
+    <div class="control-group">
+      <label for="refractiveIndex">Refractive Index (x100):</label>
+      <input type="range" id="refractiveIndex" min="100" max="200" value="150" />
+      <div class="value-display" id="refractiveIndexValue">n = 1.50</div>
+    </div>
+    <div class="control-group">
+      <label for="lensWidth">Lens Width (mm):</label>
+      <input type="range" id="lensWidth" min="20" max="100" value="40" />
+      <div class="value-display" id="lensWidthValue">40mm</div>
+    </div>
+    <div class="control-group">
+      <label for="lensHeight">Lens Height (mm):</label>
+      <input type="range" id="lensHeight" min="100" max="300" value="200" />
+      <div class="value-display" id="lensHeightValue">200mm</div>
+    </div>
+    <div class="control-group">
+      <label for="curvatureFactor">Curvature Factor:</label>
+      <input type="range" id="curvatureFactor" min="0.5" max="1.5" step="0.1" value="1" />
+      <div class="value-display" id="curvatureFactorValue">1.0</div>
+    </div>
+  </div>
+  
+  <!-- Dynamic Explanation Area -->
+  <div id="steps">
+    <!-- Explanation steps will be added here dynamically -->
+  </div>
+  
+  <script>
+    /************* Initialization & Utility Functions *************/
+    // Load MathJax for rendering LaTeX formulas
+    const mathjaxScript = document.createElement('script');
+    mathjaxScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-svg.js';
+    mathjaxScript.async = true;
+    document.head.appendChild(mathjaxScript);
+
+    // Get DOM elements
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const steps = document.getElementById('steps');
+    const elementTypeSelect = document.getElementById('elementType');
+    const rayCountInput = document.getElementById('rayCount');
+    const focalLengthInput = document.getElementById('focalLength');
+    const refractiveIndexInput = document.getElementById('refractiveIndex');
+    const lensWidthInput = document.getElementById('lensWidth');
+    const lensHeightInput = document.getElementById('lensHeight');
+    const curvatureFactorInput = document.getElementById('curvatureFactor');
+
+    const rayCountValue = document.getElementById('rayCountValue');
+    const focalLengthValue = document.getElementById('focalLengthValue');
+    const refractiveIndexValue = document.getElementById('refractiveIndexValue');
+    const lensWidthValue = document.getElementById('lensWidthValue');
+    const lensHeightValue = document.getElementById('lensHeightValue');
+    const curvatureFactorValue = document.getElementById('curvatureFactorValue');
+
+    // LaTeX formulas for physics equations
+    const FORMULAS = {
+      snellsLaw: '$$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$',
+      lensEquation: '$$\\frac{1}{f} = \\frac{1}{u} + \\frac{1}{v}$$',
+      magnification: '$$m = -\\frac{v}{u} = \\frac{h_i}{h_o}$$'
+    };
+
+    // Add an explanation step to the #steps container
+    function addExplanationStep(stepText) {
+      const stepDiv = document.createElement('div');
+      stepDiv.className = 'step';
+      stepDiv.innerHTML = stepText;
+      steps.appendChild(stepDiv);
+      if (window.MathJax) {
         MathJax.typeset([stepDiv]);
+      }
     }
-}
 
-function clearExplanation() {
-    steps.innerHTML = '';
-}
+    // Clear all explanation steps
+    function clearExplanation() {
+      steps.innerHTML = '';
+    }
 
-function addFormula(formula, description) {
-    const formulaDiv = document.createElement('div');
-    formulaDiv.className = 'formula';
-    formulaDiv.innerHTML = `
-        <div class="formula-content">${formula}</div>
-        <div class="formula-description">${description}</div>
-    `;
-    return formulaDiv;
-}
+    /************* Drawing Functions *************/
+    // Draw a dashed optical axis at given y-coordinate
+    function drawOpticalAxis(y) {
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.strokeStyle = '#999';
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
 
-// Drawing functions
-function drawOpticalAxis(y) {
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.strokeStyle = '#999';
-    ctx.stroke();
-    ctx.setLineDash([]);
-}
+    // Draw a convex lens with a curved shape
+    function drawConvexLens(x, y, width, height, curvatureFactor) {
+      const curveAmount = (width / 2) * curvatureFactor;
+      ctx.beginPath();
+      ctx.moveTo(x, y - height / 2);
+      ctx.quadraticCurveTo(x + curveAmount, y, x, y + height / 2);
+      ctx.quadraticCurveTo(x - curveAmount, y, x, y - height / 2);
+      ctx.strokeStyle = '#0077ff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
+      ctx.fill();
+      drawOpticalAxis(y);
+      addLensMeasurements(x, y, width, height, curveAmount);
+    }
 
-function drawConvexLens(x, y, width, height) {
-    const curveAmount = width / 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(x, y - height/2);
-    ctx.quadraticCurveTo(x + curveAmount, y, x, y + height/2);
-    ctx.quadraticCurveTo(x - curveAmount, y, x, y - height/2);
-    ctx.strokeStyle = '#0077ff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
-    ctx.fill();
+    // Draw a concave lens with an inward curve
+    function drawConcaveLens(x, y, width, height, curvatureFactor) {
+      const curveAmount = (width / 2) * curvatureFactor;
+      ctx.beginPath();
+      ctx.moveTo(x - width / 4, y - height / 2);
+      ctx.quadraticCurveTo(x - curveAmount, y, x - width / 4, y + height / 2);
+      ctx.lineTo(x + width / 4, y + height / 2);
+      ctx.quadraticCurveTo(x + curveAmount, y, x + width / 4, y - height / 2);
+      ctx.closePath();
+      ctx.strokeStyle = '#0077ff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
+      ctx.fill();
+      drawOpticalAxis(y);
+      addLensMeasurements(x, y, width, height, curveAmount);
+    }
 
-    drawOpticalAxis(y);
-    addLensMeasurements(x, y, width, height, curveAmount);
-}
+    // Draw a refraction block (a rectangle) for simulating light bending
+    function drawRefractionBlock(x, y, width, height) {
+      ctx.beginPath();
+      ctx.rect(x - width / 2, y - height / 2, width, height);
+      ctx.strokeStyle = '#0077ff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
+      ctx.fill();
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x - width / 2, y - height / 2);
+      ctx.lineTo(x - width / 2, y + height / 2);
+      ctx.moveTo(x + width / 2, y - height / 2);
+      ctx.lineTo(x + width / 2, y + height / 2);
+      ctx.strokeStyle = '#999';
+      ctx.stroke();
+      ctx.setLineDash([]);
+      addBlockMeasurements(x, y, width, height);
+    }
 
-function drawConcaveLens(x, y, width, height) {
-    const curveAmount = width / 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(x - width/4, y - height/2);
-    ctx.quadraticCurveTo(x - curveAmount, y, x - width/4, y + height/2);
-    ctx.lineTo(x + width/4, y + height/2);
-    ctx.quadraticCurveTo(x + curveAmount, y, x + width/4, y - height/2);
-    ctx.closePath();
-    ctx.strokeStyle = '#0077ff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
-    ctx.fill();
+    // Add measurement annotations for a lens
+    function addLensMeasurements(x, y, width, height, curveAmount) {
+      ctx.font = '12px Arial';
+      ctx.fillStyle = '#666';
+      ctx.fillText(`Height: ${height}mm`, x + width / 2 + 10, y);
+      ctx.fillText(`Curvature: ${curveAmount.toFixed(1)}mm`, x - width / 2 - 80, y - height / 4);
+    }
 
-    drawOpticalAxis(y);
-    addLensMeasurements(x, y, width, height, curveAmount);
-}
+    // Add measurement annotations for a refraction block
+    function addBlockMeasurements(x, y, width, height) {
+      ctx.font = '12px Arial';
+      ctx.fillStyle = '#666';
+      ctx.fillText(`Width: ${width}mm`, x, y + height / 2 + 20);
+      ctx.fillText(`Height: ${height}mm`, x + width / 2 + 10, y);
+    }
 
-function drawRefractionBlock(x, y, width, height) {
-    ctx.beginPath();
-    ctx.rect(x - width/2, y - height/2, width, height);
-    ctx.strokeStyle = '#0077ff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(0, 119, 255, 0.1)';
-    ctx.fill();
-
-    // Draw normal lines
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(x - width/2, y - height/2);
-    ctx.lineTo(x - width/2, y + height/2);
-    ctx.moveTo(x + width/2, y - height/2);
-    ctx.lineTo(x + width/2, y + height/2);
-    ctx.strokeStyle = '#999';
-    ctx.stroke();
-    ctx.setLineDash([]);
-    
-    addBlockMeasurements(x, y, width, height);
-}
-
-function addLensMeasurements(x, y, width, height, curveAmount) {
-    ctx.font = '12px Arial';
-    ctx.fillStyle = '#666';
-    ctx.fillText(`h = ${height}mm`, x + width/2 + 10, y);
-    ctx.fillText(`R = ${curveAmount}mm`, x - width/2 - 40, y - height/4);
-}
-
-function addBlockMeasurements(x, y, width, height) {
-    ctx.font = '12px Arial';
-    ctx.fillStyle = '#666';
-    ctx.fillText(`w = ${width}mm`, x, y + height/2 + 20);
-    ctx.fillText(`h = ${height}mm`, x + width/2 + 10, y);
-}
-
-function calculateRefractedRay(x1, y1, x2, y2, n1, n2, normalAngle) {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const incidentAngle = Math.atan2(dy, dx) - normalAngle;
-    
-    // Check for total internal reflection
-    const criticalAngle = n2 > n1 ? Math.asin(n1/n2) : Math.PI/2;
-    if (Math.abs(incidentAngle) > criticalAngle) {
+    // Calculate the refracted ray using Snell's Law
+    function calculateRefractedRay(x1, y1, x2, y2, n1, n2, normalAngle) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const incidentAngle = Math.atan2(dy, dx) - normalAngle;
+      const criticalAngle = n2 > n1 ? Math.asin(n1 / n2) : Math.PI / 2;
+      if (Math.abs(incidentAngle) > criticalAngle) {
         return {
-            angle: Math.PI - incidentAngle + normalAngle,
-            incidentAngle: incidentAngle,
-            refractedAngle: null,
-            totalInternalReflection: true
+          angle: Math.PI - incidentAngle + normalAngle,
+          incidentAngle: incidentAngle,
+          refractedAngle: null,
+          totalInternalReflection: true
         };
-    }
-    
-    const refractedAngle = Math.asin((n1 * Math.sin(incidentAngle)) / n2);
-    return {
+      }
+      const refractedAngle = Math.asin((n1 * Math.sin(incidentAngle)) / n2);
+      return {
         angle: normalAngle + refractedAngle,
         incidentAngle: incidentAngle,
         refractedAngle: refractedAngle,
         totalInternalReflection: false
-    };
-}
+      };
+    }
 
-function drawRay(startX, startY, angle, length, color = '#ff0000', showAngle = true) {
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    const endX = startX + length * Math.cos(angle);
-    const endY = startY + length * Math.sin(angle);
-    ctx.lineTo(endX, endY);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    if (showAngle && Math.abs(angle) > 0.01) {
+    // Draw a light ray from a starting point at a given angle and length
+    function drawRay(startX, startY, angle, length, color = '#ff0000', showAngle = true) {
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      const endX = startX + length * Math.cos(angle);
+      const endY = startY + length * Math.sin(angle);
+      ctx.lineTo(endX, endY);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      if (showAngle && Math.abs(angle) > 0.01) {
         drawAngleArc(startX, startY, angle);
+      }
+      return { endX, endY };
     }
-    
-    return { endX, endY };
-}
 
-function drawAngleArc(x, y, angle) {
-    ctx.beginPath();
-    ctx.arc(x, y, 20, 0, -angle, angle > 0);
-    ctx.strokeStyle = '#999';
-    ctx.stroke();
+    // Draw an arc that indicates the angle of the ray
+    function drawAngleArc(x, y, angle) {
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, -angle, angle > 0);
+      ctx.strokeStyle = '#999';
+      ctx.stroke();
+      const degrees = Math.abs(Math.round(angle * 180 / Math.PI));
+      ctx.fillStyle = '#666';
+      ctx.font = '12px Arial';
+      ctx.fillText(`${degrees}°`, x + 25, y + 15);
+    }
 
-    const degrees = Math.abs(Math.round(angle * 180 / Math.PI));
-    ctx.fillStyle = '#666';
-    ctx.font = '12px Arial';
-    ctx.fillText(`${degrees}°`, x + 25, y + 15);
-}
+    // Draw focal points and a marker for the focal length
+    function drawFocalPoints(x, focalLength) {
+      ctx.beginPath();
+      ctx.arc(x - focalLength, canvas.height / 2, 4, 0, Math.PI * 2);
+      ctx.arc(x + focalLength, canvas.height / 2, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff0000';
+      ctx.fill();
+      ctx.font = '14px Arial';
+      ctx.fillStyle = '#000';
+      ctx.fillText('F', x - focalLength - 15, canvas.height / 2 - 10);
+      ctx.fillText('F', x + focalLength + 10, canvas.height / 2 - 10);
+      drawFocalLengthMarker(x, focalLength);
+    }
 
-function drawFocalPoints(x, focalLength) {
-    // Draw focal points
-    ctx.beginPath();
-    ctx.arc(x - focalLength, CENTER_Y, 4, 0, Math.PI * 2);
-    ctx.arc(x + focalLength, CENTER_Y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = '#ff0000';
-    ctx.fill();
+    // Draw a dashed line to represent the focal length measurement
+    function drawFocalLengthMarker(x, focalLength) {
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x, canvas.height / 2 + 50);
+      ctx.lineTo(x + focalLength, canvas.height / 2 + 50);
+      ctx.strokeStyle = '#666';
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#666';
+      ctx.fillText(`f = ${focalLength}mm`, x + focalLength / 2 - 30, canvas.height / 2 + 70);
+    }
 
-    // Label focal points
-    ctx.font = '14px Arial';
-    ctx.fillStyle = '#000';
-    ctx.fillText('F', x - focalLength - 15, CENTER_Y - 10);
-    ctx.fillText('F', x + focalLength + 10, CENTER_Y - 10);
+    /************* Simulation Functions *************/
+    // Main function to simulate rays based on user controls
+    function simulateRays() {
+      const elementType = elementTypeSelect.value;
+      const rayCount = parseInt(rayCountInput.value);
+      const focalLength = parseInt(focalLengthInput.value);
+      const n2 = parseFloat(refractiveIndexInput.value) / 100;
+      const n1 = 1.0; // Air's refractive index
 
-    // Add focal length measurement
-    drawFocalLengthMarker(x, focalLength);
-}
+      const lensWidth = parseInt(lensWidthInput.value);
+      const lensHeight = parseInt(lensHeightInput.value);
+      const curvatureFactor = parseFloat(curvatureFactorInput.value);
 
-function drawFocalLengthMarker(x, focalLength) {
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(x, CENTER_Y + 50);
-    ctx.lineTo(x + focalLength, CENTER_Y + 50);
-    ctx.strokeStyle = '#666';
-    ctx.stroke();
-    ctx.setLineDash([]);
+      updateDisplayValues(rayCount, focalLength, n2, lensWidth, lensHeight, curvatureFactor);
+      clearCanvas();
+      drawOpticalElement(elementType, focalLength, lensWidth, lensHeight, curvatureFactor);
+      addPhysicsExplanation(elementType, n1, n2, focalLength);
+      simulateRayPaths(elementType, rayCount, focalLength, n1, n2, lensHeight);
+    }
 
-    ctx.fillStyle = '#666';
-    ctx.fillText(`f = ${focalLength}mm`, x + focalLength/2 - 30, CENTER_Y + 70);
-}
+    // Update control panel displays
+    function updateDisplayValues(rayCount, focalLength, n2, lensWidth, lensHeight, curvatureFactor) {
+      rayCountValue.textContent = `${rayCount} rays`;
+      focalLengthValue.textContent = `${focalLength}mm`;
+      refractiveIndexValue.textContent = `n = ${n2.toFixed(2)}`;
+      lensWidthValue.textContent = `${lensWidth}mm`;
+      lensHeightValue.textContent = `${lensHeight}mm`;
+      curvatureFactorValue.textContent = curvatureFactor.toFixed(1);
+    }
 
-function simulateRays() {
-    const elementType = elementTypeSelect.value;
-    const rayCount = parseInt(rayCountInput.value);
-    const focalLength = parseInt(focalLengthInput.value);
-    const n2 = parseFloat(refractiveIndexInput.value) / 100;
-    const n1 = 1.0; // Air
+    // Clear the canvas and explanation area
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      clearExplanation();
+    }
 
-    updateDisplayValues(rayCount, focalLength, n2);
-    clearCanvas();
-    drawOpticalElement(elementType, focalLength);
-    addPhysicsExplanation(elementType, n1, n2, focalLength);
-    simulateRayPaths(elementType, rayCount, focalLength, n1, n2);
-}
-
-function updateDisplayValues(rayCount, focalLength, n2) {
-    rayCountValue.textContent = `${rayCount} rays`;
-    focalLengthValue.textContent = `${focalLength}mm`;
-    refractiveIndexValue.textContent = `n = ${n2.toFixed(2)}`;
-}
-
-function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    clearExplanation();
-}
-
-function drawOpticalElement(elementType, focalLength) {
-    switch(elementType) {
+    // Draw the chosen optical element on the canvas
+    function drawOpticalElement(elementType, focalLength, lensWidth, lensHeight, curvatureFactor) {
+      switch (elementType) {
         case 'convexLens':
-            drawConvexLens(CENTER_X, CENTER_Y, 40, LENS_HEIGHT);
-            drawFocalPoints(CENTER_X, focalLength);
-            break;
+          drawConvexLens(canvas.width / 2, canvas.height / 2, lensWidth, lensHeight, curvatureFactor);
+          drawFocalPoints(canvas.width / 2, focalLength);
+          break;
         case 'concaveLens':
-            drawConcaveLens(CENTER_X, CENTER_Y, 40, LENS_HEIGHT);
-            drawFocalPoints(CENTER_X, focalLength);
-            break;
+          drawConcaveLens(canvas.width / 2, canvas.height / 2, lensWidth, lensHeight, curvatureFactor);
+          drawFocalPoints(canvas.width / 2, focalLength);
+          break;
         default:
-            drawRefractionBlock(CENTER_X, CENTER_Y, 40, LENS_HEIGHT);
+          drawRefractionBlock(canvas.width / 2, canvas.height / 2, lensWidth, lensHeight);
+      }
     }
-}
 
-function addPhysicsExplanation(elementType, n1, n2, focalLength) {
-    const explanations = {
+    // Add clear, concise explanations for each optical element
+    function addPhysicsExplanation(elementType, n1, n2, focalLength) {
+      const explanations = {
         convexLens: `<strong>Convex Lens Properties:</strong><br>
-            • Converging lens focuses parallel rays at focal point<br>
-            • ${FORMULAS.lensEquation}<br>
-            • Real image formed beyond focal point`,
+          • Focuses parallel rays at a focal point<br>
+          • ${FORMULAS.lensEquation}<br>
+          • Produces a real image beyond the focal point`,
         concaveLens: `<strong>Concave Lens Properties:</strong><br>
-            • Diverging lens spreads parallel rays<br>
-            • Virtual image formed between lens and focal point<br>
-            • Always produces diminished virtual image`,
+          • Spreads parallel rays<br>
+          • Forms a virtual image between the lens and the focal point`,
         refraction: `<strong>Refraction Block Properties:</strong><br>
-            • ${FORMULAS.snellsLaw}<br>
-            • Light bends toward normal when n₂ > n₁<br>
-            • Light bends away from normal when n₂ < n₁`
-    };
+          • ${FORMULAS.snellsLaw}<br>
+          • Light bends toward the normal when n₂ > n₁<br>
+          • Light bends away from the normal when n₂ < n₁`
+      };
 
-    addExplanationStep(`<strong>Physical Properties:</strong><br>
+      addExplanationStep(`<strong>Physical Properties:</strong><br>
         Refractive Index of Air (n₁) = ${n1}<br>
         ${elementType === 'refraction' ? 
             `Refractive Index of Block (n₂) = ${n2}` : 
             `Focal Length (f) = ${focalLength}mm`}`);
-    
-    addExplanationStep(explanations[elementType] || explanations.refraction);
-}
+      addExplanationStep(explanations[elementType] || explanations.refraction);
+    }
 
-function simulateRayPaths(elementType, rayCount, focalLength, n1, n2) {
-    const raySpacing = LENS_HEIGHT / (rayCount + 1);
-
-    for (let i = 1; i <= rayCount; i++) {
-        const startY = CENTER_Y - LENS_HEIGHT/2 + i * raySpacing;
-        
-        switch(elementType) {
-            case 'convexLens':
-                simulateConvergingRay(startY, focalLength, i === 1);
-                break;
-            case 'concaveLens':
-                simulateDivergingRay(startY, focalLength, i === 1);
-                break;
-            default:
-                simulateRefractionRay(startY, n1, n2, i === 1);
+    // Simulate ray paths based on the optical element selected
+    function simulateRayPaths(elementType, rayCount, focalLength, n1, n2, lensHeight) {
+      const raySpacing = lensHeight / (rayCount + 1);
+      for (let i = 1; i <= rayCount; i++) {
+        const startY = (canvas.height / 2) - (lensHeight / 2) + i * raySpacing;
+        switch (elementType) {
+          case 'convexLens':
+            simulateConvergingRay(startY, focalLength, i === 1);
+            break;
+          case 'concaveLens':
+            simulateDivergingRay(startY, focalLength, i === 1);
+            break;
+          default:
+            simulateRefractionRay(startY, n1, n2, i === 1);
         }
+      }
     }
-}
 
-function simulateConvergingRay(startY, focalLength, isFirstRay) {
-    const angleToFocus = Math.atan2(CENTER_Y - startY, focalLength);
-    drawRay(0, startY, 0, CENTER_X);
-    const { endX, endY } = drawRay(CENTER_X, startY, angleToFocus, canvas.width - CENTER_X);
-    
-    if (isFirstRay) {
-        addExplanationStep(`<strong>Ray Path:</strong> Angle of convergence = ${Math.round(angleToFocus * 180 / Math.PI)}°`);
+    // Simulate a ray converging through a convex lens
+    function simulateConvergingRay(startY, focalLength, isFirstRay) {
+      const angleToFocus = Math.atan2((canvas.height / 2) - startY, focalLength);
+      drawRay(0, startY, 0, canvas.width / 2);
+      drawRay(canvas.width / 2, startY, angleToFocus, canvas.width / 2);
+      if (isFirstRay) {
+        addExplanationStep(`<strong>Ray Path:</strong> Convergence angle = ${Math.round(angleToFocus * 180 / Math.PI)}°`);
+      }
     }
-}
 
-function simulateDivergingRay(startY, focalLength, isFirstRay) {
-    const virtualFocusAngle = Math.atan2(startY - CENTER_Y, focalLength);
-    drawRay(0, startY, 0, CENTER_X);
-    const divergeAngle = -virtualFocusAngle;
-    const { endX, endY } = drawRay(CENTER_X, startY, divergeAngle, canvas.width - CENTER_X);
-    
-    if (isFirstRay) {
-        addExplanationStep(`<strong>Ray Path:</strong> Angle of divergence = ${Math.round(Math.abs(divergeAngle) * 180 / Math.PI)}°`);
+    // Simulate a ray diverging through a concave lens
+    function simulateDivergingRay(startY, focalLength, isFirstRay) {
+      const virtualFocusAngle = Math.atan2(startY - (canvas.height / 2), focalLength);
+      drawRay(0, startY, 0, canvas.width / 2);
+      const divergeAngle = -virtualFocusAngle;
+      drawRay(canvas.width / 2, startY, divergeAngle, canvas.width / 2);
+      if (isFirstRay) {
+        addExplanationStep(`<strong>Ray Path:</strong> Divergence angle = ${Math.round(Math.abs(divergeAngle) * 180 / Math.PI)}°`);
+      }
     }
-}
 
-function simulateRefractionRay(startY, n1, n2, isFirstRay) {
-    const incidentRayLength = CENTER_X - 50;
-    drawRay(50, startY, 0, incidentRayLength);
-
-    const { angle: refractedAngle1, incidentAngle: theta1 } = 
-        calculateRefractedRay(50, startY, CENTER_X - 20, startY, n1, n2, Math.PI/2);
-    
-    drawRay(CENTER_X - 20, startY, refractedAngle1, 40, '#ff6666');
-const { angle: exitAngle, refractedAngle: theta2 } = 
-        calculateRefractedRay(CENTER_X + 20, startY, CENTER_X - 20, startY, n2, n1, Math.PI/2);
-    
-    drawRay(CENTER_X + 20, startY, exitAngle, canvas.width - CENTER_X - 20);
-
-    if (isFirstRay) {
+    // Simulate a ray undergoing refraction through a block
+    function simulateRefractionRay(startY, n1, n2, isFirstRay) {
+      const incidentRayLength = canvas.width / 2 - 50;
+      drawRay(50, startY, 0, incidentRayLength);
+      const { angle: refractedAngle1, incidentAngle: theta1 } = calculateRefractedRay(50, startY, canvas.width / 2 - 20, startY, n1, n2, Math.PI / 2);
+      drawRay(canvas.width / 2 - 20, startY, refractedAngle1, 40, '#ff6666');
+      const { angle: exitAngle, refractedAngle: theta2 } = calculateRefractedRay(canvas.width / 2 + 20, startY, canvas.width / 2 - 20, startY, n2, n1, Math.PI / 2);
+      drawRay(canvas.width / 2 + 20, startY, exitAngle, canvas.width - (canvas.width / 2) - 20);
+      if (isFirstRay) {
         addExplanationStep(`<strong>Ray Path:</strong><br>
-            • Incident angle (θ₁) = ${Math.round(theta1 * 180 / Math.PI)}°<br>
-            • Refracted angle (θ₂) = ${Math.round(theta2 * 180 / Math.PI)}°<br>
-            • ${theta2 === null ? 'Total internal reflection occurred' : ''}`);
+          • Incident angle (θ₁) = ${Math.round(theta1 * 180 / Math.PI)}°<br>
+          • Refracted angle (θ₂) = ${Math.round(theta2 * 180 / Math.PI)}°<br>
+          ${theta2 === null ? '• Total internal reflection occurred' : ''}`);
+      }
     }
-}
 
-// Event listeners for controls
-elementTypeSelect.addEventListener('change', () => {
-    const isRefraction = elementTypeSelect.value === 'refraction';
-    focalLengthInput.parentElement.style.display = isRefraction ? 'none' : 'block';
-    refractiveIndexInput.parentElement.style.display = isRefraction ? 'block' : 'none';
+    /************* Event Handling & Responsiveness *************/
+    elementTypeSelect.addEventListener('change', () => {
+      const isRefraction = elementTypeSelect.value === 'refraction';
+      focalLengthInput.parentElement.style.display = isRefraction ? 'none' : 'block';
+      refractiveIndexInput.parentElement.style.display = isRefraction ? 'block' : 'none';
+      simulateRays();
+    });
+    rayCountInput.addEventListener('input', simulateRays);
+    focalLengthInput.addEventListener('input', simulateRays);
+    refractiveIndexInput.addEventListener('input', simulateRays);
+    lensWidthInput.addEventListener('input', simulateRays);
+    lensHeightInput.addEventListener('input', simulateRays);
+    curvatureFactorInput.addEventListener('input', simulateRays);
+
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth;
+      canvas.height = Math.min(400, window.innerHeight - 300);
+      simulateRays();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
     simulateRays();
-});
-
-rayCountInput.addEventListener('input', simulateRays);
-focalLengthInput.addEventListener('input', simulateRays);
-refractiveIndexInput.addEventListener('input', simulateRays);
-
-// Initialize MathJax configuration if available
-if (window.MathJax) {
-    window.MathJax.config = {
-        tex: {
-            inlineMath: [['$$', '$$']],
-            displayMath: [['$$', '$$']],
-            processEscapes: true
-        },
-        svg: {
-            fontCache: 'global'
-        }
-    };
-}
-
-// Add resize handler for responsive canvas
-function resizeCanvas() {
-    const container = canvas.parentElement;
-    canvas.width = container.clientWidth;
-    canvas.height = Math.min(400, window.innerHeight - 300);
-    simulateRays();
-}
-
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-// Initial simulation
-simulateRays();
   </script>
 </body>
 </html>
