@@ -55,7 +55,12 @@
       border-radius: 8px;
     }
 
+    /* Make canvas responsive */
     canvas {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
       border: 2px solid #2196F3;
       border-radius: 8px;
       margin: 20px 0;
@@ -111,6 +116,20 @@
       border-left: 8px solid #4CAF50;
       border-top: 7px solid transparent;
       border-bottom: 7px solid transparent;
+    }
+
+    /* Media query for smaller devices */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 15px;
+      }
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
     }
   </style>
 </head>
@@ -177,13 +196,25 @@
       </div>
     </div>
 
-    <canvas id="canvas" width="800" height="300"></canvas>
+    <canvas id="canvas"></canvas>
   </div>
 
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    
+
+    // Set initial canvas dimensions (responsive)
+    function resizeCanvas() {
+      // Set canvas width to the width of its parent container (minus any padding if necessary)
+      const containerWidth = document.querySelector('.container').clientWidth;
+      // We'll maintain an aspect ratio similar to 800x300 (approx 8:3)
+      canvas.width = containerWidth;
+      canvas.height = containerWidth * (300 / 800);
+      drawScene();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
     let objects = [
       {
         x: 300,
@@ -210,9 +241,10 @@
     let lastTimestamp = 0;
 
     function init() {
-      drawScene();
+      resizeCanvas();
       updateDisplay();
       setupEventListeners();
+      drawScene();
     }
 
     function setupEventListeners() {
@@ -250,14 +282,12 @@
     function drawGrid() {
       ctx.strokeStyle = '#ddd';
       ctx.lineWidth = 0.5;
-      
       for (let x = 0; x <= canvas.width; x += 50) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
         ctx.stroke();
       }
-      
       for (let y = 0; y <= canvas.height; y += 50) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -286,8 +316,6 @@
         ctx.strokeStyle = '#4CAF50';
         ctx.lineWidth = 4;
         ctx.stroke();
-        
-        // Arrow head
         drawArrowHead(
           objects[0].x + direction * (objects[0].radius + arrowLength),
           objects[0].y,
@@ -299,8 +327,6 @@
         ctx.moveTo(objects[1].x - direction * objects[1].radius, objects[1].y);
         ctx.lineTo(objects[1].x - direction * (objects[1].radius + arrowLength), objects[1].y);
         ctx.stroke();
-        
-        // Arrow head
         drawArrowHead(
           objects[1].x - direction * (objects[1].radius + arrowLength),
           objects[1].y,
@@ -313,7 +339,6 @@
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(angle);
-      
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo(-10, 5);
@@ -321,7 +346,6 @@
       ctx.closePath();
       ctx.fillStyle = '#4CAF50';
       ctx.fill();
-      
       ctx.restore();
     }
 
@@ -332,14 +356,16 @@
       
       if (isSimulating) {
         objects.forEach((obj, index) => {
-          // Calculate acceleration based on F = ma
+          // Calculate acceleration based on F = ma.
+          // For object 1: acceleration is in the positive direction if force is positive.
+          // For object 2: acceleration is equal and opposite.
           obj.acceleration = (index === 0 ? 1 : -1) * appliedForce / obj.mass;
           
-          // Update velocity and position
+          // Update velocity and position.
           obj.velocity += obj.acceleration * deltaTime;
-          obj.x += obj.velocity * deltaTime * 50; // Scale for visualization
+          obj.x += obj.velocity * deltaTime * 50; // Scale for visualization.
           
-          // Keep objects within bounds
+          // Keep objects within bounds.
           if (obj.x < obj.radius) {
             obj.x = obj.radius;
             obj.velocity = 0;
@@ -350,10 +376,10 @@
           }
         });
         
-        // Check for collision
+        // Check for collision between objects.
         const dx = objects[1].x - objects[0].x;
         if (dx <= (objects[0].radius + objects[1].radius)) {
-          // Stop simulation if objects collide
+          // Stop simulation if objects collide.
           isSimulating = false;
         }
         
@@ -367,11 +393,8 @@
     }
 
     function updateDisplay() {
-      // Update force displays
       document.getElementById('force1-display').textContent = appliedForce.toFixed(1);
       document.getElementById('force2-display').textContent = (-appliedForce).toFixed(1);
-      
-      // Update acceleration displays
       const acc1 = appliedForce / objects[0].mass;
       const acc2 = -appliedForce / objects[1].mass;
       document.getElementById('acc1-display').textContent = acc1.toFixed(2);
@@ -380,6 +403,7 @@
 
     function resetSimulation() {
       isSimulating = false;
+      // Reset positions and velocities.
       objects[0].x = 300;
       objects[1].x = 500;
       objects[0].velocity = 0;
@@ -399,8 +423,8 @@
       }
     }
 
-    // Initialize the simulation
-    init();
+    // Initialize the simulation once the DOM is loaded.
+    document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>
