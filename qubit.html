@@ -1,55 +1,124 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-<div class="explanations">
-  
-  <div class="explanations">
-    <style>
-        .explanations {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        .gate-info {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-left: 3px solid #007bff;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .analogy {
-            background: #ffe8cc;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border-left: 3px solid #ff9933;
-        }
-        .example {
-            background: #e6f3ff;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border-left: 3px solid #007bff;
-        }
-        .tip {
-            background: #e6ffe6;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border-left: 3px solid #28a745;
-        }
-        .gate-info h4 {
-            color: #007bff;
-            margin: 0 0 10px 0;
-            font-size: 1.2em;
-        }
-        .emoji-large {
-            font-size: 2em;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-    </style>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Quantum Gates Simulator & Guide</title>
+  <!-- MathJax for LaTeX support -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <!-- Three.js for 3D Bloch sphere -->
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js" type="module"></script>
+  <style>
+    /* Explanations & Guide Styling */
+    .explanations {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .gate-info {
+      margin-bottom: 20px;
+      padding: 15px;
+      border-left: 3px solid #007bff;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .analogy {
+      background: #ffe8cc;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border-left: 3px solid #ff9933;
+    }
+    .example {
+      background: #e6f3ff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border-left: 3px solid #007bff;
+    }
+    .tip {
+      background: #e6ffe6;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border-left: 3px solid #28a745;
+    }
+    .gate-info h4 {
+      color: #007bff;
+      margin: 0 0 10px 0;
+      font-size: 1.2em;
+    }
+    .emoji-large {
+      font-size: 2em;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    .matrix {
+      font-family: "Times New Roman", Times, serif;
+      background: #f0f0f0;
+      padding: 10px;
+      display: inline-block;
+      margin: 5px 0;
+      border-radius: 4px;
+    }
+    /* Simulation Area Styling */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .controls {
+      flex: 1;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      max-width: 300px;
+      height: fit-content;
+    }
+    .visualization {
+      flex: 2;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-height: 400px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      width: calc(100% - 10px);
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #stateInfo {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    .math {
+      font-family: "Times New Roman", Times, serif;
+    }
+  </style>
+</head>
+<body>
 
+  <!-- Explanation & Guide Section -->
+  <div class="explanations">
     <h3>🎮 Quantum Gates: The Super Simple Guide</h3>
 
     <div class="gate-info">
@@ -147,39 +216,6 @@
             <strong>Fun fact:</strong> You've just created your first quantum sequence! This is how quantum computers do their magic.
         </div>
     </div>
-</div>
-    <style>
-        .explanations {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-        .gate-info {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-left: 3px solid #007bff;
-            background: white;
-        }
-        .matrix {
-            font-family: "Times New Roman", Times, serif;
-            background: #f0f0f0;
-            padding: 10px;
-            display: inline-block;
-            margin: 5px 0;
-            border-radius: 4px;
-        }
-        .example {
-            background: #e6f3ff;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 4px;
-        }
-        .gate-info h4 {
-            color: #007bff;
-            margin: 0 0 10px 0;
-        }
-    </style>
 
     <h3>📚 Gate Guide for Beginners</h3>
 
@@ -259,271 +295,7 @@
             Equator: $$\frac{|0\rangle \pm |1\rangle}{\sqrt{2}}$$ (with various phases)
         </div>
     </div>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Interactive Qubit Simulator</title>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js" type="module"></script>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            background: #f0f0f0;
-        }
-        .container {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-            padding: 20px;
-            gap: 20px;
-            box-sizing: border-box;
-        }
-        .controls {
-            flex: 1;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 300px;
-            height: fit-content;
-        }
-        .visualization {
-            flex: 2;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            min-height: 400px;
-        }
-        button {
-            margin: 5px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            background: #007bff;
-            color: white;
-            cursor: pointer;
-            width: calc(100% - 10px);
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        #stateInfo {
-            margin-top: 20px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-        .math {
-            font-family: "Times New Roman", Times, serif;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="controls">
-            <h2>Quantum Gates</h2>
-            <button onclick="window.applyGate('X')">X Gate (NOT)</button>
-            <button onclick="window.applyGate('Y')">Y Gate</button>
-            <button onclick="window.applyGate('Z')">Z Gate</button>
-            <button onclick="window.applyGate('H')">H Gate (Hadamard)</button>
-            <button onclick="window.reset()">Reset</button>
-            
-            <div id="stateInfo">
-                <h3>Qubit State</h3>
-                <p class="math">|ψ⟩ = <span id="stateVector">1|0⟩ + 0|1⟩</span></p>
-                <p>Probability |0⟩: <span id="prob0">100</span>%</p>
-                <p>Probability |1⟩: <span id="prob1">0</span>%</p>
-            </div>
-        </div>
-        <div class="visualization" id="blochSphere"></div>
-    </div>
 
-    <script type="module">
-        import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js';
-
-        let scene, camera, renderer, sphere, arrow;
-        let currentState = {
-            alpha: { real: 1, imag: 0 },
-            beta: { real: 0, imag: 0 }
-        };
-
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xffffff);
-            
-            const container = document.getElementById('blochSphere');
-            const aspect = container.clientWidth / container.clientHeight;
-            camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
-            camera.position.set(3, 3, 3);
-            camera.lookAt(0, 0, 0);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(renderer.domElement);
-
-            const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-            const sphereMaterial = new THREE.MeshBasicMaterial({
-                color: 0xcccccc,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.5
-            });
-            sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-            scene.add(sphere);
-
-            const arrowLength = 1;
-            const arrowGeometry = new THREE.CylinderGeometry(0, 0.05, arrowLength, 12);
-            arrowGeometry.translate(0, arrowLength/2, 0);
-            const arrowMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-            arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-            scene.add(arrow);
-
-            const axesHelper = new THREE.AxesHelper(1.5);
-            scene.add(axesHelper);
-
-            addAxisLabel('X', new THREE.Vector3(1.7, 0, 0));
-            addAxisLabel('Y', new THREE.Vector3(0, 1.7, 0));
-            addAxisLabel('Z', new THREE.Vector3(0, 0, 1.7));
-
-            animate();
-            updateDisplay();
-        }
-
-        function addAxisLabel(text, position) {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 64;
-            canvas.height = 64;
-            context.fillStyle = 'black';
-            context.font = '48px Arial';
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            context.fillText(text, 32, 32);
-
-            const texture = new THREE.CanvasTexture(canvas);
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(material);
-            sprite.position.copy(position);
-            sprite.scale.set(0.5, 0.5, 1);
-            scene.add(sprite);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-
-        function updateArrow() {
-            const theta = 2 * Math.acos(Math.sqrt(currentState.alpha.real ** 2 + currentState.alpha.imag ** 2));
-            const phi = Math.atan2(currentState.beta.imag, currentState.beta.real);
-
-            const x = Math.sin(theta) * Math.cos(phi);
-            const y = Math.sin(theta) * Math.sin(phi);
-            const z = Math.cos(theta);
-
-            arrow.position.set(0, 0, 0);
-            arrow.rotation.set(0, 0, 0);
-            arrow.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), phi);
-            arrow.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), -theta);
-        }
-
-        function updateDisplay() {
-            updateArrow();
-
-            const prob0 = (currentState.alpha.real ** 2 + currentState.alpha.imag ** 2) * 100;
-            const prob1 = (currentState.beta.real ** 2 + currentState.beta.imag ** 2) * 100;
-
-            document.getElementById('prob0').textContent = prob0.toFixed(1);
-            document.getElementById('prob1').textContent = prob1.toFixed(1);
-
-            const formatComplex = (real, imag) => {
-                if (Math.abs(real) < 1e-10) real = 0;
-                if (Math.abs(imag) < 1e-10) imag = 0;
-                
-                if (real === 0 && imag === 0) return "0";
-                if (imag === 0) return real.toFixed(3);
-                if (real === 0) return `${imag.toFixed(3)}i`;
-                return `${real.toFixed(3)}${imag >= 0 ? '+' : ''}${imag.toFixed(3)}i`;
-            };
-
-            const alphaStr = formatComplex(currentState.alpha.real, currentState.alpha.imag);
-            const betaStr = formatComplex(currentState.beta.real, currentState.beta.imag);
-            
-            document.getElementById('stateVector').textContent = 
-                `${alphaStr}|0⟩ + ${betaStr}|1⟩`;
-        }
-
-        function applyGate(gate) {
-            const oldState = {
-                alpha: {...currentState.alpha},
-                beta: {...currentState.beta}
-            };
-            
-            switch(gate) {
-                case 'X':
-                    currentState.alpha = {...oldState.beta};
-                    currentState.beta = {...oldState.alpha};
-                    break;
-                    
-                case 'Z':
-                    currentState.beta = {
-                        real: -oldState.beta.real,
-                        imag: -oldState.beta.imag
-                    };
-                    break;
-                    
-                case 'H':
-                    const factor = 1/Math.sqrt(2);
-                    currentState.alpha = {
-                        real: factor * (oldState.alpha.real + oldState.beta.real),
-                        imag: factor * (oldState.alpha.imag + oldState.beta.imag)
-                    };
-                    currentState.beta = {
-                        real: factor * (oldState.alpha.real - oldState.beta.real),
-                        imag: factor * (oldState.alpha.imag - oldState.beta.imag)
-                    };
-                    break;
-                    
-                case 'Y':
-                    currentState.alpha = {
-                        real: -oldState.beta.imag,
-                        imag: oldState.beta.real
-                    };
-                    currentState.beta = {
-                        real: oldState.alpha.imag,
-                        imag: -oldState.alpha.real
-                    };
-                    break;
-            }
-            
-            updateDisplay();
-        }
-
-        function reset() {
-            currentState = {
-                alpha: { real: 1, imag: 0 },
-                beta: { real: 0, imag: 0 }
-            };
-            updateDisplay();
-        }
-
-        window.addEventListener('resize', () => {
-            const container = document.getElementById('blochSphere');
-            const aspect = container.clientWidth / container.clientHeight;
-            camera.aspect = aspect;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
-
-        // Make functions globally accessible
-        window.applyGate = applyGate;
-        window.reset = reset;
-
-        // Initialize when the page loads
-        init();
-    </script>
-    
     <div class="gate-info">
         <h4>Gate Relationships 💡</h4>
         <p>Important relationships between gates:</p>
@@ -535,6 +307,222 @@
         $$H^2 = I$$
         <p>Where $$I$$ is the identity matrix: $$\begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}$$</p>
     </div>
-</div>
+    
+    <!-- Additional Information Sections -->
+    <div class="gate-info">
+      <h4>Quantum Computing: Beyond Quantum Gates</h4>
+      <p>
+        Quantum computing harnesses the unique properties of quantum mechanics—such as <strong>superposition</strong> and <strong>entanglement</strong>—to process information in ways that classical computers cannot. Unlike classical bits that exist in one of two states (0 or 1), qubits can exist in multiple states at once. This parallelism opens the door to solving complex problems more efficiently.
+      </p>
+    </div>
+
+    <div class="gate-info">
+      <h4>Superposition and Controlled Operations (CNOT)</h4>
+      <p>
+        A qubit in superposition is described by the state 
+        $$|\psi\rangle = \alpha|0\rangle + \beta|1\rangle,$$ 
+        meaning it has probabilities for both 0 and 1 until measured.
+      </p>
+      <p>
+        The <strong>CNOT (Controlled NOT)</strong> gate is a fundamental two-qubit operation that uses one qubit (the control) to conditionally flip the state of another (the target). For example, if the control qubit is $$|1\rangle$$, the CNOT gate flips the target qubit from $$|0\rangle$$ to $$|1\rangle$$ (or vice versa). This operation is key to generating entanglement, which is essential for many quantum algorithms.
+      </p>
+    </div>
+
+    <div class="gate-info">
+      <h4>Building Quantum Applications</h4>
+      <p>
+        With a grasp on quantum gates and their effects on qubit states, you’re now ready to explore the world of quantum algorithms. Frameworks such as <strong>IBM's Qiskit</strong>, <strong>Google's Cirq</strong>, and <strong>Microsoft's Q#</strong> allow you to design, simulate, and even run quantum circuits on real quantum hardware via the cloud.
+      </p>
+      <p>
+        Potential applications of quantum computing include:
+      </p>
+      <ul>
+        <li><strong>Cryptography:</strong> Secure communication protocols and quantum-resistant encryption methods.</li>
+        <li><strong>Optimization:</strong> Solving complex problems in logistics, finance, and machine learning through quantum-enhanced optimization algorithms.</li>
+        <li><strong>Simulation:</strong> Modeling molecular structures and materials, which can accelerate discoveries in chemistry and physics.</li>
+      </ul>
+      <p>
+        This tutorial provides a foundation in quantum gate operations and visualization. As you continue learning, you can experiment with multi-qubit systems (like integrating a CNOT-based simulation), develop custom quantum circuits, and eventually build full-scale applications that leverage the power of quantum mechanics.
+      </p>
+    </div>
+  </div>
+
+  <!-- Interactive Simulation Section -->
+  <div class="container">
+    <div class="controls">
+      <h2>Quantum Gates Simulator</h2>
+      <button onclick="applyGate('X')">X Gate (NOT)</button>
+      <button onclick="applyGate('Y')">Y Gate</button>
+      <button onclick="applyGate('Z')">Z Gate</button>
+      <button onclick="applyGate('H')">H Gate (Hadamard)</button>
+      <button onclick="reset()">Reset</button>
+      
+      <div id="stateInfo">
+        <h3>Qubit State</h3>
+        <p class="math">|ψ⟩ = <span id="stateVector">1|0⟩ + 0|1⟩</span></p>
+        <p>Probability |0⟩: <span id="prob0">100</span>%</p>
+        <p>Probability |1⟩: <span id="prob1">0</span>%</p>
+      </div>
+    </div>
+    <div class="visualization" id="blochSphere"></div>
+  </div>
+
+  <!-- JavaScript for Simulation -->
+  <script type="module">
+    import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js';
+
+    let scene, camera, renderer, sphere, arrow;
+    let currentState = {
+      alpha: { real: 1, imag: 0 },
+      beta: { real: 0, imag: 0 }
+    };
+
+    function init() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffffff);
+      
+      const container = document.getElementById('blochSphere');
+      const aspect = container.clientWidth / container.clientHeight;
+      camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+      camera.position.set(3, 3, 3);
+      camera.lookAt(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+      const sphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0xcccccc,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+      });
+      sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      scene.add(sphere);
+
+      // Red arrow to indicate qubit state on Bloch sphere
+      const arrowLength = 1;
+      const arrowGeometry = new THREE.CylinderGeometry(0, 0.05, arrowLength, 12);
+      arrowGeometry.translate(0, arrowLength/2, 0);
+      const arrowMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+      scene.add(arrow);
+
+      // Axes Helper and Labels
+      const axesHelper = new THREE.AxesHelper(1.5);
+      scene.add(axesHelper);
+      addAxisLabel('X', new THREE.Vector3(1.7, 0, 0));
+      addAxisLabel('Y', new THREE.Vector3(0, 1.7, 0));
+      addAxisLabel('Z', new THREE.Vector3(0, 0, 1.7));
+
+      animate();
+      updateDisplay();
+    }
+
+    function addAxisLabel(text, position) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = 64;
+      canvas.height = 64;
+      context.fillStyle = 'black';
+      context.font = '48px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(text, 32, 32);
+      const texture = new THREE.CanvasTexture(canvas);
+      const material = new THREE.SpriteMaterial({ map: texture });
+      const sprite = new THREE.Sprite(material);
+      sprite.position.copy(position);
+      sprite.scale.set(0.5, 0.5, 1);
+      scene.add(sprite);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    function updateArrow() {
+      const theta = 2 * Math.acos(Math.sqrt(currentState.alpha.real**2 + currentState.alpha.imag**2));
+      const phi = Math.atan2(currentState.beta.imag, currentState.beta.real);
+      arrow.position.set(0, 0, 0);
+      arrow.rotation.set(0, 0, 0);
+      arrow.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), phi);
+      arrow.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), -theta);
+    }
+
+    function updateDisplay() {
+      updateArrow();
+      const prob0 = (currentState.alpha.real**2 + currentState.alpha.imag**2) * 100;
+      const prob1 = (currentState.beta.real**2 + currentState.beta.imag**2) * 100;
+      document.getElementById('prob0').textContent = prob0.toFixed(1);
+      document.getElementById('prob1').textContent = prob1.toFixed(1);
+      const formatComplex = (real, imag) => {
+        if (Math.abs(real) < 1e-10) real = 0;
+        if (Math.abs(imag) < 1e-10) imag = 0;
+        if (real === 0 && imag === 0) return "0";
+        if (imag === 0) return real.toFixed(3);
+        if (real === 0) return `${imag.toFixed(3)}i`;
+        return `${real.toFixed(3)}${imag >= 0 ? '+' : ''}${imag.toFixed(3)}i`;
+      };
+      const alphaStr = formatComplex(currentState.alpha.real, currentState.alpha.imag);
+      const betaStr = formatComplex(currentState.beta.real, currentState.beta.imag);
+      document.getElementById('stateVector').textContent = `${alphaStr}|0⟩ + ${betaStr}|1⟩`;
+    }
+
+    function applyGate(gate) {
+      const oldState = {
+        alpha: { ...currentState.alpha },
+        beta: { ...currentState.beta }
+      };
+      switch(gate) {
+        case 'X':
+          currentState.alpha = { ...oldState.beta };
+          currentState.beta = { ...oldState.alpha };
+          break;
+        case 'Z':
+          currentState.beta = { real: -oldState.beta.real, imag: -oldState.beta.imag };
+          break;
+        case 'H': {
+          const factor = 1 / Math.sqrt(2);
+          currentState.alpha = {
+            real: factor * (oldState.alpha.real + oldState.beta.real),
+            imag: factor * (oldState.alpha.imag + oldState.beta.imag)
+          };
+          currentState.beta = {
+            real: factor * (oldState.alpha.real - oldState.beta.real),
+            imag: factor * (oldState.alpha.imag - oldState.beta.imag)
+          };
+          break;
+        }
+        case 'Y':
+          currentState.alpha = { real: -oldState.beta.imag, imag: oldState.beta.real };
+          currentState.beta = { real: oldState.alpha.imag, imag: -oldState.alpha.real };
+          break;
+      }
+      updateDisplay();
+    }
+
+    function reset() {
+      currentState = { alpha: { real: 1, imag: 0 }, beta: { real: 0, imag: 0 } };
+      updateDisplay();
+    }
+
+    window.addEventListener('resize', () => {
+      const container = document.getElementById('blochSphere');
+      const aspect = container.clientWidth / container.clientHeight;
+      camera.aspect = aspect;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    // Expose functions globally for button access
+    window.applyGate = applyGate;
+    window.reset = reset;
+
+    // Initialize simulation when the page loads
+    init();
+  </script>
 </body>
 </html>
