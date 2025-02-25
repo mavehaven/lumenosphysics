@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>2D Circuit Designer – Futuristic, Comprehensive & Downloadable</title>
+  <!-- Futuristic font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    /* Basic layout */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Orbitron', sans-serif;
+      user-select: none;
+      background: #121212;
+      color: #e0e0e0;
+    }
+    #container {
+      display: flex;
+      height: 100vh;
+    }
+    /* Palette styling with futuristic theme */
+    #palette {
+      width: 320px;
+      background: #1e1e2f;
+      padding: 10px;
+      border-right: 2px solid #00ffff;
+      overflow-y: auto;
+    }
+    #palette h2 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #00ffff;
+    }
+    #togglePropertiesBtn, #educationalGuideBtn {
+      margin-bottom: 10px;
+      padding: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #00ffff;
+      border: none;
+      color: #121212;
+      border-radius: 4px;
+    }
+    .menu-item {
+      display: flex;
+      flex-direction: column;
+      margin: 5px 0;
+      padding: 5px;
+      border: 1px solid #00ffff;
+      border-radius: 4px;
+    }
+    .menu-item .top-line {
+      display: flex;
+      align-items: center;
+    }
+    .menu-item .top-line .info-icon {
+      order: 0;
+      margin-right: 5px;
+      margin-left: 0;
+    }
+    .menu-item .top-line button {
+      order: 1;
+      flex: 1;
+      padding: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #00ffff;
+      border: none;
+      color: #121212;
+      border-radius: 4px;
+    }
+    .info-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #00ffff;
+      color: #121212;
+      text-align: center;
+      line-height: 16px;
+      font-size: 12px;
+      cursor: default;
+      position: relative;
+      overflow: visible; /* Ensure tooltip isn't clipped */
+    }
+    .info-icon .tooltip {
+      display: none;
+      position: absolute;
+      top: -5px;
+      left: 25px;
+      background: #0f0f0f;
+      color: #00ffff;
+      padding: 5px;
+      font-size: 12px;
+      border: 1px solid #00ffff;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      max-width: 220px;
+      z-index: 1000;
+    }
+    .info-icon:hover .tooltip {
+      display: block;
+    }
+    .symbol-properties {
+      display: none;
+      font-size: 12px;
+      color: #00ffff;
+      margin-top: 3px;
+      padding-left: 5px;
+      border-left: 1px solid #00ffff;
+    }
+    /* Canvas container - white background for circuit design */
+    #canvasContainer {
+      flex: 1;
+      position: relative;
+      background: #ffffff;
+    }
+    #canvas {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      cursor: move;
+    }
+    /* Controls & Properties Panel */
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid #00ffff;
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+    #controls button {
+      margin-right: 5px;
+      background: #00ffff;
+      border: none;
+      color: #121212;
+      padding: 6px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #propertiesPanel {
+      margin-top: 5px;
+      border-top: 1px solid #00ffff;
+      padding-top: 5px;
+      font-size: 13px;
+    }
+    #propertiesPanel label {
+      display: block;
+      margin-bottom: 3px;
+      color: #00ffff;
+    }
+    #propertiesPanel input {
+      width: 90%;
+      margin-bottom: 5px;
+      background: #1e1e2f;
+      border: 1px solid #00ffff;
+      color: #e0e0e0;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    /* Simulation Panel (in palette) */
+    #simulationPanel {
+      margin-top: 10px;
+      border-top: 1px solid #00ffff;
+      padding-top: 10px;
+    }
+    #simulationPanel label,
+    #simulationPanel input,
+    #simulationPanel select {
+      width: 100%;
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: #00ffff;
+    }
+    #simulationPanel input, #simulationPanel select {
+      background: #1e1e2f;
+      border: 1px solid #00ffff;
+      color: #e0e0e0;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    /* Explainer styling */
+    #explainer {
+      margin-top: 10px;
+      border-top: 1px solid #00ffff;
+      padding-top: 10px;
+      font-size: 13px;
+      color: #00ffff;
+    }
+    /* Selected symbol style */
+    .selected {
+      stroke: #ff00ff;
+      stroke-width: 3;
+    }
+    /* Modal styling for the Educational Guide */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.85);
+    }
+    .modal-content {
+      background-color: #1e1e2f;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #00ffff;
+      width: 80%;
+      max-width: 600px;
+      color: #e0e0e0;
+      position: relative;
+      border-radius: 4px;
+    }
+    .close {
+      color: #00ffff;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      right: 10px;
+      top: 5px;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: #ff00ff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Left Palette -->
+    <div id="palette">
+      <h2>Symbol Library</h2>
+      <button id="togglePropertiesBtn" onclick="toggleSymbolProperties()">Show Symbol Properties</button>
+      <button id="educationalGuideBtn" onclick="openGuide()">Educational Guide</button>
+      <!-- Each menu-item now has the info icon to the left of the button -->
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Battery: Provides a DC voltage source.</div>
+          </div>
+          <button onclick="addSymbol('battery')">Battery</button>
+        </div>
+        <div class="symbol-properties">Default Voltage: 9V</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Resistor: Limits current by providing resistance.</div>
+          </div>
+          <button onclick="addSymbol('resistor')">Resistor</button>
+        </div>
+        <div class="symbol-properties">Default Resistance: 100Ω</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Capacitor: Stores electrical charge.</div>
+          </div>
+          <button onclick="addSymbol('capacitor')">Capacitor</button>
+        </div>
+        <div class="symbol-properties">Default Capacitance: 10F</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Inductor: Stores energy in a magnetic field.</div>
+          </div>
+          <button onclick="addSymbol('inductor')">Inductor</button>
+        </div>
+        <div class="symbol-properties">Default Inductance: 10 mH</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Diode: Allows current flow in one direction. Editable: Forward Voltage.</div>
+          </div>
+          <button onclick="addSymbol('diode')">Diode</button>
+        </div>
+        <div class="symbol-properties">Default Forward Voltage: 0.7V</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">LED: Emits light when forward biased. Editable: Forward Voltage.</div>
+          </div>
+          <button onclick="addSymbol('LED')">LED</button>
+        </div>
+        <div class="symbol-properties">Default Forward Voltage: 2V</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Photodiode: Converts light into current. Editable: Sensitivity (A/W).</div>
+          </div>
+          <button onclick="addSymbol('photodiode')">Photodiode</button>
+        </div>
+        <div class="symbol-properties">Default Sensitivity: 0.5 A/W</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Transistor: Amplifies or switches signals. Editable: Current Gain (β).</div>
+          </div>
+          <button onclick="addSymbol('transistor')">Transistor</button>
+        </div>
+        <div class="symbol-properties">Default Gain: 100</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Op-Amp: Used for signal conditioning. Editable: Open-Loop Gain.</div>
+          </div>
+          <button onclick="addSymbol('opamp')">Op-Amp</button>
+        </div>
+        <div class="symbol-properties">Default Open-Loop Gain: 100000</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Switch: Opens or closes a circuit. Editable: State.</div>
+          </div>
+          <button onclick="addSymbol('switch')">Switch</button>
+        </div>
+        <div class="symbol-properties">Default State: Open</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Potentiometer: Adjustable resistor for voltage division.</div>
+          </div>
+          <button onclick="addSymbol('potentiometer')">Potentiometer</button>
+        </div>
+        <div class="symbol-properties">Default Resistance: 50Ω</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Ground: Reference for circuit voltages.</div>
+          </div>
+          <button onclick="addSymbol('ground')">Ground</button>
+        </div>
+        <div class="symbol-properties"></div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Electromagnet: Generates a magnetic field. Editable: Coil Resistance.</div>
+          </div>
+          <button onclick="addSymbol('electromagnet')">Electromagnet</button>
+        </div>
+        <div class="symbol-properties">Default Coil Resistance: 50Ω</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Laser: Emits a coherent light beam. Editable: Wavelength (nm).</div>
+          </div>
+          <button onclick="addSymbol('laser')">Laser</button>
+        </div>
+        <div class="symbol-properties">Default Wavelength: 650nm</div>
+      </div>
+      <!-- Additional Components -->
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Fuse: Protects circuits by melting at high current. Editable: Current Rating (A).</div>
+          </div>
+          <button onclick="addSymbol('fuse')">Fuse</button>
+        </div>
+        <div class="symbol-properties">Default Current Rating: 1A</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Relay: Electrically operated switch. Editable: Coil Voltage (V).</div>
+          </div>
+          <button onclick="addSymbol('relay')">Relay</button>
+        </div>
+        <div class="symbol-properties">Default Coil Voltage: 5V</div>
+      </div>
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">Oscillator: Generates a periodic AC signal. Editable: Frequency (Hz).</div>
+          </div>
+          <button onclick="addSymbol('oscillator')">Oscillator</button>
+        </div>
+        <div class="symbol-properties">Default Frequency: 1000Hz</div>
+      </div>
+      <!-- New Memristor -->
+      <div class="menu-item">
+        <div class="top-line">
+          <div class="info-icon">i
+            <div class="tooltip">
+Memristor: A resistor with memory.
+Logic 1 (ON): 0–0.2V  
+Undefined: 0.2–0.4V  
+Logic 0 (OFF): 0.4–0.5V  
+Editable: Capacitor Voltage.
+            </div>
+          </div>
+          <button onclick="addSymbol('memristor')">Memristor</button>
+        </div>
+        <div class="symbol-properties">Default Cap Voltage: 0.5V</div>
+      </div>
+      <hr>
+      <button onclick="toggleWireMode()">Toggle Wire Mode (<span id="wireModeStatus">Off</span>)</button>
+      <button onclick="deleteSelected()">Delete Selected</button>
+      <button onclick="downloadCircuit()">Download Circuit</button>
+      <hr>
+      <!-- Simulation Panel -->
+      <div id="simulationPanel">
+        <h3>Live Simulation Control Panel</h3>
+        <label for="simModeSelect">Simulation Mode:</label>
+        <select id="simModeSelect">
+          <option value="DC">DC</option>
+          <option value="AC">AC</option>
+        </select>
+        <label for="acFreq">AC Frequency (Hz):</label>
+        <input type="number" id="acFreq" value="1" min="0.1" step="0.1">
+        <label for="batteryVoltageInput">Battery Voltage (V):</label>
+        <input type="number" id="batteryVoltageInput" value="9" min="0" step="0.1">
+        <div id="simOutput">
+          <p>Simulation: Connect one battery and one resistor to see current.</p>
+        </div>
+      </div>
+      <hr>
+      <!-- Explainer -->
+      <div id="explainer">
+        <h3>Explainer</h3>
+        <p>Hover over the "i" icons for a description of each symbol.</p>
+        <p>Click a symbol button to add it to the canvas. In normal mode, click and drag symbols to reposition them.</p>
+        <p>Toggle "Wire Mode" to connect two symbols by clicking them sequentially.</p>
+        <p>Use "Delete Selected" to remove the currently selected symbol (and its wires).</p>
+        <p>The live simulation calculates current (I = V/R) if one battery and one resistor are connected.</p>
+        <p>For more details, see: <a href="https://jlcpcb.com/blog/circuit-symbols-key-to-understanding-electrical-and-electronic-diagrams" target="_blank" style="color:#00ffff;">Circuit Symbols – Key to Understanding Diagrams</a></p>
+      </div>
+    </div>
+    <!-- SVG Canvas and Controls/Properties Panel -->
+    <div id="canvasContainer">
+      <svg id="canvas"></svg>
+      <div id="controls">
+        <span id="status">No symbol selected</span>
+        <div id="propertiesPanel">
+          <h4>Properties</h4>
+          <div id="propertiesContent">No properties</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Educational Guide Modal -->
+  <div id="educationalGuideModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeGuide()">&times;</span>
+      <h2>Educational Guide</h2>
+      <h3>Ohm's Law</h3>
+      <p>Ohm's Law is one of the fundamental principles in electronics. It states that the voltage (V) across a resistor is directly proportional to the current (I) flowing through it, with the proportionality constant being the resistance (R):</p>
+      <p><strong>V = I × R</strong></p>
+      <p>For example, if a battery provides 9V and the resistor is 100Ω, the current is 9V / 100Ω = 0.09A.</p>
+      <h3>Memristors</h3>
+      <p>A memristor is a resistor with memory. Its resistance changes based on the history of current or voltage, allowing it to store information. In our design, the memristor’s state is determined by the voltage across its internal capacitor:</p>
+      <ul>
+        <li><strong>Logic 1 (ON-state):</strong> 0–0.2V</li>
+        <li><strong>Undefined state:</strong> 0.2–0.4V</li>
+        <li><strong>Logic 0 (OFF-state):</strong> 0.4–0.5V</li>
+      </ul>
+      <p>Memristors are promising for nonvolatile memory and neuromorphic computing applications.</p>
+    </div>
+  </div>
+  <script>
+    // Modal Educational Guide Handling
+    function openGuide() {
+      document.getElementById("educationalGuideModal").style.display = "block";
+    }
+    function closeGuide() {
+      document.getElementById("educationalGuideModal").style.display = "none";
+    }
+    window.onclick = function(event) {
+      let modal = document.getElementById("educationalGuideModal");
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    };
+
+    // Global variables for SVG canvas and wire mode.
+    const svgNS = "http://www.w3.org/2000/svg";
+    let svgCanvas = document.getElementById("canvas");
+    svgCanvas.setAttribute("width", "100%");
+    svgCanvas.setAttribute("height", "100%");
+    let selectedElement = null;
+    let wireMode = false;
+    let firstWireSymbol = null;
+    let wires2D = []; // Array of wires { from, to, line }
+
+    // Toggle display of symbol properties in the palette.
+    let propertiesVisible = false;
+    function toggleSymbolProperties() {
+      propertiesVisible = !propertiesVisible;
+      const btn = document.getElementById("togglePropertiesBtn");
+      btn.textContent = propertiesVisible ? "Hide Symbol Properties" : "Show Symbol Properties";
+      let props = document.querySelectorAll(".symbol-properties");
+      props.forEach(div => {
+        div.style.display = propertiesVisible ? "block" : "none";
+      });
+    }
+
+    // Comprehensive symbol library.
+    const symbolLibrary = {
+      battery: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let linePos = document.createElementNS(svgNS, "line");
+        linePos.setAttribute("x1", "0");
+        linePos.setAttribute("y1", "0");
+        linePos.setAttribute("x2", "0");
+        linePos.setAttribute("y2", "30");
+        linePos.setAttribute("stroke", "black");
+        linePos.setAttribute("stroke-width", "2");
+        g.appendChild(linePos);
+        let lineNeg = document.createElementNS(svgNS, "line");
+        lineNeg.setAttribute("x1", "10");
+        lineNeg.setAttribute("y1", "10");
+        lineNeg.setAttribute("x2", "10");
+        lineNeg.setAttribute("y2", "20");
+        lineNeg.setAttribute("stroke", "black");
+        lineNeg.setAttribute("stroke-width", "2");
+        g.appendChild(lineNeg);
+        g.dataset.type = "battery";
+        g.dataset.voltage = 9;
+        return g;
+      },
+      resistor: function() {
+        let poly = document.createElementNS(svgNS, "polyline");
+        poly.setAttribute("points", "0,15 5,5 10,25 15,5 20,25 25,15");
+        poly.setAttribute("stroke", "black");
+        poly.setAttribute("stroke-width", "2");
+        poly.setAttribute("fill", "none");
+        poly.dataset.type = "resistor";
+        poly.dataset.resistance = 100;
+        return poly;
+      },
+      capacitor: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let line1 = document.createElementNS(svgNS, "line");
+        line1.setAttribute("x1", "0");
+        line1.setAttribute("y1", "0");
+        line1.setAttribute("x2", "0");
+        line1.setAttribute("y2", "30");
+        line1.setAttribute("stroke", "black");
+        line1.setAttribute("stroke-width", "2");
+        g.appendChild(line1);
+        let line2 = document.createElementNS(svgNS, "line");
+        line2.setAttribute("x1", "10");
+        line2.setAttribute("y1", "0");
+        line2.setAttribute("x2", "10");
+        line2.setAttribute("y2", "30");
+        line2.setAttribute("stroke", "black");
+        line2.setAttribute("stroke-width", "2");
+        g.appendChild(line2);
+        g.dataset.type = "capacitor";
+        g.dataset.capacitance = 10;
+        return g;
+      },
+      inductor: function() {
+        let path = document.createElementNS(svgNS, "path");
+        path.setAttribute("d", "M0,15 a5,5 0 0,1 10,0 a5,5 0 0,1 10,0");
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "black");
+        path.setAttribute("stroke-width", "2");
+        path.dataset.type = "inductor";
+        path.dataset.inductance = 10;
+        return path;
+      },
+      diode: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let triangle = document.createElementNS(svgNS, "polygon");
+        triangle.setAttribute("points", "0,0 20,15 0,30");
+        triangle.setAttribute("fill", "none");
+        triangle.setAttribute("stroke", "black");
+        triangle.setAttribute("stroke-width", "2");
+        g.appendChild(triangle);
+        let line = document.createElementNS(svgNS, "line");
+        line.setAttribute("x1", "20");
+        line.setAttribute("y1", "0");
+        line.setAttribute("x2", "20");
+        line.setAttribute("y2", "30");
+        line.setAttribute("stroke", "black");
+        line.setAttribute("stroke-width", "2");
+        g.appendChild(line);
+        g.dataset.type = "diode";
+        g.dataset.forwardVoltage = 0.7;
+        return g;
+      },
+      LED: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let triangle = document.createElementNS(svgNS, "polygon");
+        triangle.setAttribute("points", "0,0 20,15 0,30");
+        triangle.setAttribute("fill", "none");
+        triangle.setAttribute("stroke", "black");
+        triangle.setAttribute("stroke-width", "2");
+        g.appendChild(triangle);
+        let line = document.createElementNS(svgNS, "line");
+        line.setAttribute("x1", "20");
+        line.setAttribute("y1", "0");
+        line.setAttribute("x2", "20");
+        line.setAttribute("y2", "30");
+        line.setAttribute("stroke", "black");
+        line.setAttribute("stroke-width", "2");
+        g.appendChild(line);
+        let arrow1 = document.createElementNS(svgNS, "line");
+        arrow1.setAttribute("x1", "10");
+        arrow1.setAttribute("y1", "5");
+        arrow1.setAttribute("x2", "15");
+        arrow1.setAttribute("y2", "0");
+        arrow1.setAttribute("stroke", "black");
+        arrow1.setAttribute("stroke-width", "2");
+        g.appendChild(arrow1);
+        let arrow2 = document.createElementNS(svgNS, "line");
+        arrow2.setAttribute("x1", "10");
+        arrow2.setAttribute("y1", "25");
+        arrow2.setAttribute("x2", "15");
+        arrow2.setAttribute("y2", "30");
+        arrow2.setAttribute("stroke", "black");
+        arrow2.setAttribute("stroke-width", "2");
+        g.appendChild(arrow2);
+        g.dataset.type = "LED";
+        g.dataset.forwardVoltage = 2;
+        return g;
+      },
+      photodiode: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let triangle = document.createElementNS(svgNS, "polygon");
+        triangle.setAttribute("points", "0,0 20,15 0,30");
+        triangle.setAttribute("fill", "none");
+        triangle.setAttribute("stroke", "black");
+        triangle.setAttribute("stroke-width", "2");
+        g.appendChild(triangle);
+        let line = document.createElementNS(svgNS, "line");
+        line.setAttribute("x1", "20");
+        line.setAttribute("y1", "0");
+        line.setAttribute("x2", "20");
+        line.setAttribute("y2", "30");
+        line.setAttribute("stroke", "black");
+        line.setAttribute("stroke-width", "2");
+        g.appendChild(line);
+        let arrow = document.createElementNS(svgNS, "line");
+        arrow.setAttribute("x1", "-10");
+        arrow.setAttribute("y1", "15");
+        arrow.setAttribute("x2", "0");
+        arrow.setAttribute("y2", "15");
+        arrow.setAttribute("stroke", "black");
+        arrow.setAttribute("stroke-width", "2");
+        g.appendChild(arrow);
+        g.dataset.type = "photodiode";
+        g.dataset.sensitivity = 0.5;
+        return g;
+      },
+      transistor: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute("cx", "15");
+        circle.setAttribute("cy", "15");
+        circle.setAttribute("r", "10");
+        circle.setAttribute("stroke", "black");
+        circle.setAttribute("stroke-width", "2");
+        circle.setAttribute("fill", "none");
+        g.appendChild(circle);
+        let emitter = document.createElementNS(svgNS, "line");
+        emitter.setAttribute("x1", "25");
+        emitter.setAttribute("y1", "15");
+        emitter.setAttribute("x2", "35");
+        emitter.setAttribute("y2", "15");
+        emitter.setAttribute("stroke", "black");
+        emitter.setAttribute("stroke-width", "2");
+        g.appendChild(emitter);
+        let base = document.createElementNS(svgNS, "line");
+        base.setAttribute("x1", "15");
+        base.setAttribute("y1", "15");
+        base.setAttribute("x2", "5");
+        base.setAttribute("y2", "25");
+        base.setAttribute("stroke", "black");
+        base.setAttribute("stroke-width", "2");
+        g.appendChild(base);
+        let collector = document.createElementNS(svgNS, "line");
+        collector.setAttribute("x1", "15");
+        collector.setAttribute("y1", "5");
+        collector.setAttribute("x2", "15");
+        collector.setAttribute("y2", "0");
+        collector.setAttribute("stroke", "black");
+        collector.setAttribute("stroke-width", "2");
+        g.appendChild(collector);
+        g.dataset.type = "transistor";
+        g.dataset.gain = 100;
+        return g;
+      },
+      opamp: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let triangle = document.createElementNS(svgNS, "polygon");
+        triangle.setAttribute("points", "0,0 40,20 0,40");
+        triangle.setAttribute("fill", "none");
+        triangle.setAttribute("stroke", "black");
+        triangle.setAttribute("stroke-width", "2");
+        g.appendChild(triangle);
+        let plus = document.createElementNS(svgNS, "text");
+        plus.setAttribute("x", "-15");
+        plus.setAttribute("y", "18");
+        plus.setAttribute("font-size", "16");
+        plus.textContent = "+";
+        g.appendChild(plus);
+        let minus = document.createElementNS(svgNS, "text");
+        minus.setAttribute("x", "-15");
+        minus.setAttribute("y", "32");
+        minus.setAttribute("font-size", "16");
+        minus.textContent = "–";
+        g.appendChild(minus);
+        g.dataset.type = "opamp";
+        g.dataset.openLoopGain = 100000;
+        return g;
+      },
+      switch: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let line1 = document.createElementNS(svgNS, "line");
+        line1.setAttribute("x1", "0");
+        line1.setAttribute("y1", "0");
+        line1.setAttribute("x2", "20");
+        line1.setAttribute("y2", "0");
+        line1.setAttribute("stroke", "black");
+        line1.setAttribute("stroke-width", "2");
+        g.appendChild(line1);
+        let line2 = document.createElementNS(svgNS, "line");
+        line2.setAttribute("x1", "20");
+        line2.setAttribute("y1", "0");
+        line2.setAttribute("x2", "30");
+        line2.setAttribute("y2", "10");
+        line2.setAttribute("stroke", "black");
+        line2.setAttribute("stroke-width", "2");
+        g.appendChild(line2);
+        g.dataset.type = "switch";
+        g.dataset.state = "open";
+        return g;
+      },
+      potentiometer: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let resistorElem = symbolLibrary.resistor();
+        g.appendChild(resistorElem);
+        let arrow = document.createElementNS(svgNS, "line");
+        arrow.setAttribute("x1", "12");
+        arrow.setAttribute("y1", "15");
+        arrow.setAttribute("x2", "22");
+        arrow.setAttribute("y2", "5");
+        arrow.setAttribute("stroke", "black");
+        arrow.setAttribute("stroke-width", "2");
+        g.appendChild(arrow);
+        g.dataset.type = "potentiometer";
+        g.dataset.resistance = 50;
+        return g;
+      },
+      ground: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let line1 = document.createElementNS(svgNS, "line");
+        line1.setAttribute("x1", "0");
+        line1.setAttribute("y1", "0");
+        line1.setAttribute("x2", "20");
+        line1.setAttribute("y2", "0");
+        line1.setAttribute("stroke", "black");
+        line1.setAttribute("stroke-width", "2");
+        g.appendChild(line1);
+        let line2 = document.createElementNS(svgNS, "line");
+        line2.setAttribute("x1", "5");
+        line2.setAttribute("y1", "5");
+        line2.setAttribute("x2", "15");
+        line2.setAttribute("y2", "5");
+        line2.setAttribute("stroke", "black");
+        line2.setAttribute("stroke-width", "2");
+        g.appendChild(line2);
+        let line3 = document.createElementNS(svgNS, "line");
+        line3.setAttribute("x1", "8");
+        line3.setAttribute("y1", "10");
+        line3.setAttribute("x2", "12");
+        line3.setAttribute("y2", "10");
+        line3.setAttribute("stroke", "black");
+        line3.setAttribute("stroke-width", "2");
+        g.appendChild(line3);
+        g.dataset.type = "ground";
+        return g;
+      },
+      electromagnet: function() {
+        let path = document.createElementNS(svgNS, "path");
+        path.setAttribute("d", "M0,15 C5,0 15,30 20,15 S35,0 40,15");
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "black");
+        path.setAttribute("stroke-width", "2");
+        path.dataset.type = "electromagnet";
+        path.dataset.coilResistance = 50;
+        return path;
+      },
+      laser: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let diodeElem = symbolLibrary.diode();
+        g.appendChild(diodeElem);
+        let arrow = document.createElementNS(svgNS, "line");
+        arrow.setAttribute("x1", "20");
+        arrow.setAttribute("y1", "15");
+        arrow.setAttribute("x2", "30");
+        arrow.setAttribute("y2", "15");
+        arrow.setAttribute("stroke", "red");
+        arrow.setAttribute("stroke-width", "2");
+        g.appendChild(arrow);
+        g.dataset.type = "laser";
+        g.dataset.wavelength = 650;
+        return g;
+      },
+      fuse: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let rect = document.createElementNS(svgNS, "rect");
+        rect.setAttribute("x", "0");
+        rect.setAttribute("y", "0");
+        rect.setAttribute("width", "30");
+        rect.setAttribute("height", "10");
+        rect.setAttribute("fill", "none");
+        rect.setAttribute("stroke", "black");
+        rect.setAttribute("stroke-width", "2");
+        g.appendChild(rect);
+        let squiggle = document.createElementNS(svgNS, "path");
+        squiggle.setAttribute("d", "M0,5 Q7,0 15,5 T30,5");
+        squiggle.setAttribute("fill", "none");
+        squiggle.setAttribute("stroke", "black");
+        squiggle.setAttribute("stroke-width", "2");
+        g.appendChild(squiggle);
+        g.dataset.type = "fuse";
+        g.dataset.currentRating = 1;
+        return g;
+      },
+      relay: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let rect = document.createElementNS(svgNS, "rect");
+        rect.setAttribute("x", "0");
+        rect.setAttribute("y", "0");
+        rect.setAttribute("width", "30");
+        rect.setAttribute("height", "20");
+        rect.setAttribute("fill", "none");
+        rect.setAttribute("stroke", "black");
+        rect.setAttribute("stroke-width", "2");
+        g.appendChild(rect);
+        let coil = document.createElementNS(svgNS, "path");
+        coil.setAttribute("d", "M5,10 a5,5 0 0,1 10,0");
+        coil.setAttribute("fill", "none");
+        coil.setAttribute("stroke", "black");
+        coil.setAttribute("stroke-width", "2");
+        g.appendChild(coil);
+        let swLine = document.createElementNS(svgNS, "line");
+        swLine.setAttribute("x1", "20");
+        swLine.setAttribute("y1", "0");
+        swLine.setAttribute("x2", "30");
+        swLine.setAttribute("y2", "10");
+        swLine.setAttribute("stroke", "black");
+        swLine.setAttribute("stroke-width", "2");
+        g.appendChild(swLine);
+        g.dataset.type = "relay";
+        g.dataset.coilVoltage = 5;
+        return g;
+      },
+      oscillator: function() {
+        let g = document.createElementNS(svgNS, "g");
+        let circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute("cx", "15");
+        circle.setAttribute("cy", "15");
+        circle.setAttribute("r", "15");
+        circle.setAttribute("fill", "none");
+        circle.setAttribute("stroke", "black");
+        circle.setAttribute("stroke-width", "2");
+        g.appendChild(circle);
+        let sine = document.createElementNS(svgNS, "path");
+        sine.setAttribute("d", "M0,15 Q7,5 15,15 T30,15");
+        sine.setAttribute("fill", "none");
+        sine.setAttribute("stroke", "black");
+        sine.setAttribute("stroke-width", "2");
+        g.appendChild(sine);
+        g.dataset.type = "oscillator";
+        g.dataset.oscFrequency = 1000;
+        return g;
+      },
+      memristor: function() {
+        let g = document.createElementNS(svgNS, "g");
+        // Draw resistor-like zigzag
+        let poly = document.createElementNS(svgNS, "polyline");
+        poly.setAttribute("points", "0,15 5,5 10,25 15,5 20,25 25,15");
+        poly.setAttribute("stroke", "black");
+        poly.setAttribute("stroke-width", "2");
+        poly.setAttribute("fill", "none");
+        g.appendChild(poly);
+        // Diagonal arrow from bottom-left to top-right
+        let arrow = document.createElementNS(svgNS, "line");
+        arrow.setAttribute("x1", "5");
+        arrow.setAttribute("y1", "25");
+        arrow.setAttribute("x2", "20");
+        arrow.setAttribute("y2", "5");
+        arrow.setAttribute("stroke", "black");
+        arrow.setAttribute("stroke-width", "2");
+        g.appendChild(arrow);
+        // "M" label
+        let text = document.createElementNS(svgNS, "text");
+        text.setAttribute("x", "10");
+        text.setAttribute("y", "20");
+        text.setAttribute("font-size", "12");
+        text.textContent = "M";
+        g.appendChild(text);
+        g.dataset.type = "memristor";
+        g.dataset.capVoltage = 0.5;
+        return g;
+      }
+    };
+
+    // Add a symbol to the SVG canvas.
+    function addSymbol(type) {
+      if (!(type in symbolLibrary)) {
+        alert("Symbol not available: " + type);
+        return;
+      }
+      let symbol = symbolLibrary[type]();
+      symbol.setAttribute("transform", "translate(50,50)");
+      symbol.dataset.x = 50;
+      symbol.dataset.y = 50;
+      symbol.dataset.type = type;
+      symbol.classList.add("draggable");
+      symbol.addEventListener("mousedown", symbolMouseDown);
+      svgCanvas.appendChild(symbol);
+    }
+
+    // Drag-and-drop handling.
+    let dragTarget = null;
+    let dragOffset = { x: 0, y: 0 };
+
+    function symbolMouseDown(evt) {
+      evt.stopPropagation();
+      if (wireMode) {
+        if (!firstWireSymbol) {
+          firstWireSymbol = evt.currentTarget;
+          firstWireSymbol.classList.add("selected");
+        } else if (firstWireSymbol !== evt.currentTarget) {
+          createWire(firstWireSymbol, evt.currentTarget);
+          firstWireSymbol.classList.remove("selected");
+          firstWireSymbol = null;
+        }
+        return;
+      }
+      dragTarget = evt.currentTarget;
+      let pt = getMousePosition(evt);
+      let transform = dragTarget.getAttribute("transform");
+      let translate = parseTransform(transform);
+      dragOffset.x = pt.x - translate.x;
+      dragOffset.y = pt.y - translate.y;
+      setSelected(dragTarget);
+    }
+
+    function getMousePosition(evt) {
+      let CTM = svgCanvas.getScreenCTM();
+      return {
+        x: (evt.clientX - CTM.e) / CTM.a,
+        y: (evt.clientY - CTM.f) / CTM.d
+      };
+    }
+
+    function parseTransform(transformStr) {
+      let translate = { x: 0, y: 0 };
+      let match = /translate\(\s*([\d.]+)[ ,]+([\d.]+)\s*\)/.exec(transformStr);
+      if (match) {
+        translate.x = parseFloat(match[1]);
+        translate.y = parseFloat(match[2]);
+      }
+      return translate;
+    }
+
+    function symbolMouseMove(evt) {
+      if (!dragTarget) return;
+      let pt = getMousePosition(evt);
+      let newX = pt.x - dragOffset.x;
+      let newY = pt.y - dragOffset.y;
+      dragTarget.setAttribute("transform", "translate(" + newX + "," + newY + ")");
+      dragTarget.dataset.x = newX;
+      dragTarget.dataset.y = newY;
+      updateAllWires();
+      updatePropertiesPanel(selectedElement);
+    }
+
+    function symbolMouseUp(evt) {
+      dragTarget = null;
+    }
+
+    svgCanvas.addEventListener("mousemove", symbolMouseMove);
+    svgCanvas.addEventListener("mouseup", symbolMouseUp);
+    svgCanvas.addEventListener("mouseleave", symbolMouseUp);
+
+    function setSelected(element) {
+      let prev = document.querySelector(".selected");
+      if (prev && prev !== element) {
+        prev.classList.remove("selected");
+      }
+      element.classList.add("selected");
+      selectedElement = element;
+      document.getElementById("status").textContent = "Selected: " + element.dataset.type;
+      updatePropertiesPanel(element);
+    }
+
+    function deleteSelected() {
+      if (selectedElement) {
+        svgCanvas.removeChild(selectedElement);
+        wires2D = wires2D.filter(wire => {
+          if (wire.from === selectedElement || wire.to === selectedElement) {
+            svgCanvas.removeChild(wire.line);
+            return false;
+          }
+          return true;
+        });
+        selectedElement = null;
+        document.getElementById("status").textContent = "No symbol selected";
+        document.getElementById("propertiesContent").innerHTML = "No properties";
+        updateSimulation();
+      }
+    }
+
+    function createWire(symbolA, symbolB) {
+      let aTransform = parseTransform(symbolA.getAttribute("transform"));
+      let bTransform = parseTransform(symbolB.getAttribute("transform"));
+      let line = document.createElementNS(svgNS, "line");
+      line.setAttribute("x1", aTransform.x + 20);
+      line.setAttribute("y1", aTransform.y + 15);
+      line.setAttribute("x2", bTransform.x + 20);
+      line.setAttribute("y2", bTransform.y + 15);
+      line.setAttribute("stroke", "black");
+      line.setAttribute("stroke-width", "2");
+      svgCanvas.appendChild(line);
+      wires2D.push({ from: symbolA, to: symbolB, line: line });
+      updateSimulation();
+    }
+
+    function updateAllWires() {
+      wires2D.forEach(wire => {
+        let aTrans = parseTransform(wire.from.getAttribute("transform"));
+        let bTrans = parseTransform(wire.to.getAttribute("transform"));
+        wire.line.setAttribute("x1", aTrans.x + 20);
+        wire.line.setAttribute("y1", aTrans.y + 15);
+        wire.line.setAttribute("x2", bTrans.x + 20);
+        wire.line.setAttribute("y2", bTrans.y + 15);
+      });
+      updateSimulation();
+    }
+
+    // Live simulation: if one battery and one resistor are connected.
+    function updateSimulation() {
+      let batteries = Array.from(svgCanvas.querySelectorAll("[data-type='battery']"));
+      let resistors = Array.from(svgCanvas.querySelectorAll("[data-type='resistor']"));
+      let completeCircuit = false;
+      wires2D.forEach(wire => {
+        let aType = wire.from.dataset.type;
+        let bType = wire.to.dataset.type;
+        if ((aType === "battery" && bType === "resistor") ||
+            (aType === "resistor" && bType === "battery")) {
+          completeCircuit = true;
+        }
+      });
+      let simOutput = document.getElementById("simOutput");
+      if (batteries.length === 1 && resistors.length === 1 && completeCircuit) {
+        let V = batteries[0].dataset.voltage ? parseFloat(batteries[0].dataset.voltage) : 9;
+        let R = resistors[0].dataset.resistance ? parseFloat(resistors[0].dataset.resistance) : 100;
+        let I = V / R;
+        simOutput.innerHTML = `<p>Circuit complete!</p>
+                               <p>Battery Voltage: ${V} V</p>
+                               <p>Resistor: ${R} Ω</p>
+                               <p>Calculated Current: ${I.toFixed(3)} A</p>`;
+      } else {
+        simOutput.innerHTML = `<p>Circuit incomplete. Connect one battery and one resistor.</p>`;
+      }
+    }
+
+    // Toggle wire mode.
+    function toggleWireMode() {
+      wireMode = !wireMode;
+      document.getElementById("wireModeStatus").textContent = wireMode ? "On" : "Off";
+      if (!wireMode && firstWireSymbol) {
+        firstWireSymbol.classList.remove("selected");
+        firstWireSymbol = null;
+      }
+    }
+
+    // Simulation control panel listeners.
+    document.getElementById("simModeSelect").addEventListener("change", function() {
+      updateSimulation();
+    });
+    document.getElementById("acFreq").addEventListener("change", function() {
+      updateSimulation();
+    });
+    document.getElementById("batteryVoltageInput").addEventListener("change", function() {
+      let newV = parseFloat(this.value);
+      let battery = svgCanvas.querySelector("[data-type='battery']");
+      if (battery) {
+        battery.dataset.voltage = newV;
+      }
+      updateSimulation();
+    });
+
+    // Deselect if canvas background is clicked.
+    svgCanvas.addEventListener("click", function(evt) {
+      if (evt.target === svgCanvas) {
+        let sel = document.querySelector(".selected");
+        if (sel) {
+          sel.classList.remove("selected");
+          selectedElement = null;
+          document.getElementById("status").textContent = "No symbol selected";
+          document.getElementById("propertiesContent").innerHTML = "No properties";
+        }
+      }
+    });
+
+    // -------------------------
+    // Properties Panel Handling
+    // -------------------------
+    function updatePropertiesPanel(element) {
+      let content = document.getElementById("propertiesContent");
+      content.innerHTML = "";
+      if (!element) {
+        content.innerHTML = "No properties";
+        return;
+      }
+      let type = element.dataset.type;
+      if (type === "battery") {
+        let label = document.createElement("label");
+        label.textContent = "Voltage (V):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.voltage || 9;
+        input.onchange = function() {
+          element.dataset.voltage = input.value;
+          updateSimulation();
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "resistor" || type === "potentiometer") {
+        let label = document.createElement("label");
+        label.textContent = "Resistance (Ω):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.resistance || 100;
+        input.onchange = function() {
+          element.dataset.resistance = input.value;
+          updateSimulation();
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "capacitor") {
+        let label = document.createElement("label");
+        label.textContent = "Capacitance (F):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.capacitance || 10;
+        input.onchange = function() {
+          element.dataset.capacitance = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "inductor") {
+        let label = document.createElement("label");
+        label.textContent = "Inductance (mH):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.inductance || 10;
+        input.onchange = function() {
+          element.dataset.inductance = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "diode") {
+        let label = document.createElement("label");
+        label.textContent = "Forward Voltage (V):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.forwardVoltage || 0.7;
+        input.onchange = function() {
+          element.dataset.forwardVoltage = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "LED") {
+        let label = document.createElement("label");
+        label.textContent = "Forward Voltage (V):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.forwardVoltage || 2;
+        input.onchange = function() {
+          element.dataset.forwardVoltage = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "photodiode") {
+        let label = document.createElement("label");
+        label.textContent = "Sensitivity (A/W):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.sensitivity || 0.5;
+        input.onchange = function() {
+          element.dataset.sensitivity = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "transistor") {
+        let label = document.createElement("label");
+        label.textContent = "Current Gain (β):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.gain || 100;
+        input.onchange = function() {
+          element.dataset.gain = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "opamp") {
+        let label = document.createElement("label");
+        label.textContent = "Open-Loop Gain:";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.openLoopGain || 100000;
+        input.onchange = function() {
+          element.dataset.openLoopGain = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "switch") {
+        let label = document.createElement("label");
+        label.textContent = "State (open/closed):";
+        let input = document.createElement("input");
+        input.type = "text";
+        input.value = element.dataset.state || "open";
+        input.onchange = function() {
+          element.dataset.state = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "electromagnet") {
+        let label = document.createElement("label");
+        label.textContent = "Coil Resistance (Ω):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.coilResistance || 50;
+        input.onchange = function() {
+          element.dataset.coilResistance = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "laser") {
+        let label = document.createElement("label");
+        label.textContent = "Wavelength (nm):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.wavelength || 650;
+        input.onchange = function() {
+          element.dataset.wavelength = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "fuse") {
+        let label = document.createElement("label");
+        label.textContent = "Current Rating (A):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.currentRating || 1;
+        input.onchange = function() {
+          element.dataset.currentRating = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "relay") {
+        let label = document.createElement("label");
+        label.textContent = "Coil Voltage (V):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.coilVoltage || 5;
+        input.onchange = function() {
+          element.dataset.coilVoltage = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "oscillator") {
+        let label = document.createElement("label");
+        label.textContent = "Oscillation Frequency (Hz):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.oscFrequency || 1000;
+        input.onchange = function() {
+          element.dataset.oscFrequency = input.value;
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+      } else if (type === "memristor") {
+        let label = document.createElement("label");
+        label.textContent = "Capacitor Voltage (V):";
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = element.dataset.capVoltage || 0.5;
+        input.onchange = function() {
+          element.dataset.capVoltage = input.value;
+          updateMemristorState(element, input.value);
+        };
+        content.appendChild(label);
+        content.appendChild(input);
+        let stateDiv = document.createElement("div");
+        stateDiv.id = "memristorState";
+        stateDiv.style.marginTop = "5px";
+        content.appendChild(stateDiv);
+        updateMemristorState(element, input.value);
+      } else {
+        content.innerHTML = "No editable properties for " + type;
+      }
+    }
+    
+    function updateMemristorState(element, voltage) {
+      let stateDiv = document.getElementById("memristorState");
+      let v = parseFloat(voltage);
+      let state;
+      if (v >= 0.4 && v <= 0.5) {
+        state = "Logic 0 (OFF-state)";
+      } else if (v >= 0 && v <= 0.2) {
+        state = "Logic 1 (ON-state)";
+      } else if (v > 0.2 && v < 0.4) {
+        state = "Undefined state";
+      } else {
+        state = "Out of range";
+      }
+      stateDiv.innerHTML = "<strong>Memristor State:</strong> " + state;
+    }
+
+    // -------------------------
+    // Drag-and-Drop Handling
+    // -------------------------
+    let currentDrag = null;
+    document.addEventListener("mousemove", function(evt) {
+      if (currentDrag) {
+        let pt = getMousePosition(evt);
+        let newX = pt.x - dragOffset.x;
+        let newY = pt.y - dragOffset.y;
+        currentDrag.setAttribute("transform", "translate(" + newX + "," + newY + ")");
+        currentDrag.dataset.x = newX;
+        currentDrag.dataset.y = newY;
+        updateAllWires();
+        updatePropertiesPanel(selectedElement);
+      }
+    });
+    document.addEventListener("mouseup", function(evt) {
+      currentDrag = null;
+    });
+    function symbolMouseDown(evt) {
+      evt.stopPropagation();
+      if (wireMode) {
+        if (!firstWireSymbol) {
+          firstWireSymbol = evt.currentTarget;
+          firstWireSymbol.classList.add("selected");
+        } else if (firstWireSymbol !== evt.currentTarget) {
+          createWire(firstWireSymbol, evt.currentTarget);
+          firstWireSymbol.classList.remove("selected");
+          firstWireSymbol = null;
+        }
+        return;
+      }
+      currentDrag = evt.currentTarget;
+      let pt = getMousePosition(evt);
+      let transform = currentDrag.getAttribute("transform");
+      let translate = parseTransform(transform);
+      dragOffset.x = pt.x - translate.x;
+      dragOffset.y = pt.y - translate.y;
+      setSelected(currentDrag);
+    }
+    // -------------------------
+    // End Drag-and-Drop Handling
+    // -------------------------
+
+    // Deselect if canvas background is clicked.
+    svgCanvas.addEventListener("click", function(evt) {
+      if (evt.target === svgCanvas) {
+        let sel = document.querySelector(".selected");
+        if (sel) {
+          sel.classList.remove("selected");
+          selectedElement = null;
+          document.getElementById("status").textContent = "No symbol selected";
+          document.getElementById("propertiesContent").innerHTML = "No properties";
+        }
+      }
+    });
+
+    // -------------------------
+    // Download Circuit Functionality
+    // -------------------------
+    function downloadCircuit() {
+      // Gather components
+      let components = [];
+      let allElements = svgCanvas.querySelectorAll("g");
+      allElements.forEach(el => {
+        // Get basic properties from the element's dataset and transform attribute
+        let transform = parseTransform(el.getAttribute("transform"));
+        let props = { type: el.dataset.type, x: transform.x, y: transform.y };
+        // Also, include all dataset properties
+        for (let key in el.dataset) {
+          if (el.dataset.hasOwnProperty(key) && key !== "type" && key !== "x" && key !== "y") {
+            props[key] = el.dataset[key];
+          }
+        }
+        components.push(props);
+      });
+      // Gather wires (connections)
+      let connections = [];
+      wires2D.forEach(wire => {
+        // Get the type and transform for each end
+        let a = wire.from;
+        let b = wire.to;
+        let aTrans = parseTransform(a.getAttribute("transform"));
+        let bTrans = parseTransform(b.getAttribute("transform"));
+        connections.push({
+          from: { type: a.dataset.type, x: aTrans.x, y: aTrans.y },
+          to: { type: b.dataset.type, x: bTrans.x, y: bTrans.y }
+        });
+      });
+      let circuitData = {
+        components: components,
+        connections: connections
+      };
+      // Convert to JSON string
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(circuitData, null, 2));
+      let downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "circuit_data.json");
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    }
+  </script>
+</body>
+</html>
