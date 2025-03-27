@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Physics Hub - Unleash your rational power with immersive simulations that command the universe." />
+  <title>Physics Hub - Command Your Universe</title>
+  <!-- Tailwind CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Global styles with deliberate transitions */
+    *, *::before, *::after {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      background-color: #fff;
+      color: #1f2937;
+    }
+    
+    /* Dark mode settings for those who dare challenge the norm */
+    .dark {
+      background-color: #111827;
+      color: #e5e7eb;
+    }
+    .dark .bg-white { background-color: #111827; }
+    .dark .bg-gray-50 { background-color: #1f2937; }
+    .dark .text-gray-900 { color: #ffffff; }
+    .dark .text-gray-500 { color: #9ca3af; }
+    .dark .bg-gray-200 { background-color: #374151; }
+    .dark .border-gray-200 { border-color: #374151; }
+    .dark .text-gray-600 { color: #d1d5db; }
+    
+    /* Navigation underline for assertive emphasis */
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: currentColor;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    /* Card scaling: a subtle display of power */
+    .sim-card {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sim-card:hover {
+      transform: scale(1.02);
+    }
+    
+    /* Impactful hero title */
+    .section-title {
+      font-size: 3rem;
+      line-height: 1.1;
+      letter-spacing: -0.015em;
+    }
+    
+    /* Clean, focused search results */
+    .search-results {
+      max-height: 400px;
+      overflow-y: auto;
+      backdrop-filter: blur(8px);
+    }
+    .search-results::-webkit-scrollbar {
+      width: 8px;
+    }
+    .search-results::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .search-results::-webkit-scrollbar-thumb {
+      background-color: rgba(156, 163, 175, 0.5);
+      border-radius: 4px;
+    }
+    
+    /* Mobile menu animation for a decisive reveal */
+    .mobile-menu {
+      transition: transform 0.3s ease-in-out;
+      transform: translateX(-100%);
+    }
+    .mobile-menu.active {
+      transform: translateX(0);
+    }
+    
+    @media (max-width: 768px) {
+      .desktop-menu { display: none; }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900">
+  <!-- Login Modal: Only the strong are granted access -->
+  <div id="loginModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" aria-modal="true" role="dialog">
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg text-center">
+      <h2 class="text-2xl font-semibold mb-4">Sign In Required</h2>
+      <p class="mb-6 text-gray-600 dark:text-gray-300">Only the worthy gain access. Log in now to unleash your full potential.</p>
+      <button id="loginButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Sign In with Email</button>
+    </div>
+  </div>
+
+  <!-- Payment Modal for Exclusive Content -->
+  <div id="paymentModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" aria-modal="true" role="dialog">
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg text-center">
+      <h2 class="text-2xl font-semibold mb-4">Photon Explorer Pack Required</h2>
+      <p class="mb-6 text-gray-600 dark:text-gray-300">Access to this simulation requires the Photon Explorer pack.</p>
+      <p class="mb-4 font-mono text-sm">Payment ID: P-68W77385P64884615M5K3SEI</p>
+      <button id="payNowButton" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Purchase Now</button>
+      <button id="cancelPayButton" class="ml-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Header Navigation: The Command Center -->
+  <header class="fixed w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main Navigation">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo and Title -->
+        <div class="flex items-center">
+          <a href="/" class="flex items-center space-x-3" aria-label="Physics Hub Home">
+            <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" alt="Physics Hub Logo" class="h-8 w-8">
+            <span class="text-xl font-semibold text-gray-900 dark:text-white">PhysicsHub</span>
+          </a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          <!-- Search Bar -->
+          <div class="relative">
+            <input type="text" id="search" placeholder="Search..." aria-label="Search Simulations"
+              class="w-48 px-4 py-2 rounded-lg text-sm bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div id="searchResults" class="search-results hidden absolute top-full left-0 right-0 mt-2 bg-white/90 dark:bg-gray-800/90 rounded-lg shadow-lg z-50"></div>
+          </div>
+
+          <!-- Simulations Dropdown -->
+          <div class="relative group">
+            <button class="nav-link text-sm flex items-center" aria-haspopup="true">
+              Simulations
+              <svg class="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50">
+              <a href="#mechanics" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Classical Mechanics</a>
+              <a href="#em" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Electromagnetism</a>
+              <a href="#waves" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Waves &amp; Optics</a>
+              <a href="#modern" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Modern Physics</a>
+            </div>
+          </div>
+
+          <!-- Dark Mode Toggle -->
+          <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Toggle Dark Mode">
+            <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg id="moonIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700" aria-label="Toggle Mobile Menu">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Panel -->
+      <div id="mobile-menu" class="hidden md:hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <div class="p-2">
+            <input type="text" id="mobile-search" placeholder="Search..." aria-label="Mobile Search"
+              class="w-full px-4 py-2 rounded-lg text-sm bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <a href="#mechanics" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700">Classical Mechanics</a>
+          <a href="#em" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700">Electromagnetism</a>
+          <a href="#waves" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700">Waves &amp; Optics</a>
+          <a href="#modern" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700">Modern Physics</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section: The Call to Domination -->
+  <section class="pt-32 pb-20 px-6">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="section-title font-semibold mb-6">Experience Physics.<br>Like Never Before.</h1>
+      <p class="text-xl text-gray-500 max-w-2xl">
+        Immersive simulations that simplify complex physics concepts. Emotions are weak—command the universe with rational power.
+      </p>
+    </div>
+  </section>
+
+  <!-- Simulations Sections -->
+  <main class="space-y-20">
+    <!-- Classical Mechanics Section (Free Access) -->
+    <section id="mechanics" class="py-20 px-6 bg-gray-50 dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-semibold mb-12">Classical Mechanics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <a href="newtons_laws.html" class="sim-card group free-access" data-category="free">
+            <div class="aspect-w-16 aspect-h-9 mb-4">
+              <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                <img src="/api/placeholder/600/400" alt="Newton's Laws" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Newton's Laws</h3>
+            <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Electromagnetism Section (Paid Access) -->
+    <section id="em" class="py-20 px-6">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-semibold mb-12">Electromagnetism</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <a href="circuits.html" class="sim-card group paid-access" data-category="paid">
+            <div class="aspect-w-16 aspect-h-9 mb-4">
+              <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                <img src="/api/placeholder/600/400" alt="Circuit Lab" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Circuit Lab</h3>
+            <p class="text-sm text-gray-500">Build and analyze electrical circuits</p>
+          </a>
+          <a href="em_waves.html" class="sim-card group paid-access" data-category="paid">
+            <div class="aspect-w-16 aspect-h-9 mb-4">
+              <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                <img src="/api/placeholder/600/400" alt="EM Waves" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Electromagnetic Waves</h3>
+            <p class="text-sm text-gray-500">Visualize electromagnetic wave propagation</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Waves & Optics Section (Paid Access) -->
+    <section id="waves" class="py-20 px-6 bg-gray-50 dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-semibold mb-12">Waves &amp; Optics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <a href="wave_motion.html" class="sim-card group paid-access" data-category="paid">
+            <div class="aspect-w-16 aspect-h-9 mb-4">
+              <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                <img src="/api/placeholder/600/400" alt="Wave Motion" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Wave Motion</h3>
+            <p class="text-sm text-gray-500">Study wave properties and behavior</p>
+          </a>
+          <a href="optics.html" class="sim-card group paid-access" data-category="paid">
+            <div class="aspect-w-16 aspect-h-9 mb-4">
+              <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                <img src="/api/placeholder/600/400" alt="Optics Lab" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Optics Lab</h3>
+            <p class="text-sm text-gray-500">Explore light behavior and lenses</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modern Physics Section (Paid Access) -->
+    <section id="modern" class="py-20 px-6">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-semibold mb-12">Modern Physics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <a href="quantum.html" class="sim-card group paid-access" data-category="paid">
+            <div class="aspect-w-16 aspect-h-9 mb-4">
+              <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                <img src="/api/placeholder/600/400" alt="Quantum Mechanics" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Quantum Mechanics</h3>
+            <p class="text-sm text-gray-500">Discover the quantum world</p>
+          </a>
+          <a href="nuclear.html" class="sim-card group paid-access" data-category="paid">
+            <div class="aspect-w-16 aspect-h-9 mb-4">
+              <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                <img src="/api/placeholder/600/400" alt="Nuclear Physics" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Nuclear Physics</h3>
+            <p class="text-sm text-gray-500">Explore atomic nuclei and radiation</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase Integration: Forge the connection -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+      authDomain: "lumenos-749a1.firebaseapp.com",
+      projectId: "lumenos-749a1",
+      storageBucket: "lumenos-749a1.firebasestorage.app",
+      messagingSenderId: "857410556058",
+      appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+      measurementId: "G-CEZ4PHV9GE"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    let userHasAccess = false; // Simulated payment access flag
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User signed in:", user);
+        userHasAccess = true;
+        document.getElementById('loginModal').classList.add('hidden');
+      } else {
+        console.log("No user signed in.");
+        document.getElementById('loginModal').classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('loginButton').addEventListener('click', () => {
+      signInAnonymously(auth).catch(console.error);
+    });
+  </script>
+
+  <!-- Script Section: Efficiency and control in every interaction -->
+  <script>
+    // Payment modal logic for secure, exclusive access
+    document.querySelectorAll('.paid-access').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (!userHasAccess) {
+          e.preventDefault();
+          document.getElementById('paymentModal').classList.remove('hidden');
+        }
+      });
+    });
+
+    document.getElementById('payNowButton').addEventListener('click', () => {
+      window.location.href = "https://your-payment-gateway.example.com/pay?paymentId=P-68W77385P64884615M5K3SEI";
+    });
+
+    document.getElementById('cancelPayButton').addEventListener('click', () => {
+      document.getElementById('paymentModal').classList.add('hidden');
+    });
+
+    // Search functionality: Assertive and responsive search
+    const simulations = [
+      { title: "Newton's Laws", category: "Mechanics", url: "newtons_laws.html", description: "Understand the fundamental principles of motion", access: "free" },
+      { title: "Projectile Motion", category: "Mechanics", url: "projectile_motion.html", description: "Explore the physics of moving objects", access: "free" },
+      { title: "Work and Energy", category: "Mechanics", url: "work_energy.html", description: "Discover energy transformation principles", access: "free" },
+      { title: "Circuit Lab", category: "Electromagnetism", url: "circuits.html", description: "Build and analyze electrical circuits", access: "paid" },
+      { title: "Electromagnetic Waves", category: "Electromagnetism", url: "em_waves.html", description: "Visualize electromagnetic wave propagation", access: "paid" },
+      { title: "Wave Motion", category: "Waves & Optics", url: "wave_motion.html", description: "Study wave properties and behavior", access: "paid" },
+      { title: "Optics Lab", category: "Waves & Optics", url: "optics.html", description: "Explore light behavior and lenses", access: "paid" },
+      { title: "Quantum Mechanics", category: "Modern Physics", url: "quantum.html", description: "Discover the quantum world", access: "paid" },
+      { title: "Nuclear Physics", category: "Modern Physics", url: "nuclear.html", description: "Explore atomic nuclei and radiation", access: "paid" }
+    ];
+
+    const searchInput = document.getElementById('search');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      if (query.length < 2) {
+        searchResults.classList.add('hidden');
+        return;
+      }
+      const filteredResults = simulations.filter(sim =>
+        sim.title.toLowerCase().includes(query) ||
+        sim.description.toLowerCase().includes(query) ||
+        sim.category.toLowerCase().includes(query)
+      );
+      if (filteredResults.length > 0) {
+        searchResults.innerHTML = filteredResults.map(sim => `
+          <a href="${sim.url}" class="block p-4 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div class="font-medium">${sim.title}</div>
+            <div class="text-sm text-gray-500">${sim.category} - ${sim.description}</div>
+          </a>
+        `).join('');
+        searchResults.classList.remove('hidden');
+      } else {
+        searchResults.innerHTML = `<div class="p-4 text-gray-500">No simulations found for "${e.target.value}"</div>`;
+        searchResults.classList.remove('hidden');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+
+    // Dark Mode Toggle: Command the visual state
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      sunIcon.classList.remove('hidden');
+      moonIcon.classList.add('hidden');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      sunIcon.classList.toggle('hidden');
+      moonIcon.classList.toggle('hidden');
+      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    // Mobile Menu Toggle: Instantaneous and commanding
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) { mobileMenu.classList.add('hidden'); }
+    });
+
+    // Parallax Effect on Scroll: Subtle yet forceful motion
+    window.addEventListener('scroll', () => {
+      document.querySelectorAll('.parallax-section').forEach(section => {
+        const scrolled = window.pageYOffset;
+        section.style.transform = `translate3d(0, ${scrolled * -0.3}px, 0)`;
+      });
+    });
+  </script>
+</body>
+</html>
