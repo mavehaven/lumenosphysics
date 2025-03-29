@@ -7,7 +7,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-    
+
     /* Dark mode styles */
     .dark {
       background-color: #111827;
@@ -31,7 +31,7 @@
     .dark .bg-white {
       background-color: #111827;
     }
-    
+
     /* Search results styles */
     .search-results {
       max-height: 400px;
@@ -48,7 +48,7 @@
       background-color: rgba(156, 163, 175, 0.5);
       border-radius: 4px;
     }
-    
+
     /* Smooth theme transition */
     * {
       transition: background-color 0.3s ease, color 0.3s ease;
@@ -88,7 +88,7 @@
       transform: translateZ(0);
       will-change: transform;
     }
-    
+
     /* Mobile menu animation */
     .mobile-menu {
       transition: transform 0.3s ease-in-out;
@@ -102,19 +102,19 @@
         display: none;
       }
     }
-    
+
     /* Modal (paywall) styling */
     .modal-bg {
       background-color: rgba(0, 0, 0, 0.6);
     }
-    
-    /* Settings Sidebar */
+
+    /* Comprehensive Settings Sidebar */
     #settingsSidebar {
       position: fixed;
       right: -300px;
       top: 0;
       height: 100%;
-      width: 300px;
+      width: 18rem; /* 300px */
       background-color: #fff;
       box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
       z-index: 60;
@@ -124,8 +124,39 @@
     #settingsSidebar.dark {
       background-color: #1f2937;
     }
-    #settingsSidebar.active {
-      right: 0;
+    
+    /* Sidebar Header & Nav Items */
+    #settingsSidebar .sidebar-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #settingsSidebar .sidebar-header img {
+      border-radius: 9999px;
+    }
+    #settingsSidebar nav {
+      padding: 1rem;
+    }
+    #settingsSidebar nav ul li {
+      margin-bottom: 1rem;
+    }
+    #settingsSidebar nav ul li a,
+    #settingsSidebar nav ul li button {
+      font-size: 1.125rem;
+      color: #1f2937;
+    }
+    #settingsSidebar.dark nav ul li a,
+    #settingsSidebar.dark nav ul li button {
+      color: #d1d5db;
+    }
+
+    /* Animation container styling */
+    .animation-container {
+      width: 100%;
+      height: 250px; /* Adjust as needed */
+      margin-bottom: 2rem;
     }
   </style>
 </head>
@@ -134,7 +165,7 @@
   <header class="fixed w-full bg-white border-b border-gray-200 z-50">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <!-- Left side - Prominent Logo -->
+        <!-- Left side - Logo -->
         <div class="flex items-center">
           <a href="/" class="flex items-center">
             <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
@@ -161,13 +192,11 @@
             </svg>
           </button>
           
-          <!-- Profile Button with Gear (Settings) -->
+          <!-- Profile Button (opens sidebar) -->
           <button id="profileBtn" class="flex items-center p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-            <!-- Profile Avatar (Placeholder Circle) -->
             <div id="profileAvatar" class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
               <span class="text-sm font-medium text-gray-700">P</span>
             </div>
-            <!-- Gear Icon for Settings -->
             <span class="ml-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a1 1 0 011 0l2.293 1.383a1 1 0 00.552.141l2.524-.305a1 1 0 011.055.723l.447 2.682a1 1 0 00.345.739l1.934 1.935a1 1 0 010 1.414l-1.935 1.935a1 1 0 00-.345.739l.447 2.682a1 1 0 01-1.055 1.055l-2.524-.305a1 1 0 00-.552.141L13 19.646a1 1 0 01-1 0l-2.293-1.383a1 1 0 00-.552-.141l-2.524.305a1 1 0 01-1.055-.723l-.447-2.682a1 1 0 00-.345-.739L2.34 13.07a1 1 0 010-1.414l1.935-1.935a1 1 0 00.345-.739l-.447-2.682a1 1 0 011.055-1.055l2.524.305a1 1 0 00.552-.141L11 4.354z" />
@@ -200,13 +229,59 @@
       </div>
     </nav>
   </header>
-  
-  <!-- Hero Section -->
+
+  <!-- Comprehensive Settings Sidebar -->
+  <div id="settingsSidebar">
+    <div class="sidebar-header">
+      <!-- User info header (dynamically updated from Firebase Auth) -->
+      <div class="flex items-center">
+        <img id="sidebarAvatar" src="//via.placeholder.com/40" alt="User Avatar" class="w-10 h-10 rounded-full mr-3" />
+        <div>
+          <p id="sidebarUsername" class="font-semibold text-gray-800">User Name</p>
+          <p id="sidebarEmail" class="text-xs text-gray-500">user@example.com</p>
+        </div>
+      </div>
+      <!-- Close button -->
+      <button id="sidebarCloseBtn" class="text-gray-600 hover:text-gray-900">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <nav>
+      <ul>
+        <li>
+          <a href="edit_profile.html" class="block hover:underline">Edit Profile</a>
+        </li>
+        <li>
+          <a href="account_settings.html" class="block hover:underline">Account Settings</a>
+        </li>
+        <li>
+          <a href="notifications.html" class="block hover:underline">Notification Settings</a>
+        </li>
+        <li>
+          <a href="privacy.html" class="block hover:underline">Privacy Settings</a>
+        </li>
+        <li>
+          <a href="help_support.html" class="block hover:underline">Help &amp; Support</a>
+        </li>
+        <!-- Teacher-only options -->
+        <li id="teacherOptions" class="hidden">
+          <a href="manage_classes.html" class="block hover:underline">Manage Pupils/Classes</a>
+        </li>
+        <li>
+          <button id="signOutBtn" class="w-full text-left text-red-600 hover:underline">Sign Out</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Hero Section with Animation -->
   <section class="pt-32 pb-20 px-6">
     <div class="max-w-7xl mx-auto">
+      <div id="animationHero" class="animation-container"></div>
       <h1 class="section-title font-semibold mb-6">
-        Experience Physics.<br />
-        Like Never Before.
+        Experience Physics.<br />Like Never Before.
       </h1>
       <p class="text-xl text-gray-500 max-w-2xl">
         Immersive simulations that make complex physics concepts simple and intuitive.
@@ -219,148 +294,31 @@
     <div class="max-w-7xl mx-auto">
       <h2 class="text-3xl font-semibold mb-12">
         Classical Mechanics 
-        <!-- Gear icon for Mechanics -->
         <span class="inline-block ml-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0a1.723 1.723 0 001.028 1.039 1.724 1.724 0 012.121 1.136c.346.923.926 1.598 1.715 2.052.791.454 1.667.4 2.42-.137.751-.537 1.271-1.416 1.271-2.377V4.857a1.724 1.724 0 011.724-1.724 1.724 1.724 0 011.724 1.724v2.083c0 .961.52 1.84 1.271 2.377.753.537 1.629.59 2.42.137.789-.454 1.369-1.129 1.715-2.052a1.724 1.724 0 012.121-1.136 1.723 1.723 0 001.028-1.039c.3-.921 1.603-.921 1.902 0M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </span>
       </h2>
+      <div id="animationMechanics" class="animation-container"></div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Content Cards for Mechanics -->
         <a href="newtonian.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- F = ma Equation -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="24" fill="#1e293b">
-    F = ma
-  </text>
-  
-  <!-- Moving Block -->
-  <rect id="block">
-    <animate attributeName="x" values="50;300;50" dur="4s" repeatCount="indefinite"/>
-    <animate attributeName="y" values="150" dur="4s" repeatCount="indefinite"/>
-    width="40" height="40" fill="#3b82f6"/>
-  </rect>
-  
-  <!-- Force Arrow -->
-  <path id="force-arrow">
-    <animate attributeName="d" values="M90,170 L140,170 M130,160 L140,170 L130,180;
-                                     M340,170 L390,170 M380,160 L390,170 L380,180;
-                                     M90,170 L140,170 M130,160 L140,170 L130,180"
-           dur="4s" repeatCount="indefinite"/>
-    stroke="#ef4444" stroke-width="3" fill="none"/>
-  </path>
-  
-  <!-- Newton's Laws Text -->
-  <text x="200" y="250" text-anchor="middle" font-family="Arial" font-size="14" fill="#475569">
-    <tspan x="200" dy="0">1st Law: An object remains at rest or in motion unless acted upon by a force</tspan>
-    <tspan x="200" dy="20">2nd Law: F = ma</tspan>
-    <tspan x="200" dy="20">3rd Law: For every action, there is an equal and opposite reaction</tspan>
-  </text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Newton's Laws</h3>
           <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
         </a>
         <a href="projectile_motion.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Equations -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#1e293b">
-    <tspan x="200" dy="0">x = v₀t cos θ</tspan>
-    <tspan x="200" dy="20">y = v₀t sin θ - ½gt²</tspan>
-  </text>
-  
-  <!-- Trajectory Path -->
-  <path d="M50,250 Q 200,50 350,250" stroke="#3b82f6" stroke-width="2" fill="none"/>
-  
-  <!-- Moving Ball -->
-  <circle r="8" fill="#ef4444">
-    <animateMotion dur="3s" repeatCount="indefinite"
-      path="M50,250 Q 200,50 350,250"/>
-  </circle>
-  
-  <!-- Velocity Vectors -->
-  <g stroke="#10b981" stroke-width="2">
-    <!-- Initial velocity vector -->
-    <line x1="50" y1="250" x2="80" y2="220">
-      <animate attributeName="opacity" values="1;0;1" dur="3s" repeatCount="indefinite"/>
-    </line>
-    <!-- Velocity components at apex -->
-    <line x1="200" y1="100" x2="230" y2="100">
-      <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/>
-    </line>
-  </g>
-  
-  <!-- Ground Line -->
-  <line x1="30" y1="250" x2="370" y2="250" stroke="#475569" stroke-width="2"/>
-  
-  <!-- Labels -->
-  <text x="200" y="280" text-anchor="middle" font-family="Arial" font-size="14" fill="#475569">
-    Range
-  </text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Projectile Motion</h3>
           <p class="text-sm text-gray-500">Explore the physics of moving objects</p>
         </a>
         <a href="work_energy_power.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Equations -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#1e293b">
-    <tspan x="200" dy="0">W = F·d = ΔE</tspan>
-    <tspan x="200" dy="20">E = ½mv² + mgh</tspan>
-  </text>
-  
-  <!-- Pendulum -->
-  <g transform="translate(200,100)">
-    <line stroke="#475569" stroke-width="2">
-      <animate attributeName="x2" values="0;50;0;-50;0" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="y2" values="0;40;0;40;0" dur="2s" repeatCount="indefinite"/>
-    </line>
-    <circle r="10" fill="#3b82f6">
-      <animate attributeName="cx" values="0;50;0;-50;0" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="cy" values="0;40;0;40;0" dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </g>
-  
-  <!-- Energy Bars -->
-  <g transform="translate(50,200)">
-    <!-- Potential Energy -->
-    <rect x="0" y="0" width="20" height="80" fill="#10b981">
-      <animate attributeName="height" values="80;0;80" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="y" values="0;80;0" dur="2s" repeatCount="indefinite"/>
-    </rect>
-    <!-- Kinetic Energy -->
-    <rect x="30" y="0" width="20" height="0" fill="#ef4444">
-      <animate attributeName="height" values="0;80;0" dur="2s" repeatCount="indefinite"/>
-      <animate attributeName="y" values="80;0;80" dur="2s" repeatCount="indefinite"/>
-    </rect>
-  </g>
-  
-  <!-- Labels -->
-  <text x="60" y="290" text-anchor="middle" font-family="Arial" font-size="12" fill="#475569">
-    <tspan x="60" dy="0">PE</tspan>
-    <tspan x="90" dy="0">KE</tspan>
-  </text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Work and Energy</h3>
           <p class="text-sm text-gray-500">Discover energy transformation principles</p>
@@ -374,113 +332,24 @@
     <div class="max-w-7xl mx-auto">
       <h2 class="text-3xl font-semibold mb-12">
         Electromagnetism 
-        <!-- Lightning bolt icon -->
         <span class="inline-block ml-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </span>
       </h2>
+      <div id="animationEM" class="animation-container"></div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Content Cards for Electromagnetism -->
         <a href="circuit_simulator.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Equations -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#1e293b">
-    <tspan x="200" dy="0">V = IR</tspan>
-    <tspan x="200" dy="20">P = VI</tspan>
-  </text>
-  
-  <!-- Circuit -->
-  <g transform="translate(100,100)">
-    <!-- Battery -->
-    <line x1="0" y1="0" x2="0" y2="40" stroke="#475569" stroke-width="2"/>
-    <line x1="-10" y1="10" x2="10" y2="10" stroke="#475569" stroke-width="2"/>
-    <line x1="-5" y1="30" x2="5" y2="30" stroke="#475569" stroke-width="2"/>
-    
-    <!-- Resistor -->
-    <path d="M200,0 h-40 l-5,5 l10,10 l-10,10 l10,10 l-10,10 l5,5 h40" 
-          fill="none" stroke="#475569" stroke-width="2"/>
-    
-    <!-- Wires -->
-    <path d="M0,0 H200 M0,40 H200" 
-          stroke="#475569" stroke-width="2" fill="none"/>
-    
-    <!-- Current Flow -->
-    <circle r="3" fill="#ef4444">
-      <animateMotion path="M0,0 H200 v40 H0 v-40" 
-                     dur="2s" repeatCount="indefinite"/>
-    </circle>
-  </g>
-  
-  <!-- Voltage Graph -->
-  <g transform="translate(50,200)">
-    <path d="M0,0 v50 h300" stroke="#475569" stroke-width="1"/>
-    <path stroke="#3b82f6" stroke-width="2" fill="none">
-      <animate attributeName="d" 
-               values="M0,25 h100 v-20 h100 v20 h100;
-                       M0,25 h100 v20 h100 v-20 h100;
-                       M0,25 h100 v-20 h100 v20 h100"
-               dur="2s" repeatCount="indefinite"/>
-    </path>
-  </g>
-  
-  <!-- Labels -->
-  <text x="85" y="105" font-family="Arial" font-size="12" fill="#475569">V</text>
-  <text x="270" y="105" font-family="Arial" font-size="12" fill="#475569">R</text>
-  <text x="350" y="220" font-family="Arial" font-size="12" fill="#475569">t</text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Circuit Lab</h3>
           <p class="text-sm text-gray-500">Build and analyze electrical circuits</p>
         </a>
         <a href="electromagnetic_flux.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Maxwell's Equations -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="14" fill="#1e293b">
-    <tspan x="200" dy="0">∇ × E = -∂B/∂t</tspan>
-    <tspan x="200" dy="20">∇ × B = μ₀J + μ₀ε₀∂E/∂t</tspan>
-  </text>
-  
-  <!-- Electric Field Wave -->
-  <path stroke="#ef4444" stroke-width="2" fill="none">
-    <animate attributeName="d" 
-             values="M50,150 Q 150,100 250,150 T 450,150;
-                     M50,150 Q 150,200 250,150 T 450,150;
-                     M50,150 Q 150,100 250,150 T 450,150"
-             dur="3s" repeatCount="indefinite"/>
-  </path>
-  
-  <!-- Magnetic Field Wave -->
-  <path stroke="#3b82f6" stroke-width="2" fill="none">
-    <animate attributeName="d" 
-             values="M50,150 Q 150,200 250,150 T 450,150;
-                     M50,150 Q 150,100 250,150 T 450,150;
-                     M50,150 Q 150,200 250,150 T 450,150"
-             dur="3s" repeatCount="indefinite"/>
-  </path>
-  
-  <!-- Direction Arrow -->
-  <path d="M370,150 L390,150 M380,140 L390,150 L380,160" 
-        stroke="#475569" stroke-width="2" fill="none"/>
-  
-  <!-- Labels -->
-  <text x="350" y="130" font-family="Arial" font-size="12" fill="#ef4444">E</text>
-  <text x="350" y="170" font-family="Arial" font-size="12" fill="#3b82f6">B</text>
-  <text x="380" y="130" font-family="Arial" font-size="12" fill="#475569">k</text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Electromagnetic Waves</h3>
           <p class="text-sm text-gray-500">Visualize electromagnetic wave propagation</p>
@@ -494,117 +363,24 @@
     <div class="max-w-7xl mx-auto">
       <h2 class="text-3xl font-semibold mb-12">
         Waves & Optics 
-        <!-- Sine wave icon -->
         <span class="inline-block ml-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12c4-4 8 4 12 0" />
           </svg>
         </span>
       </h2>
+      <div id="animationWaves" class="animation-container"></div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Content Cards for Waves & Optics -->
         <a href="waves.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Wave Equation -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#1e293b">
-    <tspan x="200" dy="0">∂²y/∂t² = v²(∂²y/∂x²)</tspan>
-    <tspan x="200" dy="20">y(x,t) = A sin(kx - ωt)</tspan>
-  </text>
-  
-  <!-- Standing Wave -->
-  <g transform="translate(50,150)">
-    <path stroke="#3b82f6" stroke-width="2" fill="none">
-      <animate attributeName="d" 
-               values="M0,0 Q 75,-50 150,0 T 300,0;
-                       M0,0 Q 75,50 150,0 T 300,0;
-                       M0,0 Q 75,-50 150,0 T 300,0"
-               dur="2s" repeatCount="indefinite"/>
-    </path>
-    
-    <!-- Nodes -->
-    <circle cx="0" cy="0" r="4" fill="#ef4444"/>
-    <circle cx="150" cy="0" r="4" fill="#ef4444"/>
-    <circle cx="300" cy="0" r="4" fill="#ef4444"/>
-  </g>
-  
-  <!-- Wavelength Indicator -->
-  <g transform="translate(50,200)">
-    <line x1="0" y1="0" x2="300" y2="0" stroke="#475569" stroke-width="1"/>
-    <path d="M0,-5 v10 M150,-5 v10 M300,-5 v10" stroke="#475569" stroke-width="1"/>
-    <text x="75" y="20" text-anchor="middle" font-family="Arial" font-size="12" fill="#475569">λ</text>
-  </g>
-  
-  <!-- Amplitude Indicator -->
-  <line x1="30" y1="100" x2="30" y2="200" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
-  <text x="20" y="150" text-anchor="middle" font-family="Arial" font-size="12" fill="#475569">A</text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Wave Motion</h3>
           <p class="text-sm text-gray-500">Study wave properties and behavior</p>
         </a>
         <a href="optics_simulator.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Lens Equation -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#1e293b">
-    <tspan x="200" dy="0">1/f = 1/u + 1/v</tspan>
-    <tspan x="200" dy="20">M = -v/u</tspan>
-  </text>
-  
-  <!-- Optical System -->
-  <g transform="translate(50,150)">
-    <!-- Principal Axis -->
-    <line x1="0" y1="0" x2="300" y2="0" stroke="#475569" stroke-width="1"/>
-    
-    <!-- Lens -->
-    <path d="M150,-50 Q 160,0 150,50" stroke="#3b82f6" stroke-width="2" fill="none"/>
-    <path d="M140,-50 Q 130,0 140,50" stroke="#3b82f6" stroke-width="2" fill="none"/>
-    
-    <!-- Object -->
-    <line x1="50" y1="0" x2="50" y2="-40" stroke="#ef4444" stroke-width="2">
-      <animate attributeName="y2" values="-40;-20;-40" dur="3s" repeatCount="indefinite"/>
-    </line>
-    
-    <!-- Image -->
-    <line x1="250" y1="0" x2="250" y2="40" stroke="#10b981" stroke-width="2" opacity="0.7">
-      <animate attributeName="y2" values="40;20;40" dur="3s" repeatCount="indefinite"/>
-    </line>
-    
-    <!-- Light Rays -->
-    <g stroke="#fbbf24" stroke-width="1" opacity="0.7">
-      <!-- Parallel Ray -->
-      <line>
-        <animate attributeName="x1" values="50;150" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="y1" values="-40;-40" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="x2" values="150;250" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="y2" values="-40;40" dur="3s" repeatCount="indefinite"/>
-      </line>
-      <!-- Focal Ray -->
-      <line>
-        <animate attributeName="x1" values="50;150" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="y1" values="-40;-40" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="x2" values="150;250" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="y2" values="-40;40" dur="3s" repeatCount="indefinite"/>
-      </line>
-    </g>
-  </g>
-  
-  <!-- Labels -->
-  <text x="95" y="130" font-family="Arial" font-size="12" fill="#475569">Object</text>
-  <text x="295" y="130" font-family="Arial" font-size="12" fill="#475569">Image</text>
-  <text x="200" y="220" font-family="Arial" font-size="12" fill="#475569">f</text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Optics Lab</h3>
           <p class="text-sm text-gray-500">Explore light behavior and lenses</p>
@@ -618,141 +394,26 @@
     <div class="max-w-7xl mx-auto">
       <h2 class="text-3xl font-semibold mb-12">
         Modern Physics 
-        <!-- Atom icon -->
         <span class="inline-block ml-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <!-- Central circle -->
             <circle cx="12" cy="12" r="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle>
-            <!-- Orbits -->
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a7 7 0 00-14.8 0" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.6 9a7 7 0 0014.8 0" />
           </svg>
         </span>
       </h2>
+      <div id="animationModern" class="animation-container"></div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Content Cards for Modern Physics -->
         <a href="quantum_mechanics" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Schrödinger Equation -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#1e293b">
-    <tspan x="200" dy="0">iℏ∂ψ/∂t = Ĥψ</tspan>
-    <tspan x="200" dy="20">E = ℏω</tspan>
-  </text>
-  
-  <!-- Probability Wave -->
-  <path stroke="#3b82f6" stroke-width="2" fill="none" opacity="0.5">
-    <animate attributeName="d" 
-             values="M50,150 Q 125,50 200,150 T 350,150;
-                     M50,150 Q 125,250 200,150 T 350,150;
-                     M50,150 Q 125,50 200,150 T 350,150"
-             dur="4s" repeatCount="indefinite"/>
-  </path>
-  
-  <!-- Particle Position -->
-  <circle r="6" fill="#ef4444">
-    <animateMotion dur="4s" repeatCount="indefinite"
-      path="M50,150 Q 125,50 200,150 T 350,150"/>
-    <animate attributeName="opacity" values="0.2;1;0.2" dur="4s" repeatCount="indefinite"/>
-  </circle>
-  
-  <!-- Energy Levels -->
-  <g transform="translate(50,100)">
-    <!-- Energy level lines -->
-    <line x1="0" y1="0" x2="50" y2="0" stroke="#10b981" stroke-width="2"/>
-    <line x1="0" y1="30" x2="50" y2="30" stroke="#10b981" stroke-width="2"/>
-    <line x1="0" y1="60" x2="50" y2="60" stroke="#10b981" stroke-width="2"/>
-    
-    <!-- Electron transition -->
-    <circle r="4" fill="#ef4444">
-      <animate attributeName="cy" values="60;0;30" dur="4s" repeatCount="indefinite"/>
-    </circle>
-  </g>
-  
-  <!-- Labels -->
-  <text x="40" y="90" font-family="Arial" font-size="12" fill="#475569">n=1</text>
-  <text x="40" y="120" font-family="Arial" font-size="12" fill="#475569">n=2</text>
-  <text x="40" y="150" font-family="Arial" font-size="12" fill="#475569">n=3</text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Quantum Mechanics</h3>
           <p class="text-sm text-gray-500">Discover the quantum world</p>
         </a>
         <a href="nuclear_reactor.html" class="sim-card group">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-  <!-- Background -->
-  <rect width="400" height="300" fill="#f8fafc"/>
-  
-  <!-- Nuclear Equations -->
-  <text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#1e293b">
-    <tspan x="200" dy="0">E = mc²</tspan>
-    <tspan x="200" dy="20">N(t) = N₀e^(-λt)</tspan>
-  </text>
-  
-  <!-- Atom -->
-  <g transform="translate(200,150)">
-    <!-- Electron Orbits -->
-    <ellipse rx="80" ry="30" fill="none" stroke="#475569" stroke-width="1">
-      <animateTransform attributeName="transform" type="rotate"
-                       from="0" to="360" dur="4s" repeatCount="indefinite"/>
-    </ellipse>
-    <ellipse rx="80" ry="30" fill="none" stroke="#475569" stroke-width="1" transform="rotate(60)">
-      <animateTransform attributeName="transform" type="rotate"
-                       from="60" to="420" dur="4s" repeatCount="indefinite"/>
-    </ellipse>
-    <ellipse rx="80" ry="30" fill="none" stroke="#475569" stroke-width="1" transform="rotate(120)">
-      <animateTransform attributeName="transform" type="rotate"
-                       from="120" to="480" dur="4s" repeatCount="indefinite"/>
-    </ellipse>
-    
-    <!-- Nucleus -->
-    <g>
-      <!-- Protons -->
-      <circle cx="5" cy="5" r="10" fill="#ef4444">
-        <animate attributeName="r" values="10;11;10" dur="2s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="-5" cy="-5" r="10" fill="#ef4444">
-        <animate attributeName="r" values="10;11;10" dur="2s" repeatCount="indefinite"/>
-      </circle>
-      
-      <!-- Neutrons -->
-      <circle cx="-5" cy="5" r="10" fill="#3b82f6">
-        <animate attributeName="r" values="10;11;10" dur="2s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="5" cy="-5" r="10" fill="#3b82f6">
-        <animate attributeName="r" values="10;11;10" dur="2s" repeatCount="indefinite"/>
-      </circle>
-    </g>
-    
-    <!-- Electrons -->
-    <circle r="4" fill="#10b981">
-      <animateMotion dur="4s" repeatCount="indefinite"
-        path="M 0,0 m -80,0 a 80,30 0 1,0 160,0 a 80,30 0 1,0 -160,0"/>
-    </circle>
-    <circle r="4" fill="#10b981">
-      <animateMotion dur="4s" repeatCount="indefinite"
-        path="M 0,0 m -40,70 a 80,30 0 1,0 80,-140 a 80,30 0 1,0 -80,140"/>
-    </circle>
-  </g>
-  
-  <!-- Decay Path -->
-  <path d="M320,120 q 40,20 60,60" stroke="#fbbf24" stroke-width="2" fill="none" opacity="0.7">
-    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
-  </path>
-  
-  <!-- Labels -->
-  <text x="180" y="90" font-family="Arial" font-size="12" fill="#ef4444">p+</text>
-  <text x="220" y="90" font-family="Arial" font-size="12" fill="#3b82f6">n</text>
-  <text x="280" y="150" font-family="Arial" font-size="12" fill="#10b981">e-</text>
-</svg>
-            </div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
           </div>
           <h3 class="text-lg font-medium mb-2">Nuclear Physics</h3>
           <p class="text-sm text-gray-500">Explore atomic nuclei and radiation</p>
@@ -761,17 +422,18 @@
     </div>
   </section>
   
-  <!-- Paywall Modal (Firebase Login) -->
+  <!-- Paywall Modal (Firebase Login) with Lock Animation -->
   <div id="paywallModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
     <div class="absolute inset-0 modal-bg"></div>
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 p-6 w-11/12 md:w-1/3">
+      <div id="animationLock" class="animation-container"></div>
       <h2 class="text-2xl font-bold mb-4">Access Restricted</h2>
       <p class="mb-4">You must be signed in to access this content.</p>
-      <!-- Login Form -->
       <form id="loginForm">
         <input type="email" id="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded mb-4" required />
         <input type="password" id="password" placeholder="Password" class="w-full p-2 border border-gray-300 rounded mb-4" required />
         <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Login</button>
+        <p id="loginError" class="mt-2 text-red-600 text-sm hidden"></p>
       </form>
       <p class="mt-4 text-center">
         Don't have an account? 
@@ -780,97 +442,78 @@
     </div>
   </div>
   
-  <!-- Settings Sidebar -->
-  <div id="settingsSidebar">
-    <div class="p-6">
-      <h3 class="text-2xl font-bold mb-4">Settings</h3>
-      <ul class="space-y-4">
-        <li>
-          <a href="edit_profile.html" class="block text-lg text-gray-800 dark:text-gray-200 hover:underline">
-            Edit Profile
-          </a>
-        </li>
-        <!-- Only show this if the user is a teacher -->
-        <li id="teacherOptions" class="hidden">
-          <a href="manage_classes.html" class="block text-lg text-gray-800 dark:text-gray-200 hover:underline">
-            Manage Pupils/Classes
-          </a>
-        </li>
-        <li>
-          <button id="signOutBtn" class="w-full text-left text-lg text-red-600 hover:underline">
-            Sign Out
-          </button>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <!-- Lottie Web Library for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
   
   <!-- Firebase and Custom Scripts -->
-  <!-- Firebase SDK (Modular) -->
   <script type="module">
-    // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    // TODO: Replace with your Firebase project configuration
-    const config = {
-            firebase: {
-                apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-                authDomain: "lumenos-749a1.firebaseapp.com",
-                projectId: "lumenos-749a1",
-                storageBucket: "lumenos-749a1.firebasestorage.app",
-                messagingSenderId: "857410556058",
-                appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-                measurementId: "G-CEZ4PHV9GE"
-            }
-        };
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+      authDomain: "lumenos-749a1.firebaseapp.com",
+      projectId: "lumenos-749a1",
+      storageBucket: "lumenos-749a1.firebasestorage.app",
+      messagingSenderId: "857410556058",
+      appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+      measurementId: "G-CEZ4PHV9GE"
+    };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Monitor auth state and show/hide paywall accordingly
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in – hide the paywall modal.
         document.getElementById("paywallModal").classList.add("hidden");
-        
-        // For demonstration, assume user role is stored in user.customClaims.role or similar.
-        // Here we set a dummy value. Replace with your own logic.
-        let userRole = "teacher"; // or "student"
-        if(userRole === "teacher") {
-          document.getElementById("teacherOptions").classList.remove("hidden");
-        } else {
-          document.getElementById("teacherOptions").classList.add("hidden");
+        // Update sidebar and profile with authenticated user details.
+        document.getElementById("sidebarUsername").textContent = user.displayName || user.email;
+        document.getElementById("sidebarEmail").textContent = user.email;
+        if(user.photoURL){
+          document.getElementById("sidebarAvatar").src = user.photoURL;
+          document.getElementById("profileAvatar").style.backgroundImage = `url(${user.photoURL})`;
+          document.getElementById("profileAvatar").textContent = "";
         }
+        else {
+          // Default avatar or initials if no photo provided
+          document.getElementById("sidebarAvatar").src = "//via.placeholder.com/40";
+          document.getElementById("profileAvatar").textContent = user.email.charAt(0).toUpperCase();
+        }
+        // Teacher-only options based on custom claims.
+        user.getIdTokenResult().then((idTokenResult) => {
+          if (idTokenResult.claims.role === 'teacher') {
+            document.getElementById("teacherOptions").classList.remove("hidden");
+          } else {
+            document.getElementById("teacherOptions").classList.add("hidden");
+          }
+        });
       } else {
-        // No user is signed in – show the paywall modal.
         document.getElementById("paywallModal").classList.remove("hidden");
       }
     });
 
-    // Handle login form submission
     const loginForm = document.getElementById("loginForm");
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+      const loginError = document.getElementById("loginError");
+
       signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Successful login
+        .then(() => {
+          loginError.classList.add("hidden");
           document.getElementById("paywallModal").classList.add("hidden");
         })
         .catch((error) => {
-          alert("Login error: " + error.message);
+          loginError.textContent = "Login error: " + error.message;
+          loginError.classList.remove("hidden");
         });
     });
 
-    // Sign out button handler
     document.getElementById("signOutBtn").addEventListener("click", () => {
       signOut(auth)
         .then(() => {
-          // Sign-out successful.
-          document.getElementById("settingsSidebar").classList.remove("active");
+          document.getElementById("settingsSidebar").style.right = "-300px";
         })
         .catch((error) => {
           alert("Sign out error: " + error.message);
@@ -878,7 +521,7 @@
     });
   </script>
   
-  <!-- Additional Scripts (Dark mode, Mobile menu, Search, Settings Sidebar, etc.) -->
+  <!-- Additional Scripts (Dark mode, Mobile menu, Search, Sidebar, Animations) -->
   <script>
     // Dark mode toggle
     const themeToggle = document.getElementById('themeToggle');
@@ -895,8 +538,6 @@
       sunIcon.classList.toggle('hidden');
       moonIcon.classList.toggle('hidden');
       localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-      
-      // Also update the sidebar theme if it's open.
       if(document.getElementById("settingsSidebar").classList.contains("active")){
         document.getElementById("settingsSidebar").classList.toggle("dark");
       }
@@ -972,18 +613,48 @@
       }
     });
 
-    // Settings Sidebar toggle
+    // Settings Sidebar toggle logic
     const profileBtn = document.getElementById('profileBtn');
     const settingsSidebar = document.getElementById('settingsSidebar');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+
     profileBtn.addEventListener('click', () => {
-      settingsSidebar.classList.toggle('active');
-      // Sync sidebar dark mode with document
-      if(document.documentElement.classList.contains('dark')){
-        settingsSidebar.classList.add('dark');
+      if (settingsSidebar.style.right === "0px") {
+        settingsSidebar.style.right = "-300px";
       } else {
-        settingsSidebar.classList.remove('dark');
+        settingsSidebar.style.right = "0px";
       }
     });
+    sidebarCloseBtn.addEventListener('click', () => {
+      settingsSidebar.style.right = "-300px";
+    });
+    
+    // Lottie Animations Initialization
+    const animations = {
+      hero: 'https://assets3.lottiefiles.com/packages/lf20_jcikwtux.json',
+      mechanics: 'https://assets3.lottiefiles.com/packages/lf20_u4yrau.json',
+      electromagnetism: 'https://assets3.lottiefiles.com/packages/lf20_ydo1amjm.json',
+      waves: 'https://assets3.lottiefiles.com/packages/lf20_GU1j1a.json',
+      modern: 'https://assets3.lottiefiles.com/packages/lf20_z3nq1p.json',
+      lock: 'https://assets3.lottiefiles.com/packages/lf20_sFzONL.json'
+    };
+
+    function loadAnimation(containerId, animationPath) {
+      lottie.loadAnimation({
+        container: document.getElementById(containerId),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: animationPath
+      });
+    }
+
+    loadAnimation('animationHero', animations.hero);
+    loadAnimation('animationMechanics', animations.mechanics);
+    loadAnimation('animationEM', animations.electromagnetism);
+    loadAnimation('animationWaves', animations.waves);
+    loadAnimation('animationModern', animations.modern);
+    loadAnimation('animationLock', animations.lock);
   </script>
 </body>
 </html>
