@@ -5,84 +5,171 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Physics Motion Simulator</title>
   <style>
+    :root {
+      --primary-color: #2196F3;
+      --primary-dark: #1976D2;
+      --accent-color: #E91E63;
+      --bg-color: #f0f2f5;
+      --card-bg: #ffffff;
+      --formula-bg: #fff3e0;
+      --facts-bg: #e3f2fd;
+      --control-bg: #f5f5f5;
+      --ground-color: #4CAF50;
+      --button-gradient: linear-gradient(145deg, #2196F3, #1976D2);
+      --button-hover: linear-gradient(145deg, #1976D2, #1565C0);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f0f2f5;
+      background-color: var(--bg-color);
+      color: #333;
+      line-height: 1.6;
     }
 
     .container {
-      background-color: white;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
       padding: 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
       border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      padding: 20px;
+      margin-bottom: 20px;
     }
 
     h1, h2, h3 {
-      color: #2196F3;
+      color: var(--primary-color);
     }
 
     h1 {
       text-align: center;
+      margin-bottom: 20px;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
     }
 
     .tabs {
       display: flex;
       gap: 10px;
       margin: 20px 0;
+      flex-wrap: wrap;
     }
 
     .tab {
       padding: 10px 20px;
-      background-color: #e3f2fd;
+      background-color: var(--facts-bg);
       border-radius: 5px;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
     .tab.active {
-      background-color: #2196F3;
+      background-color: var(--primary-color);
       color: white;
     }
 
     .formulas {
-      background-color: #fff3e0;
+      background-color: var(--formula-bg);
       padding: 15px;
       border-radius: 8px;
       margin: 15px 0;
       font-family: "Times New Roman", serif;
+      overflow-x: auto;
+    }
+
+    .formula {
+      margin: 10px 0;
     }
 
     .simple-facts {
-      background-color: #e3f2fd;
+      background-color: var(--facts-bg);
       padding: 15px;
       border-radius: 8px;
       margin: 15px 0;
     }
 
+    .simple-facts ul {
+      padding-left: 20px;
+    }
+
     .controls {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
       margin: 20px 0;
     }
 
     .control-box {
-      background-color: #f5f5f5;
+      background-color: var(--control-bg);
       padding: 15px;
       border-radius: 8px;
     }
 
+    /* Sexy slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      background: #ddd;
+      border-radius: 5px;
+      outline: none;
+      margin: 10px 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--primary-dark);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--primary-color);
+      transform: scale(1.1);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--primary-dark);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    input[type="range"]::-moz-range-thumb:hover {
+      background: var(--primary-color);
+      transform: scale(1.1);
+    }
+
+    .canvas-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
     .canvas-container {
       position: relative;
-      margin: 40px 0;
       padding-left: 40px;
+      min-width: 600px;
     }
 
     canvas {
-      border: 2px solid #2196F3;
+      border: 2px solid var(--primary-color);
       border-radius: 8px;
+      background-color: white;
+      display: block;
     }
 
     .y-axis {
@@ -92,6 +179,7 @@
       bottom: 5px;
       width: 40px;
       border-right: 2px solid #666;
+      height: 100%;
     }
 
     .y-axis-mark {
@@ -109,169 +197,213 @@
       transform: translateY(50%);
       color: #666;
       font-size: 12px;
+      white-space: nowrap;
     }
 
+    /* Sexy button styling */
     button {
-      background-color: #2196F3;
+      background: var(--button-gradient);
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
+      padding: 12px 24px;
+      border-radius: 30px;
       cursor: pointer;
       font-size: 16px;
       display: block;
       margin: 20px auto;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     }
-
     button:hover {
-      background-color: #1976D2;
-    }
-
-    .result-box {
-      background-color: #f5f5f5;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 5px 0;
-      text-align: center;
+      background: var(--button-hover);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
     }
 
     .results-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 10px;
       margin: 20px 0;
     }
 
-    .formula {
-      margin: 10px 0;
+    .result-box {
+      background-color: var(--control-bg);
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .controls {
+        grid-template-columns: 1fr;
+      }
+      
+      .canvas-container {
+        min-width: 450px;
+      }
+      
+      canvas {
+        width: 450px;
+        height: 225px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .canvas-container {
+        min-width: 350px;
+      }
+      
+      canvas {
+        width: 350px;
+        height: 175px;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Physics Motion Simulator</h1>
-    
-    <div class="formulas">
-      <h3>Key Formulas:</h3>
-      <div id="projectile-formulas">
-        <div class="formula">
-          <strong>Position:</strong><br>
-          $$x = v_0 \cos(\theta)t$$
-          $$y = v_0 \sin(\theta)t - \frac{1}{2}gt^2$$
+    <div class="card">
+      <h1>Physics Motion Simulator</h1>
+      
+      <div class="formulas">
+        <h3>Key Formulas:</h3>
+        <div id="projectile-formulas">
+          <div class="formula">
+            <strong>Position:</strong><br>
+            $$x = v_0 \cos(\theta)t$$
+            $$y = v_0 \sin(\theta)t - \frac{1}{2}gt^2$$
+          </div>
+          <div class="formula">
+            <strong>Maximum Height:</strong><br>
+            $$h_{max} = \frac{v_0^2\sin^2(\theta)}{2g}$$
+          </div>
+          <div class="formula">
+            <strong>Range:</strong><br>
+            $$R = \frac{v_0^2\sin(2\theta)}{g}$$
+          </div>
+          <div class="formula">
+            <strong>Time of Flight:</strong><br>
+            $$T = \frac{2v_0\sin(\theta)}{g}$$
+          </div>
+          <div class="formula">
+            <strong>Units:</strong><br>
+            • Velocity (v): m/s<br>
+            • Acceleration (g): m/s²<br>
+            • Position (x,y): m<br>
+            • Time (t): s<br>
+            • Angle (θ): °
+          </div>
         </div>
-        <div class="formula">
-          <strong>Maximum Height:</strong><br>
-          $$h_{max} = \frac{v_0^2\sin^2(\theta)}{2g}$$
-        </div>
-        <div class="formula">
-          <strong>Range:</strong><br>
-          $$R = \frac{v_0^2\sin(2\theta)}{g}$$
-        </div>
-        <div class="formula">
-          <strong>Time of Flight:</strong><br>
-          $$T = \frac{2v_0\sin(\theta)}{g}$$
-        </div>
-        <div class="formula">
-          <strong>Units:</strong><br>
-          • Velocity (v): meters per second (m/s)<br>
-          • Acceleration (g): meters per second squared (m/s²)<br>
-          • Position (x,y): meters (m)<br>
-          • Time (t): seconds (s)<br>
-          • Angle (θ): degrees (°)
+        <div id="linear-formulas" style="display: none;">
+          <div class="formula">
+            <strong>Position:</strong><br>
+            $$x = x_0 + v_0t + \frac{1}{2}at^2$$
+          </div>
+          <div class="formula">
+            <strong>Velocity:</strong><br>
+            $$v = v_0 + at$$
+          </div>
+          <div class="formula">
+            <strong>Units:</strong><br>
+            • Initial Position (x₀): m<br>
+            • Velocity (v): m/s<br>
+            • Acceleration (a): m/s²<br>
+            • Time (t): s
+          </div>
         </div>
       </div>
-      <div id="linear-formulas" style="display: none;">
-        <div class="formula">
-          <strong>Position:</strong><br>
-          $$x = x_0 + v_0t + \frac{1}{2}at^2$$
-        </div>
-        <div class="formula">
-          <strong>Velocity:</strong><br>
-          $$v = v_0 + at$$
-        </div>
-        <div class="formula">
-          <strong>Units:</strong><br>
-          • Initial Position (x₀): meters (m)<br>
-          • Velocity (v): meters per second (m/s)<br>
-          • Acceleration (a): meters per second squared (m/s²)<br>
-          • Time (t): seconds (s)
-        </div>
+
+      <div class="simple-facts" id="projectile-facts">
+        <h3>Projectile Motion Facts:</h3>
+        <ul>
+          <li>Follows a parabolic path due to constant gravitational acceleration (g = 9.8 m/s²)</li>
+          <li>Horizontal motion is constant (no acceleration)</li>
+          <li>Vertical motion has constant acceleration due to gravity</li>
+          <li>Maximum height occurs when vertical velocity becomes zero</li>
+          <li>Range is maximum at 45° launch angle</li>
+          <li>Motion is symmetric about the highest point</li>
+        </ul>
       </div>
-    </div>
 
-    <div class="simple-facts" id="projectile-facts">
-      <h3>Projectile Motion Facts:</h3>
-      <ul>
-        <li>Follows a parabolic path due to constant gravitational acceleration (g = 9.8 m/s²)</li>
-        <li>Horizontal motion is constant (no acceleration)</li>
-        <li>Vertical motion has constant acceleration due to gravity</li>
-        <li>Maximum height occurs when vertical velocity becomes zero</li>
-        <li>Range is maximum at 45° launch angle</li>
-        <li>Motion is symmetric about the highest point</li>
-      </ul>
-    </div>
-
-    <div class="simple-facts" id="linear-facts" style="display: none;">
-      <h3>Linear Motion Facts:</h3>
-      <ul>
-        <li>Motion along a straight line</li>
-        <li>Constant acceleration results in linear velocity change</li>
-        <li>Position-time graph is parabolic for constant acceleration</li>
-        <li>Velocity-time graph is linear for constant acceleration</li>
-        <li>Area under v-t graph gives displacement</li>
-      </ul>
-    </div>
-    
-    <div class="tabs">
-      <div class="tab active" onclick="switchMode('projectile')">Projectile Motion</div>
-    </div>
-
-    <div class="controls" id="projectile-controls">
-      <div class="control-box">
-        <label for="angle">Initial Angle (θ): <span id="angle-value">45</span>°</label><br>
-        <input type="range" id="angle" min="0" max="90" value="45">
-        <p>Higher angle = Higher trajectory</p>
+      <div class="simple-facts" id="linear-facts" style="display: none;">
+        <h3>Linear Motion Facts:</h3>
+        <ul>
+          <li>Motion along a straight line</li>
+          <li>Constant acceleration results in linear velocity change</li>
+          <li>Position-time graph is parabolic for constant acceleration</li>
+          <li>Velocity-time graph is linear for constant acceleration</li>
+          <li>Area under v-t graph gives displacement</li>
+        </ul>
       </div>
       
-      <div class="control-box">
-        <label for="velocity">Initial Velocity (v₀): <span id="velocity-value">20</span> m/s</label><br>
-        <input type="range" id="velocity" min="5" max="30" value="20">
-        <p>Higher velocity = Greater range</p>
+      <div class="tabs">
+        <div class="tab active" onclick="switchMode('projectile', event)">Projectile Motion</div>
       </div>
 
-      <div class="control-box">
-        <label for="bounce">Coefficient of Restitution: <span id="bounce-value">0.7</span></label><br>
-        <input type="range" id="bounce" min="0" max="100" value="70">
-        <p>1 = Perfect elastic collision</p>
-      </div>
-    </div>
+      <div class="controls" id="projectile-controls">
+        <div class="control-box">
+          <label for="angle">Initial Angle (θ): <span id="angle-value">45</span>°</label><br>
+          <input type="range" id="angle" min="0" max="90" value="45">
+          <p>Higher angle = Higher trajectory</p>
+        </div>
+        
+        <div class="control-box">
+          <label for="velocity">Initial Velocity (v₀): <span id="velocity-value">20</span> m/s</label><br>
+          <input type="range" id="velocity" min="5" max="30" value="20">
+          <p>Higher velocity = Greater range</p>
+        </div>
 
-    <button onclick="startSimulation()">Start Simulation</button>
+        <div class="control-box">
+          <label for="bounce">Coefficient of Restitution: <span id="bounce-value">0.7</span></label><br>
+          <input type="range" id="bounce" min="0" max="100" value="70">
+          <p>1 = Perfect elastic collision</p>
+        </div>
+      </div>
 
-    <div class="results-grid" id="projectile-results">
-      <div class="result-box">
-        <strong>Maximum Height:</strong><br>
-        <span id="max-height-display">0</span> m
-      </div>
-      <div class="result-box">
-        <strong>Range:</strong><br>
-        <span id="range-display">0</span> m
-      </div>
-      <div class="result-box">
-        <strong>Time of Flight:</strong><br>
-        <span id="time-display">0</span> s
-      </div>
-    </div>
+      <button onclick="startSimulation()">Start Simulation</button>
 
-    <div class="canvas-container">
-      <div class="y-axis"></div>
-      <canvas id="canvas" width="800" height="400"></canvas>
+      <div class="results-grid" id="projectile-results">
+        <div class="result-box">
+          <strong>Maximum Height:</strong><br>
+          <span id="max-height-display">0</span> m
+        </div>
+        <div class="result-box">
+          <strong>Range:</strong><br>
+          <span id="range-display">0</span> m
+        </div>
+        <div class="result-box">
+          <strong>Time of Flight:</strong><br>
+          <span id="time-display">0</span> s
+        </div>
+      </div>
+
+      <div class="canvas-wrapper">
+        <div class="canvas-container">
+          <div class="y-axis"></div>
+          <canvas id="canvas" width="800" height="400"></canvas>
+        </div>
+      </div>
     </div>
   </div>
   
-  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-<script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const angleSlider = document.getElementById('angle');
@@ -287,6 +419,28 @@
     let bounceFactor = parseFloat(bounceSlider.value) / 100;
     const g = 9.8;
     let animationId = null;
+    let canvasWidth = canvas.width;
+    let canvasHeight = canvas.height;
+
+    // Handle window resize
+    function resizeCanvas() {
+      const container = document.querySelector('.canvas-container');
+      const computedStyle = window.getComputedStyle(canvas);
+      const width = parseInt(computedStyle.width);
+      const height = parseInt(computedStyle.height);
+      
+      if (width !== canvasWidth || height !== canvasHeight) {
+        canvas.width = width;
+        canvas.height = height;
+        canvasWidth = width;
+        canvasHeight = height;
+        drawGround();
+        calculateResults();
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
 
     angleSlider.oninput = () => {
       angle = parseFloat(angleSlider.value);
@@ -321,7 +475,8 @@
     function updateYAxis(maxHeight) {
       yAxis.innerHTML = '';
       const height = canvas.height - 5;
-      const numMarks = 8;
+      const maxMarks = 8;
+      const numMarks = Math.min(maxMarks, Math.floor(height / 30));
       const marksSpacing = height / numMarks;
       const valueSpacing = maxHeight / numMarks;
 
@@ -354,34 +509,29 @@
       let x = 0;
       let y = 0;
       let time = 0;
-      const scale = 10; // Pixels per meter
+      
+      const expectedMaxDistance = Math.pow(velocity, 2) * Math.sin(2 * angleRad) / g;
+      const scale = Math.min(10, (canvas.width - 20) / expectedMaxDistance);
+      
       let path = [];
 
       function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawGround();
-
-        // Update position
         x = x + vx * 0.1;
         y = y + vy * 0.1;
         vy = vy - g * 0.1;
 
-        // Check for ground collision
         if (y < 0) {
           y = 0;
-          vy = -vy * bounceFactor;  // Reverse velocity and reduce it by bounce factor
-          
-          // Stop if bounce is too small
+          vy = -vy * bounceFactor;
           if (Math.abs(vy) < 0.5) {
             vy = 0;
             vx = 0;
           }
         }
-
-        // Store path point
         path.push({x: x, y: y});
 
-        // Draw path
         ctx.beginPath();
         ctx.strokeStyle = '#E91E63';
         ctx.lineWidth = 2;
@@ -394,37 +544,59 @@
         });
         ctx.stroke();
 
-        // Draw ball
+        const ballSize = Math.max(5, Math.min(10, canvas.width / 80));
         ctx.beginPath();
-        ctx.arc(x * scale, canvas.height - y * scale, 10, 0, Math.PI * 2);
+        ctx.arc(x * scale, canvas.height - y * scale, ballSize, 0, Math.PI * 2);
         ctx.fillStyle = '#2196F3';
         ctx.fill();
 
-        // Continue animation if ball is moving
         if (Math.abs(vx) > 0.01 || Math.abs(vy) > 0.01 || y > 0) {
           time += 0.1;
           animationId = requestAnimationFrame(animate);
         }
       }
-
       animate();
     }
 
     function drawGround() {
-      // Draw ground
-      ctx.fillStyle = '#4CAF50';
+      ctx.fillStyle = getCSSVar('--ground-color', '#4CAF50');
       ctx.fillRect(0, canvas.height - 5, canvas.width, 5);
 
-      // Draw measurement marks
+      const markSpacing = canvas.width <= 400 ? 50 : (canvas.width <= 600 ? 75 : 100);
+      
       ctx.fillStyle = '#666';
       ctx.textAlign = 'center';
-      for (let x = 0; x <= canvas.width; x += 100) {
+      ctx.font = `${Math.max(10, Math.min(12, canvas.width / 50))}px Arial`;
+      
+      for (let x = 0; x <= canvas.width; x += markSpacing) {
         ctx.fillRect(x, canvas.height - 10, 2, 10);
-        ctx.fillText(`${x/10}m`, x, canvas.height - 15);
+        ctx.fillText(`${(x/10).toFixed(0)}m`, x, canvas.height - 15);
       }
     }
 
-    // Initial setup
+    function getCSSVar(name, fallback) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name) || fallback;
+    }
+
+    function switchMode(mode, event) {
+      if (mode === 'projectile') {
+        document.getElementById('projectile-facts').style.display = 'block';
+        document.getElementById('projectile-formulas').style.display = 'block';
+        document.getElementById('linear-facts').style.display = 'none';
+        document.getElementById('linear-formulas').style.display = 'none';
+      } else {
+        document.getElementById('projectile-facts').style.display = 'none';
+        document.getElementById('projectile-formulas').style.display = 'none';
+        document.getElementById('linear-facts').style.display = 'block';
+        document.getElementById('linear-formulas').style.display = 'block';
+      }
+      
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+
     drawGround();
     calculateResults();
   </script>
