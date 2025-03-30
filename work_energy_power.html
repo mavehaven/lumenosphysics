@@ -137,6 +137,16 @@
       margin-left: 20px;
       list-style: disc;
     }
+    .explanations .theory {
+      margin-top: 15px;
+      font-size: 0.95em;
+      background: #222;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .explanations .theory p {
+      margin-bottom: 10px;
+    }
     
     /* --- Responsive Media Queries --- */
     @media (max-width: 768px) {
@@ -216,59 +226,63 @@
     
     <!-- Explanations Section -->
     <div class="explanations">
-      <h2>How the Simulator Works</h2>
+      <h2>Advanced Theory Behind the Simulator</h2>
       <p>
-        In this simulation, we model the motion of a block under a constant force.
-        The key physics concepts are:
+        This simulator is built on the cornerstone of classical mechanics, ensuring that every principle is thoroughly understood. Far from oversimplification, the following detailed theory forms the backbone of our simulation.
       </p>
       <ul>
         <li>
-          <strong>Newton's Second Law:</strong>
-          The net force acting on an object is equal to the mass multiplied by its acceleration,
+          <strong>Newton's Second Law:</strong> The net force \( F \) acting on an object of mass \( m \) results in an acceleration \( a \), expressed as 
           \[
-            F = m \cdot a \quad \Longrightarrow \quad a = \frac{F}{m}
+            F = m \cdot a \quad \Longrightarrow \quad a = \frac{F}{m}.
           \]
         </li>
         <li>
-          <strong>Displacement:</strong>
-          For an object starting from rest, the displacement is calculated by:
-          \[
-            d = \frac{1}{2} a t^2
-          \]
-          where \(t\) is the time.
+          <strong>Kinematics – Displacement and Velocity:</strong> 
+          <ul>
+            <li>
+              <em>Displacement:</em> Given an object starting from rest, the displacement \( d \) over time \( t \) is given by:
+              \[
+                d = \frac{1}{2} a t^2.
+              \]
+            </li>
+            <li>
+              <em>Velocity:</em> The velocity \( v \) after time \( t \) is:
+              \[
+                v = a \cdot t.
+              \]
+            </li>
+          </ul>
         </li>
         <li>
-          <strong>Velocity:</strong>
-          Since the object starts from rest, its velocity at any time \(t\) is:
-          \[
-            v = a \cdot t
-          \]
-        </li>
-        <li>
-          <strong>Work Done:</strong>
-          Work is defined as the force applied over the displacement:
-          \[
-            W = F \cdot d
-          \]
-        </li>
-        <li>
-          <strong>Kinetic Energy:</strong>
-          The kinetic energy of a moving object is given by:
-          \[
-            KE = \frac{1}{2} m v^2
-          \]
-        </li>
-        <li>
-          <strong>Power:</strong>
-          Power is the rate at which work is done:
-          \[
-            P = \frac{W}{t} \quad (\text{for } t > 0)
-          \]
+          <strong>Work, Kinetic Energy, and Power:</strong> 
+          <ul>
+            <li>
+              <em>Work Done:</em> Work \( W \) is the product of the force and the displacement in the direction of the force:
+              \[
+                W = F \cdot d.
+              \]
+            </li>
+            <li>
+              <em>Kinetic Energy:</em> The kinetic energy \( KE \) of an object in motion is quantified by:
+              \[
+                KE = \frac{1}{2} m v^2.
+              \]
+            </li>
+            <li>
+              <em>Power:</em> Power \( P \) is the rate of doing work, calculated as:
+              \[
+                P = \frac{W}{t} \quad (t > 0).
+              \]
+            </li>
+          </ul>
         </li>
       </ul>
-      <p>
-        Adjust the controls, command the simulation, and observe the undeniable laws of physics in action.
-      </p>
+      <div class="theory">
+        <p>
+          <strong>Further Considerations:</strong> In real-world applications, friction, air resistance, and non-uniform forces add layers of complexity. However, by mastering these foundational equations, one gains the analytical prowess to tackle any deviation from ideal conditions. Knowledge is the ultimate weapon—refine your understanding, and nothing can impede your ascension.
+        </p>
+      </div>
     </div>
   </div>
   
