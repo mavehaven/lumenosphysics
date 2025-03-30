@@ -5,126 +5,216 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Work, Energy, and Power Simulator with Three.js</title>
   <style>
-    /* --- Global Styles --- */
+    /* --- Global Reset & Base Styles --- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
-      font-family: Arial, sans-serif;
-      max-width: 1200px;
-      margin: 0 auto;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1d1f21, #282a2e);
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 20px;
-      background: #f5f5f5;
+      min-height: 100vh;
+    }
+    h1, h2 {
+      font-weight: 700;
+      text-shadow: 1px 1px 2px #000;
     }
     h1 {
-      text-align: center;
-      color: #0077ff;
+      color: #00bfff;
       margin-bottom: 20px;
+      text-align: center;
     }
     
     /* --- Container --- */
     .container {
+      width: 100%;
+      max-width: 1200px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
     
-    /* --- Three.js Simulation Container --- */
-    .simulation {
-      background: #fff;
-      padding: 10px;
+    /* --- Simulation, Explanations, and Results Sections --- */
+    .simulation, .explanations, .results, .controls {
+      background: #2d2f31;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* --- Three.js Simulation Area --- */
+    .simulation {
       text-align: center;
     }
     #threeContainer {
-      width: 800px;
+      width: 100%;
+      max-width: 800px;
       height: 300px;
       margin: 0 auto;
-      background: #eaeaea;
+      background: #1e1e1e;
+      border: 2px solid #00bfff;
       border-radius: 8px;
     }
     
     /* --- Control Panel --- */
     .controls {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
-      justify-content: center;
+      justify-content: space-around;
+      align-items: center;
     }
     .control-group {
-      flex: 1 1 calc(33.33% - 10px);
+      flex: 1 1 200px;
       min-width: 200px;
     }
     .control-group label {
       font-weight: bold;
+      margin-bottom: 8px;
       display: block;
-      margin-bottom: 5px;
+      color: #00bfff;
     }
     .control-group input[type="range"],
     .control-group select {
       width: 100%;
       padding: 8px;
-      margin-bottom: 5px;
-      border: 1px solid #ddd;
+      border: none;
       border-radius: 4px;
+      background: #444;
+      color: #fff;
+      margin-bottom: 5px;
     }
     .value-display {
       font-size: 0.9em;
-      color: #333;
       text-align: right;
+      color: #ccc;
     }
     
     /* --- Buttons --- */
     .buttons {
       text-align: center;
+      margin-top: 10px;
     }
     .buttons button {
-      padding: 8px 16px;
+      padding: 10px 20px;
       font-size: 1em;
       margin: 0 10px;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
+      background: #00bfff;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+    .buttons button:hover {
+      background: #009acd;
     }
     
     /* --- Results Display --- */
     .results {
-      background: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       text-align: center;
     }
     .results p {
-      margin: 5px 0;
-      font-size: 1em;
+      margin: 8px 0;
+      font-size: 1.1em;
     }
     
     /* --- Explanations Section --- */
-    .explanations {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-top: 20px;
-    }
     .explanations h2 {
-      margin-top: 0;
-      color: #0077ff;
+      margin-bottom: 10px;
+      color: #00bfff;
+    }
+    .explanations p, .explanations li {
+      line-height: 1.6;
+    }
+    .explanations ul {
+      margin-left: 20px;
+      list-style: disc;
+    }
+    
+    /* --- Responsive Media Queries --- */
+    @media (max-width: 768px) {
+      #threeContainer {
+        height: 250px;
+      }
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .control-group {
+        width: 100%;
+      }
+    }
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8em;
+      }
+      .buttons button {
+        width: 100%;
+        margin: 10px 0;
+      }
+      .simulation, .explanations, .results, .controls {
+        padding: 15px;
+      }
     }
   </style>
   <!-- Include Three.js from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Include MathJax for LaTeX rendering -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
   <h1>Work, Energy, and Power Simulator</h1>
-
-  <!-- Detailed Explanations -->
+  <div class="container">
+    <!-- Simulation Area -->
+    <div class="simulation">
+      <div id="threeContainer"></div>
+    </div>
+    
+    <!-- Control Panel -->
+    <div class="controls">
+      <div class="control-group">
+        <label for="force">Force (N):</label>
+        <input type="range" id="force" min="0" max="100" value="50" />
+        <div class="value-display" id="forceValue">50 N</div>
+      </div>
+      <div class="control-group">
+        <label for="mass">Mass (kg):</label>
+        <input type="range" id="mass" min="1" max="50" value="10" />
+        <div class="value-display" id="massValue">10 kg</div>
+      </div>
+      <div class="control-group">
+        <label for="duration">Simulation Duration (s):</label>
+        <input type="range" id="duration" min="1" max="20" value="10" />
+        <div class="value-display" id="durationValue">10 s</div>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <div class="buttons">
+      <button id="startBtn">Start Simulation</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    
+    <!-- Results Display -->
+    <div class="results">
+      <p id="timeDisplay">Time: 0 s</p>
+      <p id="displacementDisplay">Displacement: 0 m</p>
+      <p id="velocityDisplay">Velocity: 0 m/s</p>
+      <p id="accelerationDisplay">Acceleration: 0 m/s²</p>
+      <p id="workDisplay">Work: 0 J</p>
+      <p id="kineticEnergyDisplay">Kinetic Energy: 0 J</p>
+      <p id="powerDisplay">Power: 0 W</p>
+    </div>
+    
+    <!-- Explanations Section -->
     <div class="explanations">
       <h2>How the Simulator Works</h2>
       <p>
@@ -133,7 +223,7 @@
       </p>
       <ul>
         <li>
-          <strong>Newton's Second Law:</strong> 
+          <strong>Newton's Second Law:</strong>
           The net force acting on an object is equal to the mass multiplied by its acceleration,
           \[
             F = m \cdot a \quad \Longrightarrow \quad a = \frac{F}{m}
@@ -176,57 +266,10 @@
           \]
         </li>
       </ul>
-      
-  <div class="container">
-    
-    <!-- Three.js Simulation Area -->
-    <div class="simulation">
-      <div id="threeContainer"></div>
-    </div>
-    
-    <!-- Control Panel -->
-    <div class="controls">
-      <div class="control-group">
-        <label for="force">Force (N):</label>
-        <input type="range" id="force" min="0" max="100" value="50" />
-        <div class="value-display" id="forceValue">50 N</div>
-      </div>
-      <div class="control-group">
-        <label for="mass">Mass (kg):</label>
-        <input type="range" id="mass" min="1" max="50" value="10" />
-        <div class="value-display" id="massValue">10 kg</div>
-      </div>
-      <div class="control-group">
-        <label for="duration">Simulation Duration (s):</label>
-        <input type="range" id="duration" min="1" max="20" value="10" />
-        <div class="value-display" id="durationValue">10 s</div>
-      </div>
-    </div>
-    
-    <!-- Buttons -->
-    <div class="buttons">
-      <button id="startBtn">Start Simulation</button>
-      <button id="resetBtn">Reset</button>
-    </div>
-    
-    <!-- Results Display -->
-    <div class="results">
-      <p id="timeDisplay">Time: 0 s</p>
-      <p id="displacementDisplay">Displacement: 0 m</p>
-      <p id="velocityDisplay">Velocity: 0 m/s</p>
-      <p id="accelerationDisplay">Acceleration: 0 m/s²</p>
-      <p id="workDisplay">Work: 0 J</p>
-      <p id="kineticEnergyDisplay">Kinetic Energy: 0 J</p>
-      <p id="powerDisplay">Power: 0 W</p>
-    </div>
-    
       <p>
-        Use the sliders above to adjust the force, mass, and duration. When you click 
-        <em>Start Simulation</em>, the block (rendered as a cube in the 3D scene) moves on the ground
-        according to the physics formulas. The results (time, displacement, velocity, etc.) update in real time.
+        Adjust the controls, command the simulation, and observe the undeniable laws of physics in action.
       </p>
     </div>
-    
   </div>
   
   <script>
@@ -269,42 +312,35 @@
     const threeContainer = document.getElementById('threeContainer');
     
     function initThreeJS() {
-      // Create the scene and set a background color
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xeaeaea);
+      scene.background = new THREE.Color(0x1e1e1e);
       
-      // Set up the camera with perspective view
       const aspect = threeContainer.clientWidth / threeContainer.clientHeight;
       camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
       camera.position.set(0, 5, 15);
       camera.lookAt(0, 0, 0);
       
-      // Create the renderer and attach it to the container
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
       threeContainer.innerHTML = "";
       threeContainer.appendChild(renderer.domElement);
       
-      // Add directional light for realistic shading
       const light = new THREE.DirectionalLight(0xffffff, 1);
       light.position.set(10, 10, 10);
       scene.add(light);
       
-      // Add ambient light for softer shadows
       const ambientLight = new THREE.AmbientLight(0x404040);
       scene.add(ambientLight);
       
-      // Create a ground plane
       const groundGeometry = new THREE.PlaneGeometry(50, 50);
-      const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false });
+      const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x333333, depthWrite: false });
       ground = new THREE.Mesh(groundGeometry, groundMaterial);
       ground.rotation.x = - Math.PI / 2;
       ground.position.y = -0.5;
       scene.add(ground);
       
-      // Create the moving block (cube)
       const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-      const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x0077ff });
+      const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x00bfff });
       cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
       cube.position.set(0, 0.5, 0);
       scene.add(cube);
@@ -314,18 +350,12 @@
     // Simulation Physics & Animation
     // ===============================
     function updateResults(t) {
-      // Compute displacement: d = 0.5 * a * t^2
       displacement = 0.5 * acceleration * t * t;
-      // Compute velocity: v = a * t
       const velocity = acceleration * t;
-      // Work done: W = F * d
       const work = force * displacement;
-      // Kinetic Energy: KE = 0.5 * m * v^2
       const kineticEnergy = 0.5 * mass * velocity * velocity;
-      // Power: P = W / t (if t > 0)
       const power = t > 0 ? work / t : 0;
       
-      // Update the results display
       timeDisplay.textContent = "Time: " + t.toFixed(2) + " s";
       displacementDisplay.textContent = "Displacement: " + displacement.toFixed(2) + " m";
       velocityDisplay.textContent = "Velocity: " + velocity.toFixed(2) + " m/s";
@@ -334,14 +364,12 @@
       kineticEnergyDisplay.textContent = "Kinetic Energy: " + kineticEnergy.toFixed(2) + " J";
       powerDisplay.textContent = "Power: " + power.toFixed(2) + " W";
       
-      // Update the cube's horizontal position (scale factor can be adjusted)
-      const scaleFactor = 1;
-      cube.position.x = displacement * scaleFactor;
+      cube.position.x = displacement; // Move cube along x-axis
     }
     
     function animate(timestamp) {
       if (!startTime) startTime = timestamp;
-      simulationTime = (timestamp - startTime) / 1000; // convert milliseconds to seconds
+      simulationTime = (timestamp - startTime) / 1000;
       
       if (simulationTime > simulationDuration) {
         simulationTime = simulationDuration;
@@ -366,9 +394,6 @@
       renderer.render(scene, camera);
     }
     
-    // ===============================
-    // Event Listeners for Controls
-    // ===============================
     forceSlider.addEventListener('input', () => {
       forceValue.textContent = forceSlider.value + " N";
       force = parseFloat(forceSlider.value);
@@ -397,9 +422,6 @@
     
     resetBtn.addEventListener('click', resetSimulation);
     
-    // ===============================
-    // Initialization
-    // ===============================
     initThreeJS();
     updateResults(0);
   </script>
