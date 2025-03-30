@@ -1,276 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Lumenos</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <!-- Modern Firebase SDK -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword,
-            onAuthStateChanged,
-            sendEmailVerification 
-        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc,
-            getDoc,
-            serverTimestamp 
-        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Lumenos</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <!-- Modern Firebase SDK -->
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      sendEmailVerification 
+    } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc,
+      getDoc,
+      serverTimestamp 
+    } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
-        // Firebase config should be in environment variables in production
-        const firebaseConfig = {
-    apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
-    authDomain: "lumenos-749a1.firebaseapp.com",
-    projectId: "lumenos-749a1",
-    storageBucket: "lumenos-749a1.firebasestorage.app",
-    messagingSenderId: "857410556058",
-    appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
-    measurementId: "G-CEZ4PHV9GE"
-};
+    // Firebase config should be stored securely in production
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
+      authDomain: "lumenos-749a1.firebaseapp.com",
+      projectId: "lumenos-749a1",
+      storageBucket: "lumenos-749a1.firebasestorage.app",
+      messagingSenderId: "857410556058",
+      appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
+      measurementId: "G-CEZ4PHV9GE"
+    };
 
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    // Password validation
+    const validatePassword = (password) => {
+      const minLength = 8;
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasLowerCase = /[a-z]/.test(password);
+      const hasNumbers = /\d/.test(password);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+      
+      return {
+        isValid: password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar,
+        errors: {
+          length: password.length < minLength,
+          upperCase: !hasUpperCase,
+          lowerCase: !hasLowerCase,
+          number: !hasNumbers,
+          specialChar: !hasSpecialChar
+        }
+      };
+    };
 
-        // Password validation
-        const validatePassword = (password) => {
-            const minLength = 8;
-            const hasUpperCase = /[A-Z]/.test(password);
-            const hasLowerCase = /[a-z]/.test(password);
-            const hasNumbers = /\d/.test(password);
-            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-            
-            return {
-                isValid: password.length >= minLength && hasUpperCase && hasLowerCase && 
-                        hasNumbers && hasSpecialChar,
-                errors: {
-                    length: password.length < minLength,
-                    upperCase: !hasUpperCase,
-                    lowerCase: !hasLowerCase,
-                    number: !hasNumbers,
-                    specialChar: !hasSpecialChar
-                }
-            };
-        };
+    // Update password strength indicators
+    const updatePasswordStrength = () => {
+      const password = document.getElementById('password').value;
+      const validation = validatePassword(password);
+      const indicators = document.querySelectorAll('.password-requirement');
+      
+      indicators.forEach(indicator => {
+        const requirement = indicator.dataset.requirement;
+        if (validation.errors[requirement]) {
+          indicator.classList.remove('text-green-500');
+          indicator.classList.add('text-red-500');
+        } else {
+          indicator.classList.remove('text-red-500');
+          indicator.classList.add('text-green-500');
+        }
+      });
 
-        // Update password strength indicators
-        const updatePasswordStrength = () => {
-            const password = document.getElementById('password').value;
-            const validation = validatePassword(password);
-            const indicators = document.querySelectorAll('.password-requirement');
-            
-            indicators.forEach(indicator => {
-                const requirement = indicator.dataset.requirement;
-                if (validation.errors[requirement]) {
-                    indicator.classList.remove('text-green-500');
-                    indicator.classList.add('text-red-500');
-                } else {
-                    indicator.classList.remove('text-red-500');
-                    indicator.classList.add('text-green-500');
-                }
-            });
+      return validation.isValid;
+    };
 
-            return validation.isValid;
-        };
+    // Handle signup
+    const handleSignup = async (e) => {
+      e.preventDefault();
+      
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const errorMessage = document.getElementById('errorMessage');
+      
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
 
-        // Handle signup
-        const handleSignup = async (e) => {
-            e.preventDefault();
-            
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+      // Validate inputs
+      if (!fullName || !email || !password || !confirmPassword) {
+        showError('All fields are required');
+        return;
+      }
 
-            // Validate inputs
-            if (!fullName || !email || !password || !confirmPassword) {
-                showError('All fields are required');
-                return;
-            }
+      if (password !== confirmPassword) {
+        showError('Passwords do not match');
+        return;
+      }
 
-            if (password !== confirmPassword) {
-                showError('Passwords do not match');
-                return;
-            }
+      if (!validatePassword(password).isValid) {
+        showError('Password does not meet requirements');
+        return;
+      }
 
-            if (!validatePassword(password).isValid) {
-                showError('Password does not meet requirements');
-                return;
-            }
+      try {
+        loadingOverlay.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
 
-            try {
-                loadingOverlay.classList.remove('hidden');
-                errorMessage.classList.add('hidden');
+        // Create user
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Optionally send verification email (for record only—control is yours)
+        await sendEmailVerification(userCredential.user);
 
-                // Create user
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                
-                // Send verification email
-                await sendEmailVerification(userCredential.user);
+        // Get subscription info from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const subscriptionId = urlParams.get('id');
+        const planType = urlParams.get('plan');
 
-                // Get subscription info from URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const subscriptionId = urlParams.get('id');
-                const planType = urlParams.get('plan');
-
-                // Save user data
-                await setDoc(doc(db, 'users', userCredential.user.uid), {
-                    fullName,
-                    email,
-                    subscriptionId,
-                    planType,
-                    emailVerified: false,
-                    createdAt: serverTimestamp(),
-                    subscriptionCreatedAt: serverTimestamp()
-                });
-
-                // Show verification message
-                document.getElementById('signupForm').classList.add('hidden');
-                document.getElementById('verificationMessage').classList.remove('hidden');
-
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                loadingOverlay.classList.add('hidden');
-            }
-        };
-
-        const showError = (message) => {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-        };
-
-        // Check if user is already logged in
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const userDoc = await getDoc(doc(db, 'users', user.uid));
-                    if (userDoc.exists() && userDoc.data().subscriptionId) {
-                        window.location.href = 'dashboard.html';
-                    }
-                } catch (error) {
-                    console.error('Auth state check error:', error);
-                }
-            }
+        // Save user data
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          fullName,
+          email,
+          subscriptionId,
+          planType,
+          emailVerified: false,
+          createdAt: serverTimestamp(),
+          subscriptionCreatedAt: serverTimestamp()
         });
 
-        // Add event listeners
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('signupForm').addEventListener('submit', handleSignup);
-            document.getElementById('password').addEventListener('input', updatePasswordStrength);
-            
-            // Update plan info
-            const urlParams = new URLSearchParams(window.location.search);
-            const planType = urlParams.get('plan');
-            const planDisplay = planType === 'supernova' ? 'Supernova Master' : 'Photon Explorer';
-            document.getElementById('planInfo').textContent = `Selected Plan: ${planDisplay}`;
-        });
-    </script>
+        // Immediately redirect to dashboard—decisiveness over delays
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        loadingOverlay.classList.add('hidden');
+      }
+    };
+
+    const showError = (message) => {
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = message;
+      errorMessage.classList.remove('hidden');
+    };
+
+    // Check if user is already logged in and has subscription info
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists() && userDoc.data().subscriptionId) {
+            window.location.href = 'dashboard.html';
+          }
+        } catch (error) {
+          console.error('Auth state check error:', error);
+        }
+      }
+    });
+
+    // Add event listeners
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('signupForm').addEventListener('submit', handleSignup);
+      document.getElementById('password').addEventListener('input', updatePasswordStrength);
+      
+      // Update plan info
+      const urlParams = new URLSearchParams(window.location.search);
+      const planType = urlParams.get('plan');
+      const planDisplay = planType === 'supernova' ? 'Supernova Master' : 'Photon Explorer';
+      document.getElementById('planInfo').textContent = `Selected Plan: ${planDisplay}`;
+    });
+  </script>
 </head>
 <body class="bg-gray-900 text-white">
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-    
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-xl">
-            <div>
-                <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
-                     alt="Lumenos Logo" 
-                     class="mx-auto h-12">
-                <h2 class="mt-6 text-center text-3xl font-extrabold">Create your account</h2>
-                <p class="mt-2 text-center text-sm text-gray-400" id="planInfo">
-                    Loading plan information...
-                </p>
-            </div>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+  
+  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-xl">
+      <div>
+        <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+             alt="Lumenos Logo" 
+             class="mx-auto h-12">
+        <h2 class="mt-6 text-center text-3xl font-extrabold">Create your account</h2>
+        <p class="mt-2 text-center text-sm text-gray-400" id="planInfo">
+          Loading plan information...
+        </p>
+      </div>
 
-            <!-- Signup Form -->
-            <form id="signupForm" class="mt-8 space-y-6">
-                <div class="rounded-md shadow-sm space-y-4">
-                    <div>
-                        <label for="fullName" class="sr-only">Full Name</label>
-                        <input id="fullName" name="fullName" type="text" required
-                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                               placeholder="Full Name">
-                    </div>
-                    <div>
-                        <label for="email" class="sr-only">Email address</label>
-                        <input id="email" name="email" type="email" required
-                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                               placeholder="Email address">
-                    </div>
-                    <div>
-                        <label for="password" class="sr-only">Password</label>
-                        <input id="password" name="password" type="password" required
-                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                               placeholder="Password">
-                    </div>
-                    <div>
-                        <label for="confirmPassword" class="sr-only">Confirm Password</label>
-                        <input id="confirmPassword" name="confirmPassword" type="password" required
-                               class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                               placeholder="Confirm Password">
-                    </div>
+      <!-- Signup Form -->
+      <form id="signupForm" class="mt-8 space-y-6">
+        <div class="rounded-md shadow-sm space-y-4">
+          <div>
+            <label for="fullName" class="sr-only">Full Name</label>
+            <input id="fullName" name="fullName" type="text" required
+                   class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                   placeholder="Full Name">
+          </div>
+          <div>
+            <label for="email" class="sr-only">Email address</label>
+            <input id="email" name="email" type="email" required
+                   class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                   placeholder="Email address">
+          </div>
+          <div>
+            <label for="password" class="sr-only">Password</label>
+            <input id="password" name="password" type="password" required
+                   class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                   placeholder="Password">
+          </div>
+          <div>
+            <label for="confirmPassword" class="sr-only">Confirm Password</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" required
+                   class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
+                   placeholder="Confirm Password">
+          </div>
 
-                    <!-- Password Requirements -->
-                    <div class="text-sm space-y-2">
-                        <p class="text-gray-400">Password requirements:</p>
-                        <p class="password-requirement text-red-500" data-requirement="length">
-                            ● Minimum 8 characters
-                        </p>
-                        <p class="password-requirement text-red-500" data-requirement="upperCase">
-                            ● At least one uppercase letter
-                        </p>
-                        <p class="password-requirement text-red-500" data-requirement="lowerCase">
-                            ● At least one lowercase letter
-                        </p>
-                        <p class="password-requirement text-red-500" data-requirement="number">
-                            ● At least one number
-                        </p>
-                        <p class="password-requirement text-red-500" data-requirement="specialChar">
-                            ● At least one special character
-                        </p>
-                    </div>
-                </div>
-
-                <div>
-                    <button type="submit"
-                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Create Account
-                    </button>
-                </div>
-            </form>
-
-            <!-- Verification Message -->
-            <div id="verificationMessage" class="hidden text-center space-y-4">
-                <h3 class="text-xl font-bold">Verify Your Email</h3>
-                <p class="text-gray-400">
-                    We've sent a verification link to your email address. 
-                    Please verify your email to continue.
-                </p>
-                <p class="text-sm text-gray-500">
-                    Once verified, you can proceed to the dashboard.
-                </p>
-            </div>
-
-            <!-- Error message -->
-            <div id="errorMessage" class="hidden text-red-500 text-sm text-center mt-4"></div>
+          <!-- Password Requirements -->
+          <div class="text-sm space-y-2">
+            <p class="text-gray-400">Password requirements:</p>
+            <p class="password-requirement text-red-500" data-requirement="length">
+              ● Minimum 8 characters
+            </p>
+            <p class="password-requirement text-red-500" data-requirement="upperCase">
+              ● At least one uppercase letter
+            </p>
+            <p class="password-requirement text-red-500" data-requirement="lowerCase">
+              ● At least one lowercase letter
+            </p>
+            <p class="password-requirement text-red-500" data-requirement="number">
+              ● At least one number
+            </p>
+            <p class="password-requirement text-red-500" data-requirement="specialChar">
+              ● At least one special character
+            </p>
+          </div>
         </div>
+
+        <div>
+          <button type="submit"
+                  class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Create Account
+          </button>
+        </div>
+      </form>
+
+      <!-- Error message -->
+      <div id="errorMessage" class="hidden text-red-500 text-sm text-center mt-4"></div>
     </div>
+  </div>
 </body>
 </html>
