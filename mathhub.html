@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathHub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        /* Dark mode styles */
+        .dark {
+            background-color: #111827;
+            color: #fff;
+        }
+        
+        .dark .bg-white\/90 {
+            background-color: rgba(17, 24, 39, 0.9);
+        }
+        
+        .dark .bg-gray-50 {
+            background-color: #1f2937;
+        }
+        
+        .dark .text-gray-900 {
+            color: #fff;
+        }
+        
+        .dark .text-gray-500 {
+            color: #9ca3af;
+        }
+        
+        .dark .bg-gray-200 {
+            background-color: #374151;
+        }
+        
+        .dark .bg-white {
+            background-color: #111827;
+        }
+        
+        /* Search results styles */
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+            backdrop-filter: blur(8px);
+        }
+        
+        .search-results::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .search-results::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .search-results::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 4px;
+        }
+        
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: currentColor;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .sim-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sim-card:hover {
+            transform: scale(1.02);
+        }
+
+        .section-title {
+            font-size: 48px;
+            line-height: 1.1;
+            letter-spacing: -0.015em;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Navigation -->
+    <header class="fixed w-full bg-white border-b border-gray-200 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-3">
+                        <span class="text-xl font-semibold text-gray-900">MathHub</span>
+                    </a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <div class="relative">
+                        <input type="text" 
+                               id="search" 
+                               placeholder="Search..." 
+                               class="w-48 px-4 py-2 rounded-lg text-sm bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div id="searchResults" class="search-results hidden absolute top-full left-0 right-0 mt-2 bg-white/90 rounded-lg shadow-lg z-50"></div>
+                    </div>
+
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100">
+                        <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <svg id="moonIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="mobile-menu" class="hidden md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <div class="p-2">
+                        <input type="text" 
+                               id="mobile-search"
+                               placeholder="Search..." 
+                               class="w-full px-4 py-2 rounded-lg text-sm bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <a href="#algebra" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Algebra</a>
+                    <a href="#calculus" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Calculus</a>
+                    <a href="#geometry" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Geometry</a>
+                    <a href="#statistics" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Statistics</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="section-title font-semibold mb-6">
+                Experience Mathematics.<br>
+                Like Never Before.
+            </h1>
+            <p class="text-xl text-gray-500 max-w-2xl">
+                Interactive tools and visualizations that make complex mathematical concepts clear and engaging.
+            </p>
+        </div>
+    </section>
+
+    <!-- Algebra Section -->
+    <section id="algebra" class="py-20 px-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Algebra</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="linear_equations.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746018405258x257693540142452480/linear%20algebra.png" alt="Linear Equations" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Linear Equations</h3>
+                    <p class="text-sm text-gray-500">Master solving linear equations step by step</p>
+                </a>
+
+                <a href="quadratic.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746018370917x465291529971208400/Quadratic%20Expressions.png" alt="Quadratic Functions" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Quadratic Functions</h3>
+                    <p class="text-sm text-gray-500">Explore parabolas and quadratic equations</p>
+                </a>
+
+                <a href="polynomials.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746018390921x905673167667615500/polynomials.png" alt="Polynomials" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Polynomials</h3>
+                    <p class="text-sm text-gray-500">Understand polynomial operations and graphs</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculus Section -->
+    <section id="calculus" class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Calculus</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="derivatives.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746018443920x702693302274996400/derivatives.png" alt="Derivatives" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Derivatives</h3>
+                    <p class="text-sm text-gray-500">Visualize rates of change and slopes</p>
+                </a>
+
+                <a href="integrals.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746018427176x149967431747671580/integrals.png" alt="Integrals" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Integrals</h3>
+                    <p class="text-sm text-gray-500">Explore area and accumulation functions</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Geometry Section -->
+    <section id="geometry" class="py-20 px-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Geometry</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="triangles.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746018814072x578763772696039300/triangle%20geometry.png" alt="Triangles" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Triangles</h3>
+                    <p class="text-sm text-gray-500">Study triangle properties and theorems</p>
+                </a>
+
+                <a href="transformations.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746018989153x233794588508926530/transformations.png" alt="Transformations" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Transformations</h3>
+                    <p class="text-sm text-gray-500">Explore geometric transformations</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="statistics" class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-semibold mb-12">Statistics & Probability</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="distributions.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746019566913x146406189390019500/probability.png" alt="Probability Distributions" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Probability Distributions</h3>
+                    <p class="text-sm text-gray-500">Learn about normal, binomial, and other distributions</p>
+                </a>
+
+                <a href="regression.html" class="sim-card group">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
+                            <img src="//808b9e228081972b8b76151c511368ad.cdn.bubble.io/f1746019380943x430740556631429300/regression.png" alt="Regression Analysis" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-medium mb-2">Regression Analysis</h3>
+                    <p class="text-sm text-gray-500">Explore relationships between variables</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Simulation data for search functionality
+        const simulations = [
+            { title: "Linear Equations", category: "Algebra", url: "linear_equations.html", description: "Master solving linear equations step by step" },
+            { title: "Quadratic Functions", category: "Algebra", url: "quadratic.html", description: "Explore parabolas and quadratic equations" },
+            { title: "Polynomials", category: "Algebra", url: "polynomials.html", description: "Understand polynomial operations and graphs" },
+            { title: "Derivatives", category: "Calculus", url: "derivatives.html", description: "Visualize rates of change and slopes" },
+            { title: "Integrals", category: "Calculus", url: "integrals.html", description: "Explore area and accumulation functions" },
+            { title: "Triangles", category: "Geometry", url: "triangles.html", description: "Study triangle properties and theorems" },
+            { title: "Transformations", category: "Geometry", url: "transformations.html", description: "Explore geometric transformations" },
+            { title: "Probability Distributions", category: "Statistics", url: "distributions.html", description: "Learn about normal, binomial, and other distributions" },
+            { title: "Regression Analysis", category: "Statistics", url: "regression.html", description: "Explore relationships between variables" }
+        ];
+
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            const filteredResults = simulations.filter(sim => 
+                sim.title.toLowerCase().includes(query) || 
+                sim.description.toLowerCase().includes(query) ||
+                sim.category.toLowerCase().includes(query)
+            );
+
+            if (filteredResults.length > 0) {
+                searchResults.innerHTML = filteredResults.map(sim => `
+                    <a href="${sim.url}" class="block p-4 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <div class="font-medium">${sim.title}</div>
+                        <div class="text-sm text-gray-500">${sim.category} - ${sim.description}</div>
+                    </a>
+                `).join('');
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.innerHTML = `
+                    <div class="p-4 text-gray-500">
+                        No simulations found for "${e.target.value}"
+                    </div>
+                `;
+                searchResults.classList.remove('hidden');
+            }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        // Dark mode toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        // Check for saved theme preference or default to system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+            
+            // Save preference
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
