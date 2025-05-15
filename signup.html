@@ -30,7 +30,7 @@
       apiKey: "AIzaSyC7rmhpa1z9xdXBQVABJsUfihojEhIvz5o",
       authDomain: "lumenos-749a1.firebaseapp.com",
       projectId: "lumenos-749a1",
-      storageBucket: "lumenos-749a1.firebasestorage.app",
+      storageBucket: "lumenos-749a1.firebaseapp.com",
       messagingSenderId: "857410556058",
       appId: "1:857410556058:web:bb28ae2a03874f8f27cf23",
       measurementId: "G-CEZ4PHV9GE"
@@ -40,6 +40,10 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // Set up global variables for status tracking
+    let isRedirecting = false;
+    const DASHBOARD_URL = 'dashboard.html';
 
     // Password validation
     const validatePassword = (password) => {
@@ -78,7 +82,105 @@
         }
       });
 
+      // Also check if passwords match
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const matchIndicator = document.getElementById('passwordMatch');
+      
+      if (password && confirmPassword) {
+        if (password === confirmPassword) {
+          matchIndicator.textContent = "✓ Passwords match";
+          matchIndicator.classList.remove('text-red-500');
+          matchIndicator.classList.add('text-green-500');
+        } else {
+          matchIndicator.textContent = "✗ Passwords do not match";
+          matchIndicator.classList.remove('text-green-500');
+          matchIndicator.classList.add('text-red-500');
+        }
+        matchIndicator.classList.remove('hidden');
+      } else {
+        matchIndicator.classList.add('hidden');
+      }
+
       return validation.isValid;
+    };
+
+    // Handle form validation
+    const validateForm = () => {
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      // Check if all fields are filled
+      if (!fullName || !email || !password || !confirmPassword) {
+        showError('All fields are required');
+        return false;
+      }
+      
+      // Check if passwords match
+      if (password !== confirmPassword) {
+        showError('Passwords do not match');
+        return false;
+      }
+      
+      // Check password strength
+      if (!validatePassword(password).isValid) {
+        showError('Password does not meet all requirements');
+        return false;
+      }
+      
+      // Check email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showError('Please enter a valid email address');
+        return false;
+      }
+      
+      return true;
+    };
+
+    // Safe redirect function with fallback
+    const safeRedirect = (url) => {
+      if (isRedirecting) return; // Prevent multiple redirects
+      isRedirecting = true;
+      
+      console.log(`Redirecting to ${url}...`);
+      
+      // First attempt: standard redirect
+      window.location.href = url;
+      
+      // Fallback: try alternative methods after a short delay
+      setTimeout(() => {
+        if (document.location.href !== url && document.location.pathname !== url) {
+          console.log("Standard redirect failed, trying alternatives...");
+          
+          // Try multiple methods to ensure redirect works
+          window.location.replace(url);
+          
+          // Last resort: display manual link to user
+          setTimeout(() => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const redirectMessage = document.getElementById('redirectMessage');
+            const manualLink = document.getElementById('manualRedirectLink');
+            
+            if (loadingOverlay) loadingOverlay.innerHTML = `
+              <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                <p class="text-gray-800 mb-4">Account created successfully!</p>
+                <p class="text-gray-600 mb-6">If you're not automatically redirected to the dashboard, please click the button below.</p>
+                <a href="${url}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                  Go to Dashboard
+                </a>
+              </div>
+            `;
+            
+            if (redirectMessage) redirectMessage.classList.remove('hidden');
+            if (manualLink) {
+              manualLink.href = url;
+              manualLink.classList.remove('hidden');
+            }
+          }, 2000);
+        }
+      }, 1000);
     };
 
     // Handle signup
@@ -87,59 +189,96 @@
       
       const loadingOverlay = document.getElementById('loadingOverlay');
       const errorMessage = document.getElementById('errorMessage');
+      const submitButton = document.getElementById('submitButton');
+      
+      // Disable submit button to prevent multiple submissions
+      submitButton.disabled = true;
+      
+      // Validate form inputs
+      if (!validateForm()) {
+        submitButton.disabled = false;
+        return;
+      }
       
       const fullName = document.getElementById('fullName').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-
-      // Validate inputs
-      if (!fullName || !email || !password || !confirmPassword) {
-        showError('All fields are required');
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        showError('Passwords do not match');
-        return;
-      }
-
-      if (!validatePassword(password).isValid) {
-        showError('Password does not meet requirements');
-        return;
-      }
 
       try {
+        // Show loading overlay
         loadingOverlay.classList.remove('hidden');
         errorMessage.classList.add('hidden');
 
-        // Create user
+        // Create user account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
         
-        // Optionally send verification email (for record only—control is yours)
-        await sendEmailVerification(userCredential.user);
+        // Send verification email
+        await sendEmailVerification(user);
 
         // Get subscription info from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const subscriptionId = urlParams.get('id');
-        const planType = urlParams.get('plan');
+        const subscriptionId = urlParams.get('id') || 'default';
+        const planType = urlParams.get('plan') || 'basic';
 
-        // Save user data
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
+        // Prepare user data
+        const userData = {
           fullName,
           email,
           subscriptionId,
           planType,
           emailVerified: false,
           createdAt: serverTimestamp(),
-          subscriptionCreatedAt: serverTimestamp()
-        });
+          subscriptionCreatedAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
+        };
 
-        // Immediately redirect to dashboard—decisiveness over delays
-        window.location.href = 'dashboard.html';
+        // Save user data to Firestore
+        await setDoc(doc(db, 'users', user.uid), userData);
+        
+        // Set flag in localStorage to indicate successful registration
+        try {
+          localStorage.setItem('justRegistered', 'true');
+          localStorage.setItem('userEmail', email);
+        } catch (storageError) {
+          console.warn('Could not access localStorage:', storageError);
+        }
+        
+        // Update status message
+        loadingOverlay.innerHTML = `
+          <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p class="text-gray-800">Account created successfully!</p>
+            <p class="text-gray-600 mt-2">Redirecting to dashboard...</p>
+          </div>
+        `;
+        
+        // Safe redirect with multiple fallback methods
+        setTimeout(() => safeRedirect(DASHBOARD_URL), 1000);
+        
       } catch (error) {
-        showError(error.message);
-      } finally {
+        // Handle specific Firebase auth errors
+        let errorMsg = 'An error occurred during sign up';
+        
+        switch(error.code) {
+          case 'auth/email-already-in-use':
+            errorMsg = 'This email is already registered. Please try logging in instead.';
+            break;
+          case 'auth/invalid-email':
+            errorMsg = 'Please enter a valid email address.';
+            break;
+          case 'auth/weak-password':
+            errorMsg = 'Password is too weak. Please follow all requirements.';
+            break;
+          case 'auth/network-request-failed':
+            errorMsg = 'Network error. Please check your connection and try again.';
+            break;
+          default:
+            errorMsg = `Error: ${error.message}`;
+        }
+        
+        showError(errorMsg);
+        submitButton.disabled = false;
         loadingOverlay.classList.add('hidden');
       }
     };
@@ -148,43 +287,97 @@
       const errorMessage = document.getElementById('errorMessage');
       errorMessage.textContent = message;
       errorMessage.classList.remove('hidden');
+      
+      // Scroll to error message
+      errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    // Check if user is already logged in and has subscription info
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists() && userDoc.data().subscriptionId) {
-            window.location.href = 'dashboard.html';
+    // Check if user is already logged in
+    const checkExistingAuth = async () => {
+      return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+          unsubscribe(); // Stop listening immediately
+          
+          if (user) {
+            try {
+              const userDoc = await getDoc(doc(db, 'users', user.uid));
+              if (userDoc.exists()) {
+                // Update last login time
+                await setDoc(doc(db, 'users', user.uid), {
+                  lastLogin: serverTimestamp()
+                }, { merge: true });
+                
+                // If they have a subscription, redirect to dashboard
+                if (userDoc.data().subscriptionId) {
+                  safeRedirect(DASHBOARD_URL);
+                  resolve(true);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.error('Auth state check error:', error);
+            }
           }
-        } catch (error) {
-          console.error('Auth state check error:', error);
-        }
-      }
-    });
+          resolve(false);
+        });
+      });
+    };
 
-    // Add event listeners
-    window.addEventListener('DOMContentLoaded', () => {
+    // Add event listeners and initialize page
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Check if already logged in before showing form
+      const isLoggedIn = await checkExistingAuth();
+      if (isLoggedIn) return; // Stop if we're already redirecting
+      
+      // Set up form handlers
       document.getElementById('signupForm').addEventListener('submit', handleSignup);
       document.getElementById('password').addEventListener('input', updatePasswordStrength);
+      document.getElementById('confirmPassword').addEventListener('input', updatePasswordStrength);
       
-      // Update plan info
+      // Update plan info from URL
       const urlParams = new URLSearchParams(window.location.search);
       const planType = urlParams.get('plan');
-      const planDisplay = planType === 'supernova' ? 'Supernova Master' : 'Photon Explorer';
+      
+      // Default to basic plan if none specified
+      const planDisplay = planType === 'supernova' ? 'Supernova Master' : 
+                          planType === 'photon' ? 'Photon Explorer' : 
+                          'Basic Plan';
+                          
       document.getElementById('planInfo').textContent = `Selected Plan: ${planDisplay}`;
+      
+      // Show the form once everything is initialized
+      document.getElementById('formContainer').classList.remove('hidden');
+      document.getElementById('initialLoading').classList.add('hidden');
     });
   </script>
 </head>
 <body class="bg-gray-900 text-white">
+  <!-- Initial Loading -->
+  <div id="initialLoading" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+      <p class="mt-4 text-gray-400">Loading...</p>
+    </div>
+  </div>
+
   <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
   </div>
   
+  <!-- Redirect Message -->
+  <div id="redirectMessage" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center z-50 hidden">
+    <div class="bg-white p-8 rounded-xl text-gray-800 max-w-md text-center">
+      <h3 class="text-xl font-bold mb-4">Account Created Successfully!</h3>
+      <p class="mb-6">You will be redirected to the dashboard momentarily.</p>
+      <a id="manualRedirectLink" href="dashboard.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+        Go to Dashboard
+      </a>
+    </div>
+  </div>
+  
   <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-xl">
+    <div id="formContainer" class="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-xl shadow-lg hidden">
       <div>
         <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
              alt="Lumenos Logo" 
@@ -199,61 +392,77 @@
       <form id="signupForm" class="mt-8 space-y-6">
         <div class="rounded-md shadow-sm space-y-4">
           <div>
-            <label for="fullName" class="sr-only">Full Name</label>
+            <label for="fullName" class="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
             <input id="fullName" name="fullName" type="text" required
                    class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                   placeholder="Full Name">
+                   placeholder="Enter your full name">
           </div>
           <div>
-            <label for="email" class="sr-only">Email address</label>
+            <label for="email" class="block text-sm font-medium text-gray-400 mb-1">Email address</label>
             <input id="email" name="email" type="email" required
                    class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                   placeholder="Email address">
+                   placeholder="Enter your email">
           </div>
           <div>
-            <label for="password" class="sr-only">Password</label>
+            <label for="password" class="block text-sm font-medium text-gray-400 mb-1">Password</label>
             <input id="password" name="password" type="password" required
                    class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                   placeholder="Password">
+                   placeholder="Create a password">
           </div>
           <div>
-            <label for="confirmPassword" class="sr-only">Confirm Password</label>
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-400 mb-1">Confirm Password</label>
             <input id="confirmPassword" name="confirmPassword" type="password" required
                    class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10 sm:text-sm"
-                   placeholder="Confirm Password">
+                   placeholder="Confirm your password">
+            <p id="passwordMatch" class="mt-1 text-sm hidden"></p>
           </div>
 
           <!-- Password Requirements -->
-          <div class="text-sm space-y-2">
-            <p class="text-gray-400">Password requirements:</p>
-            <p class="password-requirement text-red-500" data-requirement="length">
-              ● Minimum 8 characters
+          <div class="text-sm space-y-2 bg-gray-700 p-4 rounded-lg">
+            <p class="text-gray-300 font-medium">Password requirements:</p>
+            <p class="password-requirement text-red-500 flex items-center" data-requirement="length">
+              <span class="mr-2">●</span> Minimum 8 characters
             </p>
-            <p class="password-requirement text-red-500" data-requirement="upperCase">
-              ● At least one uppercase letter
+            <p class="password-requirement text-red-500 flex items-center" data-requirement="upperCase">
+              <span class="mr-2">●</span> At least one uppercase letter
             </p>
-            <p class="password-requirement text-red-500" data-requirement="lowerCase">
-              ● At least one lowercase letter
+            <p class="password-requirement text-red-500 flex items-center" data-requirement="lowerCase">
+              <span class="mr-2">●</span> At least one lowercase letter
             </p>
-            <p class="password-requirement text-red-500" data-requirement="number">
-              ● At least one number
+            <p class="password-requirement text-red-500 flex items-center" data-requirement="number">
+              <span class="mr-2">●</span> At least one number
             </p>
-            <p class="password-requirement text-red-500" data-requirement="specialChar">
-              ● At least one special character
+            <p class="password-requirement text-red-500 flex items-center" data-requirement="specialChar">
+              <span class="mr-2">●</span> At least one special character (!@#$%^&*(),.?":{}|<>)
             </p>
           </div>
         </div>
 
+        <!-- Error message -->
+        <div id="errorMessage" class="hidden text-red-500 text-sm p-3 bg-red-100 bg-opacity-10 rounded-lg border border-red-400"></div>
+
         <div>
-          <button type="submit"
-                  class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <button id="submitButton" type="submit"
+                  class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <!-- Heroicon name: solid/lock-closed -->
+              <svg class="h-5 w-5 text-blue-500 group-hover:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+              </svg>
+            </span>
             Create Account
           </button>
         </div>
+        
+        <div class="text-center">
+          <p class="text-sm text-gray-400">
+            Already have an account? 
+            <a href="login.html" class="text-blue-400 hover:text-blue-300">
+              Log in
+            </a>
+          </p>
+        </div>
       </form>
-
-      <!-- Error message -->
-      <div id="errorMessage" class="hidden text-red-500 text-sm text-center mt-4"></div>
     </div>
   </div>
 </body>
