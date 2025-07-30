@@ -106,6 +106,10 @@
     /* Modal (paywall) styling */
     .modal-bg {
       background-color: rgba(0, 0, 0, 0.6);
+      pointer-events: all;
+    }
+    #paywallModal.hidden {
+      display: none !important;
     }
 
     /* Comprehensive Settings Sidebar */
@@ -157,6 +161,53 @@
       width: 100%;
       height: 250px; /* Adjust as needed */
       margin-bottom: 2rem;
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translate3d(0,0,0);
+    }
+    
+    /* Loading indicator */
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #3b82f6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Error message styling */
+    .error-message {
+      background-color: #fee2e2;
+      color: #dc2626;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+      display: none;
+    }
+    
+    /* Content card styling */
+    .content-card {
+      background: linear-gradient(145deg, #ffffff, #f3f4f6);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .dark .content-card {
+      background: linear-gradient(145deg, #1f2937, #111827);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      .section-title {
+        font-size: 36px;
+      }
     }
   </style>
 </head>
@@ -168,7 +219,7 @@
         <!-- Left side - Logo -->
         <div class="flex items-center">
           <a href="/" class="flex items-center">
-            <img src="//b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
+            <img src="https://b9fe070413d9eb020045866da2feb86e.cdn.bubble.io/f1728834965913x568986154418384060/2.svg" 
                  alt="Physics Hub Logo" 
                  class="h-10 w-10" />
           </a>
@@ -235,7 +286,7 @@
     <div class="sidebar-header">
       <!-- User info header (dynamically updated from Firebase Auth) -->
       <div class="flex items-center">
-        <img id="sidebarAvatar" src="//via.placeholder.com/40" alt="User Avatar" class="w-10 h-10 rounded-full mr-3" />
+        <img id="sidebarAvatar" src="https://via.placeholder.com/40" alt="User Avatar" class="w-10 h-10 rounded-full mr-3" />
         <div>
           <p id="sidebarUsername" class="font-semibold text-gray-800">User Name</p>
           <p id="sidebarEmail" class="text-xs text-gray-500">user@example.com</p>
@@ -279,7 +330,9 @@
   <!-- Hero Section with Animation -->
   <section class="pt-32 pb-20 px-6">
     <div class="max-w-7xl mx-auto">
-      <div id="animationHero" class="animation-container"></div>
+      <div id="animationHero" class="animation-container flex items-center justify-center">
+        <div class="loading-spinner"></div>
+      </div>
       <h1 class="section-title font-semibold mb-6">
         Experience Physics.<br />Like Never Before.
       </h1>
@@ -300,25 +353,45 @@
           </svg>
         </span>
       </h2>
-      <div id="animationMechanics" class="animation-container"></div>
+      <div id="animationMechanics" class="animation-container flex items-center justify-center">
+        <div class="loading-spinner"></div>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <a href="newtonian.html" class="sim-card group">
+        <a href="newtonian.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-blue-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7l4-4m0 0l4 4m-4-4v18m0 0l-4-4m4 4l4-4" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Newton's Laws</h3>
           <p class="text-sm text-gray-500">Understand the fundamental principles of motion</p>
         </a>
-        <a href="projectile_motion.html" class="sim-card group">
+        <a href="projectile_motion.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-green-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 17l-4 4m0 0l-4-4m4 4V3" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Projectile Motion</h3>
           <p class="text-sm text-gray-500">Explore the physics of moving objects</p>
         </a>
-        <a href="work_energy_power.html" class="sim-card group">
+        <a href="work_energy_power.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-purple-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Work and Energy</h3>
           <p class="text-sm text-gray-500">Discover energy transformation principles</p>
@@ -338,18 +411,32 @@
           </svg>
         </span>
       </h2>
-      <div id="animationEM" class="animation-container"></div>
+      <div id="animationEM" class="animation-container flex items-center justify-center">
+        <div class="loading-spinner"></div>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <a href="circuit_simulator.html" class="sim-card group">
+        <a href="circuit_simulator.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-yellow-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Circuit Lab</h3>
           <p class="text-sm text-gray-500">Build and analyze electrical circuits</p>
         </a>
-        <a href="electromagnetic_flux.html" class="sim-card group">
+        <a href="electromagnetic_flux.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-red-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Electromagnetic Waves</h3>
           <p class="text-sm text-gray-500">Visualize electromagnetic wave propagation</p>
@@ -369,18 +456,32 @@
           </svg>
         </span>
       </h2>
-      <div id="animationWaves" class="animation-container"></div>
+      <div id="animationWaves" class="animation-container flex items-center justify-center">
+        <div class="loading-spinner"></div>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <a href="waves.html" class="sim-card group">
+        <a href="waves.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-indigo-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Wave Motion</h3>
           <p class="text-sm text-gray-500">Study wave properties and behavior</p>
         </a>
-        <a href="optics_simulator.html" class="sim-card group">
+        <a href="optics_simulator.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-pink-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Optics Lab</h3>
           <p class="text-sm text-gray-500">Explore light behavior and lenses</p>
@@ -402,18 +503,32 @@
           </svg>
         </span>
       </h2>
-      <div id="animationModern" class="animation-container"></div>
+      <div id="animationModern" class="animation-container flex items-center justify-center">
+        <div class="loading-spinner"></div>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <a href="quantum_mechanics" class="sim-card group">
+        <a href="quantum_mechanics" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-teal-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Quantum Mechanics</h3>
           <p class="text-sm text-gray-500">Discover the quantum world</p>
         </a>
-        <a href="nuclear_reactor.html" class="sim-card group">
+        <a href="nuclear_reactor.html" class="sim-card group content-card p-6">
           <div class="aspect-w-16 aspect-h-9 mb-4">
-            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden"></div>
+            <div class="w-full h-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+              <div class="bg-orange-200 w-16 h-16 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+              </div>
+            </div>
           </div>
           <h3 class="text-lg font-medium mb-2">Nuclear Physics</h3>
           <p class="text-sm text-gray-500">Explore atomic nuclei and radiation</p>
@@ -429,12 +544,12 @@
       <div id="animationLock" class="animation-container"></div>
       <h2 class="text-2xl font-bold mb-4">Access Restricted</h2>
       <p class="mb-4">You must be signed in to access this content.</p>
+      <div id="loginError" class="error-message">Login error message</div>
       <form id="loginForm" class="text-black">
-      <input type="email" id="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded mb-4 text-black" required />
-      <input type="password" id="password" placeholder="Password" class="w-full p-2 border border-gray-300 rounded mb-4 text-black" required />
-      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Login</button>
-      <p id="loginError" class="mt-2 text-red-600 text-sm hidden"></p>
-    </form>
+        <input type="email" id="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded mb-4 text-black" required />
+        <input type="password" id="password" placeholder="Password" class="w-full p-2 border border-gray-300 rounded mb-4 text-black" required />
+        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Login</button>
+      </form>
       <p class="mt-4 text-center">
         Don't have an account? 
         <a href="signup.html" class="text-blue-600 font-bold hover:underline">Sign Up</a>
@@ -451,73 +566,118 @@
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     const firebaseConfig = {
-    apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
-    authDomain: "lumenosphys.firebaseapp.com",
-    projectId: "lumenosphys",
-    storageBucket: "lumenosphys.firebasestorage.app",
-    messagingSenderId: "501424803085",
-    appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
-    measurementId: "G-7RTGWQ515B"
-  };
+      apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
+      authDomain: "lumenosphys.firebaseapp.com",
+      projectId: "lumenosphys",
+      storageBucket: "lumenosphys.firebasestorage.app",
+      messagingSenderId: "501424803085",
+      appId: "1:501424803085:web:b7e8976d60e1f9fd3ff444",
+      measurementId: "G-7RTGWQ515B"
+    };
+    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    // DOM element references with null checks
+    const paywallModal = document.getElementById("paywallModal");
+    const sidebarUsername = document.getElementById("sidebarUsername");
+    const sidebarEmail = document.getElementById("sidebarEmail");
+    const sidebarAvatar = document.getElementById("sidebarAvatar");
+    const profileAvatar = document.getElementById("profileAvatar");
+    const teacherOptions = document.getElementById("teacherOptions");
+    const loginError = document.getElementById("loginError");
+
+    // Auth state change handler
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("paywallModal").classList.add("hidden");
-        // Update sidebar and profile with authenticated user details.
-        document.getElementById("sidebarUsername").textContent = user.displayName || user.email;
-        document.getElementById("sidebarEmail").textContent = user.email;
-        if(user.photoURL){
-          document.getElementById("sidebarAvatar").src = user.photoURL;
-          document.getElementById("profileAvatar").style.backgroundImage = `url(${user.photoURL})`;
-          document.getElementById("profileAvatar").textContent = "";
-        }
-        else {
-          // Default avatar or initials if no photo provided
-          document.getElementById("sidebarAvatar").src = "//via.placeholder.com/40";
-          document.getElementById("profileAvatar").textContent = user.email.charAt(0).toUpperCase();
-        }
-        // Teacher-only options based on custom claims.
-        user.getIdTokenResult().then((idTokenResult) => {
-          if (idTokenResult.claims.role === 'teacher') {
-            document.getElementById("teacherOptions").classList.remove("hidden");
+      try {
+        if (user) {
+          // Hide paywall modal if it exists
+          if (paywallModal) paywallModal.classList.add("hidden");
+          
+          // Update user info in sidebar if elements exist
+          if (sidebarUsername) sidebarUsername.textContent = user.displayName || user.email;
+          if (sidebarEmail) sidebarEmail.textContent = user.email;
+          
+          // Update avatars
+          if (user.photoURL) {
+            if (sidebarAvatar) sidebarAvatar.src = user.photoURL;
+            if (profileAvatar) {
+              profileAvatar.style.backgroundImage = `url(${user.photoURL})`;
+              profileAvatar.textContent = "";
+            }
           } else {
-            document.getElementById("teacherOptions").classList.add("hidden");
+            if (sidebarAvatar) sidebarAvatar.src = "https://via.placeholder.com/40";
+            if (profileAvatar) profileAvatar.textContent = user.email?.charAt(0)?.toUpperCase() || "U";
           }
-        });
-      } else {
-        document.getElementById("paywallModal").classList.remove("hidden");
+          
+          // Check teacher role
+          if (teacherOptions) {
+            user.getIdTokenResult()
+              .then((idTokenResult) => {
+                teacherOptions.classList.toggle(
+                  "hidden", 
+                  idTokenResult.claims.role !== 'teacher'
+                );
+              })
+              .catch((error) => {
+                console.error("Role check error:", error);
+                if (teacherOptions) teacherOptions.classList.add("hidden");
+              });
+          }
+        } else if (paywallModal) {
+          paywallModal.classList.remove("hidden");
+        }
+      } catch (error) {
+        console.error("Auth state error:", error);
       }
     });
 
+    // Login form handler
     const loginForm = document.getElementById("loginForm");
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const loginError = document.getElementById("loginError");
+    if (loginForm) {
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        
+        if (loginError) {
+          loginError.textContent = "Authenticating...";
+          loginError.style.display = "block";
+          loginError.style.backgroundColor = "#dbeafe";
+          loginError.style.color = "#1d4ed8";
+        }
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          loginError.classList.add("hidden");
-          document.getElementById("paywallModal").classList.add("hidden");
-        })
-        .catch((error) => {
-          loginError.textContent = "Login error: " + error.message;
-          loginError.classList.remove("hidden");
-        });
-    });
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            if (loginError) {
+              loginError.style.display = "none";
+            }
+          })
+          .catch((error) => {
+            if (loginError) {
+              loginError.textContent = "Login error: " + error.message;
+              loginError.style.display = "block";
+              loginError.style.backgroundColor = "#fee2e2";
+              loginError.style.color = "#dc2626";
+            }
+          });
+      });
+    }
 
-    document.getElementById("signOutBtn").addEventListener("click", () => {
-      signOut(auth)
-        .then(() => {
-          document.getElementById("settingsSidebar").style.right = "-300px";
-        })
-        .catch((error) => {
-          alert("Sign out error: " + error.message);
-        });
-    });
+    // Sign out handler
+    const signOutBtn = document.getElementById("signOutBtn");
+    if (signOutBtn) {
+      signOutBtn.addEventListener("click", () => {
+        signOut(auth)
+          .then(() => {
+            const settingsSidebar = document.getElementById("settingsSidebar");
+            if (settingsSidebar) settingsSidebar.style.right = "-300px";
+          })
+          .catch((error) => {
+            alert("Sign out error: " + error.message);
+          });
+      });
+    }
   </script>
   
   <!-- Additional Scripts (Dark mode, Mobile menu, Search, Sidebar, Animations) -->
@@ -529,20 +689,26 @@
 
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
-      sunIcon.classList.remove('hidden');
-      moonIcon.classList.add('hidden');
+      if (sunIcon) sunIcon.classList.remove('hidden');
+      if (moonIcon) moonIcon.classList.add('hidden');
     }
-    themeToggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      sunIcon.classList.toggle('hidden');
-      moonIcon.classList.toggle('hidden');
-      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-      if(document.getElementById("settingsSidebar").classList.contains("active")){
-        document.getElementById("settingsSidebar").classList.toggle("dark");
-      }
-    });
+    
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        if (sunIcon && moonIcon) {
+          sunIcon.classList.toggle('hidden');
+          moonIcon.classList.toggle('hidden');
+        }
+        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        const settingsSidebar = document.getElementById("settingsSidebar");
+        if (settingsSidebar && settingsSidebar.style.right === "0px") {
+          settingsSidebar.classList.toggle("dark");
+        }
+      });
+    }
 
-    // Search functionality (for demonstration)
+    // Search functionality with throttling
     const searchInput = document.getElementById('search');
     const searchResults = document.getElementById('searchResults');
     const simulations = [
@@ -556,77 +722,96 @@
       { title: "Quantum Mechanics", category: "Modern Physics", url: "quantum.html", description: "Discover the quantum world" },
       { title: "Nuclear Physics", category: "Modern Physics", url: "nuclear.html", description: "Explore atomic nuclei and radiation" }
     ];
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      if (query.length < 2) {
-        searchResults.classList.add('hidden');
-        return;
-      }
-      const filteredResults = simulations.filter(
-        (sim) =>
-          sim.title.toLowerCase().includes(query) ||
-          sim.description.toLowerCase().includes(query) ||
-          sim.category.toLowerCase().includes(query)
-      );
-      if (filteredResults.length > 0) {
-        searchResults.innerHTML = filteredResults
-          .map(
-            (sim) => `
-          <a href="${sim.url}" class="block p-4 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <div class="font-medium">${sim.title}</div>
-            <div class="text-sm text-gray-500">${sim.category} - ${sim.description}</div>
-          </a>
-        `
-          )
-          .join('');
-        searchResults.classList.remove('hidden');
-      } else {
-        searchResults.innerHTML = `
-          <div class="p-4 text-gray-500">
-            No simulations found for "${e.target.value}"
-          </div>
-        `;
-        searchResults.classList.remove('hidden');
-      }
-    });
-    document.addEventListener('click', (e) => {
-      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-        searchResults.classList.add('hidden');
-      }
-    });
+    
+    let searchTimeout;
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          const query = e.target.value.toLowerCase();
+          if (query.length < 2) {
+            if (searchResults) searchResults.classList.add('hidden');
+            return;
+          }
+          const filteredResults = simulations.filter(
+            (sim) =>
+              sim.title.toLowerCase().includes(query) ||
+              sim.description.toLowerCase().includes(query) ||
+              sim.category.toLowerCase().includes(query)
+          );
+          if (searchResults) {
+            if (filteredResults.length > 0) {
+              searchResults.innerHTML = filteredResults
+                .map(
+                  (sim) => `
+                <a href="${sim.url}" class="block p-4 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <div class="font-medium">${sim.title}</div>
+                  <div class="text-sm text-gray-500">${sim.category} - ${sim.description}</div>
+                </a>
+              `
+                )
+                .join('');
+              searchResults.classList.remove('hidden');
+            } else {
+              searchResults.innerHTML = `
+                <div class="p-4 text-gray-500">
+                  No simulations found for "${e.target.value}"
+                </div>
+              `;
+              searchResults.classList.remove('hidden');
+            }
+          }
+        }, 300);
+      });
+    }
+    
+    if (searchResults) {
+      document.addEventListener('click', (e) => {
+        if (searchInput && !searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.classList.add('hidden');
+        }
+      });
+    }
 
     // Mobile menu toggle
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
-    mobileMenuButton.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
-    document.addEventListener('click', (e) => {
-      if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
-        mobileMenu.classList.add('hidden');
-      }
-    });
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 768) {
-        mobileMenu.classList.add('hidden');
-      }
-    });
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
+          mobileMenu.classList.add('hidden');
+        }
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+          mobileMenu.classList.add('hidden');
+        }
+      });
+    }
 
     // Settings Sidebar toggle logic
     const profileBtn = document.getElementById('profileBtn');
     const settingsSidebar = document.getElementById('settingsSidebar');
     const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
 
-    profileBtn.addEventListener('click', () => {
-      if (settingsSidebar.style.right === "0px") {
+    if (profileBtn && settingsSidebar) {
+      profileBtn.addEventListener('click', () => {
+        if (settingsSidebar.style.right === "0px") {
+          settingsSidebar.style.right = "-300px";
+        } else {
+          settingsSidebar.style.right = "0px";
+        }
+      });
+    }
+    
+    if (sidebarCloseBtn && settingsSidebar) {
+      sidebarCloseBtn.addEventListener('click', () => {
         settingsSidebar.style.right = "-300px";
-      } else {
-        settingsSidebar.style.right = "0px";
-      }
-    });
-    sidebarCloseBtn.addEventListener('click', () => {
-      settingsSidebar.style.right = "-300px";
-    });
+      });
+    }
     
     // Lottie Animations Initialization
     const animations = {
@@ -639,21 +824,47 @@
     };
 
     function loadAnimation(containerId, animationPath) {
-      lottie.loadAnimation({
-        container: document.getElementById(containerId),
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: animationPath
-      });
+      const container = document.getElementById(containerId);
+      if (container) {
+        lottie.loadAnimation({
+          container: container,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: animationPath
+        });
+      }
     }
 
+    // Only load essential animations immediately
     loadAnimation('animationHero', animations.hero);
-    loadAnimation('animationMechanics', animations.mechanics);
-    loadAnimation('animationEM', animations.electromagnetism);
-    loadAnimation('animationWaves', animations.waves);
-    loadAnimation('animationModern', animations.modern);
     loadAnimation('animationLock', animations.lock);
+    
+    // Lazy load other animations when they become visible
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id.replace('animation', '').toLowerCase();
+          if (animations[id]) {
+            loadAnimation(entry.target.id, animations[id]);
+            observer.unobserve(entry.target);
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animation-container').forEach(el => {
+      if (el.id !== 'animationHero' && el.id !== 'animationLock') {
+        observer.observe(el);
+      }
+    });
+    
+    // Initialize theme from localStorage
+    if (localStorage.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      if (sunIcon) sunIcon.classList.remove('hidden');
+      if (moonIcon) moonIcon.classList.add('hidden');
+    }
   </script>
 </body>
 </html>
