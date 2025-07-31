@@ -1,372 +1,1001 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AC vs. DC Circuits Simulator</title>
-  <!-- Three.js -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced AC/DC Circuit Simulator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- OrbitControls for click-and-drag rotation -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <!-- MathJax for LaTeX rendering -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      --primary: #3498db;
+      --secondary: #2ecc71;
+      --accent: #e74c3c;
+      --dark: #1e293b;
+      --darker: #0f172a;
+      --light: #e2e8f0;
+      --panel-bg: rgba(30, 41, 59, 0.95);
+      --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      --transition: all 0.3s ease;
+      --border-radius: 12px;
+      --wire-color: #94a3b8;
+      --wire-active: #60a5fa;
+    }
+
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      overflow: hidden;
-      background: #eaeaea;
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    #controlPanel {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background-color: #fff;
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-      z-index: 10;
-      max-width: 320px;
-      overflow-y: auto;
-      max-height: 90vh;
-    }
-    #controlPanel h3 {
-      margin: 0;
-      color: #222;
-    }
-    .input-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #333;
-      font-weight: 500;
-    }
-    input[type="number"], select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      margin-top: 2px;
-    }
-    button {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #measurements {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-      font-size: 14px;
-      color: #555;
-    }
-    .measurement {
-      margin-bottom: 8px;
-    }
-    #ammeterPanel {
-      background-color: #f8f8f8;
-      margin-top: 15px;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    #currentReading {
-      font-size: 24px;
-      font-weight: bold;
-      color: #2196f3;
-      text-align: center;
-      margin: 10px 0;
-      font-family: monospace;
-    }
-    .ammeter-controls {
       display: flex;
-      gap: 10px;
-      margin-top: 10px;
+      flex-direction: column;
+      gap: 20px;
     }
-    .ammeter-controls button {
-      flex: 1;
-      margin: 0;
-    }
-    /* Container for dynamic extra component parameters */
-    #componentParameters {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #ccc;
-    }
-    #componentParameters h4 {
-      margin-bottom: 5px;
-      font-size: 16px;
-      color: #333;
-    }
-    /* Analytics panel */
-    #componentAnalytics {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #ccc;
-    }
-    #componentAnalytics h4 {
-      margin-bottom: 5px;
-      font-size: 16px;
-      color: #333;
-    }
-    /* Info panel styling */
-    #infoPanel {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: #fff;
+
+    header {
+      text-align: center;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-      max-width: 400px;
-      z-index: 20;
-      display: none;
-      font-size: 14px;
-      color: #333;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: var(--border-radius);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    #infoPanel h4 {
-      margin-top: 0;
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
-    #infoPanel p, #infoPanel ul {
-      margin: 10px 0;
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 800px;
+      margin: 0 auto;
+      color: #cbd5e1;
     }
-    /* Sleek "I" button styling */
-    #infoToggle {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-weight: bold;
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1200px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .control-panel {
+      background: var(--panel-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--panel-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .panel-header h2 {
+      color: var(--light);
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 50px;
+      padding: 5px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      background: transparent;
       border: none;
-      background-color: #2196f3;
-      color: #fff;
+      border-radius: 50px;
       cursor: pointer;
+      font-weight: 600;
+      color: var(--light);
+      transition: var(--transition);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      gap: 8px;
     }
-    /* AC Parameters group (visible only when AC mode is selected) */
-    #acParameters {
+
+    .tab.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .tab-content {
       display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--light);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.7);
+      font-size: 1rem;
+      transition: var(--transition);
+      color: var(--light);
+    }
+
+    input[type="number"]:focus, select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--primary), #2980b9);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    button.secondary {
+      background: linear-gradient(135deg, var(--secondary), #27ae60);
+    }
+
+    button.accent {
+      background: linear-gradient(135deg, var(--accent), #c0392b);
+    }
+
+    .measurements {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .measurement-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .measurement-card {
+      background: rgba(30, 41, 59, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-left: 3px solid var(--primary);
+      transition: var(--transition);
+    }
+
+    .measurement-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .measurement-card h4 {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .measurement-value {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--light);
+    }
+
+    .visualization-container {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      height: calc(600px + 300px + 20px);
+    }
+
+    .visualization-area {
+      position: relative;
+      background: var(--darker);
+      border-radius: var(--border-radius);
+      box-shadow: var(--panel-shadow);
+      overflow: hidden;
+      height: 600px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .oscilloscope {
+      position: relative;
+      background: var(--darker);
+      border-radius: var(--border-radius);
+      box-shadow: var(--panel-shadow);
+      overflow: hidden;
+      height: 300px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .oscilloscope-header {
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .oscilloscope-content {
+      flex: 1;
+      position: relative;
+    }
+    
+    #oscilloscopeCanvas {
+      width: 100%;
+      height: 100%;
+      background: #0c1320;
+    }
+
+    .ammeter-display {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #00ff9d;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+      min-width: 180px;
+      border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
+    .info-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.2rem;
+      z-index: 20;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: var(--transition);
+    }
+    
+    .info-button:hover {
+      transform: scale(1.1);
+    }
+
+    .info-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      left: 20px;
+      background: var(--panel-bg);
+      padding: 25px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--panel-shadow);
+      z-index: 30;
+      display: none;
+      color: var(--light);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .info-panel h3 {
+      color: var(--primary);
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-panel p, .info-panel ul {
+      margin: 10px 0;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .info-panel ul {
+      padding-left: 25px;
+    }
+
+    .info-panel li {
+      margin-bottom: 8px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--accent);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      transition: var(--transition);
+    }
+    
+    .close-btn:hover {
+      transform: rotate(90deg);
+    }
+
+    .component-params {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .component-params h4 {
+      color: var(--light);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .component-params .delete-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .component-params .delete-btn:hover {
+      background: #c0392b;
+    }
+    
+    .theory-box {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      margin-top: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .theory-box h3 {
+      color: var(--primary);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .theory-content {
+      background: rgba(30, 41, 59, 0.5);
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      color: #94a3b8;
+      overflow-x: auto;
+    }
+    
+    .component-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    
+    .component-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(52, 152, 219, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
+    
+    .power-indicator {
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    
+    .power-level {
+      height: 100%;
+      background: linear-gradient(90deg, var(--secondary), var(--accent));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .schematic-view {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 10;
+      width: 200px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .schematic-view h4 {
+      color: var(--light);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .schematic {
+      width: 100%;
+      height: 120px;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 4px;
+      position: relative;
+    }
+    
+    .schematic-element {
+      position: absolute;
+      font-size: 10px;
+      color: var(--light);
+      text-align: center;
+    }
+    
+    .schematic-battery {
+      top: 30px;
+      left: 20px;
+    }
+    
+    .schematic-resistor {
+      top: 30px;
+      left: 80px;
+    }
+    
+    .schematic-resistor2 {
+      top: 30px;
+      left: 140px;
+    }
+    
+    .schematic-wire {
+      position: absolute;
+      background: var(--wire-color);
+      transition: background 0.3s ease;
+    }
+    
+    .schematic-wire.active {
+      background: var(--wire-active);
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+      
+      .visualization-area {
+        height: 400px;
+      }
+      
+      .visualization-container {
+        height: calc(400px + 250px + 20px);
+      }
+      
+      .oscilloscope {
+        height: 250px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .control-panel {
+        padding: 15px;
+      }
+      
+      .visualization-area {
+        height: 300px;
+      }
+      
+      .visualization-container {
+        height: calc(300px + 200px + 20px);
+      }
+      
+      .oscilloscope {
+        height: 200px;
+      }
+      
+      .measurement-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .schematic-view {
+        position: relative;
+        width: auto;
+        margin-bottom: 15px;
+        top: auto;
+        left: auto;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="controlPanel">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3>AC vs. DC Circuits Simulator</h3>
-      <button id="infoToggle" onclick="toggleInfo()">I</button>
-    </div>
-    <div class="input-group">
-      <label for="operationMode">Operation Mode:</label>
-      <select id="operationMode" onchange="toggleACParams()">
-        <option value="dc">DC</option>
-        <option value="ac">AC</option>
-      </select>
-    </div>
-    <div class="input-group" id="acParameters">
-      <label for="frequency">Frequency (Hz):</label>
-      <input type="number" id="frequency" value="60" min="1" max="1000" step="1">
-    </div>
-    <div class="input-group">
-      <label for="voltage">Battery Voltage (V):</label>
-      <input type="number" id="voltage" value="12" min="1" max="24" step="0.1">
-    </div>
-    <div class="input-group">
-      <label for="batteryInternal">Battery Internal Resistance (Ω):</label>
-      <input type="number" id="batteryInternal" value="0.5" min="0" max="5" step="0.1">
-    </div>
-    <div class="input-group">
-      <label for="circuitType">Circuit Type:</label>
-      <select id="circuitType">
-        <option value="series">Series</option>
-        <option value="parallel">Parallel</option>
-      </select>
-    </div>
-    <div class="input-group">
-      <label for="resistor1">Resistor 1 (Ω):</label>
-      <input type="number" id="resistor1" value="10" min="1" max="500" step="0.1">
-    </div>
-    <div class="input-group">
-      <label for="resistor2">Resistor 2 (Ω):</label>
-      <input type="number" id="resistor2" value="10" min="1" max="500" step="0.1">
-    </div>
-    <button onclick="updateCircuit()">Update Circuit</button>
-    
-    <!-- Extra Components Section -->
-    <div class="input-group">
-      <label for="newComponent">Add Extra Component:</label>
-      <select id="newComponent">
-         <option value="resistor">Resistor</option>
-         <option value="capacitor">Capacitor</option>
-         <option value="inductor">Inductor</option>
-      </select>
-      <button onclick="addComponent()">Add Component</button>
-    </div>
-    
-    <!-- Dynamic Parameters for extra components -->
-    <div id="componentParameters">
-      <h4>Component Parameters</h4>
-      <!-- Dynamic parameter panels will be appended here -->
-    </div>
-    
-    <!-- Component Analytics Panel -->
-    <div id="componentAnalytics">
-      <h4>Component Analytics</h4>
-      <!-- Analytics will be updated here -->
-    </div>
-    
-    <div id="measurements">
-      <div class="measurement">Total Resistance: <span id="totalResistance">0 Ω</span></div>
-      <div class="measurement">Total Current: <span id="totalCurrent">0 A</span></div>
-      <div class="measurement">Battery Drop: <span id="batteryDrop">0 V</span></div>
-      <div class="measurement">V<sub>R1</sub>: <span id="voltageR1">0 V</span></div>
-      <div class="measurement">V<sub>R2</sub>: <span id="voltageR2">0 V</span></div>
-      <div class="measurement">P<sub>R1</sub>: <span id="powerR1">0 W</span></div>
-      <div class="measurement">P<sub>R2</sub>: <span id="powerR2">0 W</span></div>
-      <div class="measurement">Total Power: <span id="totalPower">0 W</span></div>
-    </div>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-bolt"></i> Advanced AC/DC Circuit Simulator</h1>
+      <p class="subtitle">Interactive simulation to explore direct current (DC) and alternating current (AC) circuits with realistic physics visualization</p>
+    </header>
 
-    <div id="ammeterPanel">
-      <h4 style="margin-top: 0">Ammeter</h4>
-      <div id="currentReading">0.00 A</div>
-      <div class="input-group">
-        <label for="ammeterPosition">Measurement Point:</label>
-        <select id="ammeterPosition" onchange="updateAmmeterPosition()">
-          <option value="main">Main Line</option>
-          <option value="r1">After Resistor 1</option>
-          <option value="r2">After Resistor 2</option>
-        </select>
+    <div class="main-content">
+      <div class="control-panel">
+        <div class="panel-header">
+          <h2><i class="fas fa-sliders-h"></i> Control Panel</h2>
+          <div class="info-button" onclick="toggleInfo()">ℹ️</div>
+        </div>
+        
+        <div class="tabs">
+          <button class="tab active" data-tab="circuit"><i class="fas fa-project-diagram"></i> Circuit</button>
+          <button class="tab" data-tab="components"><i class="fas fa-puzzle-piece"></i> Components</button>
+          <button class="tab" data-tab="measure"><i class="fas fa-ruler"></i> Measure</button>
+        </div>
+        
+        <div id="circuit-tab" class="tab-content active">
+          <div class="input-group">
+            <label for="operationMode"><i class="fas fa-exchange-alt"></i> Operation Mode:</label>
+            <select id="operationMode">
+              <option value="dc">DC (Direct Current)</option>
+              <option value="ac">AC (Alternating Current)</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label for="voltage"><i class="fas fa-bolt"></i> Source Voltage (V):</label>
+            <input type="number" id="voltage" value="12" min="1" max="24" step="0.1">
+          </div>
+          
+          <div class="input-group">
+            <label for="batteryInternal"><i class="fas fa-resistance"></i> Source Resistance (Ω):</label>
+            <input type="number" id="batteryInternal" value="0.5" min="0" max="5" step="0.1">
+          </div>
+          
+          <div class="input-group">
+            <label for="circuitType"><i class="fas fa-code-branch"></i> Circuit Type:</label>
+            <select id="circuitType">
+              <option value="series">Series</option>
+              <option value="parallel">Parallel</option>
+              <option value="complex">Complex</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label for="resistor1"><i class="fas fa-resistance"></i> Resistor 1 (Ω):</label>
+            <input type="number" id="resistor1" value="10" min="1" max="500" step="0.1">
+          </div>
+          
+          <div class="input-group">
+            <label for="resistor2"><i class="fas fa-resistance"></i> Resistor 2 (Ω):</label>
+            <input type="number" id="resistor2" value="10" min="1" max="500" step="0.1">
+          </div>
+          
+          <div class="input-group" id="acFrequencyGroup" style="display: none;">
+            <label for="frequency"><i class="fas fa-wave-square"></i> AC Frequency (Hz):</label>
+            <input type="number" id="frequency" value="60" min="1" max="1000" step="1">
+          </div>
+          
+          <button onclick="updateCircuit()"><i class="fas fa-sync-alt"></i> Update Circuit</button>
+        </div>
+        
+        <div id="components-tab" class="tab-content">
+          <div class="input-group">
+            <label for="newComponent"><i class="fas fa-plus-circle"></i> Add Component:</label>
+            <select id="newComponent">
+              <option value="resistor">Resistor</option>
+              <option value="capacitor">Capacitor</option>
+              <option value="inductor">Inductor</option>
+              <option value="led">LED</option>
+            </select>
+            <button onclick="addComponent()"><i class="fas fa-plus"></i> Add Component</button>
+          </div>
+          
+          <div id="componentParameters">
+            <h3><i class="fas fa-cog"></i> Component Parameters</h3>
+            <p class="hint">Add components to see their parameters here</p>
+          </div>
+        </div>
+        
+        <div id="measure-tab" class="tab-content">
+          <div class="measurements">
+            <h3><i class="fas fa-chart-line"></i> Circuit Measurements</h3>
+            <div class="measurement-grid">
+              <div class="measurement-card">
+                <h4><i class="fas fa-resistance"></i> Total Resistance</h4>
+                <div class="measurement-value" id="totalResistance">0 Ω</div>
+                <div class="power-indicator"><div class="power-level" id="resistanceIndicator"></div></div>
+              </div>
+              <div class="measurement-card">
+                <h4><i class="fas fa-bolt"></i> Total Current</h4>
+                <div class="measurement-value" id="totalCurrent">0 A</div>
+                <div class="power-indicator"><div class="power-level" id="currentIndicator"></div></div>
+              </div>
+              <div class="measurement-card">
+                <h4><i class="fas fa-battery-quarter"></i> Source Drop</h4>
+                <div class="measurement-value" id="batteryDrop">0 V</div>
+                <div class="power-indicator"><div class="power-level" id="voltageIndicator"></div></div>
+              </div>
+              <div class="measurement-card">
+                <h4><i class="fas fa-fire"></i> Total Power</h4>
+                <div class="measurement-value" id="totalPower">0 W</div>
+                <div class="power-indicator"><div class="power-level" id="powerIndicator"></div></div>
+              </div>
+              <div class="measurement-card">
+                <h4><i class="fas fa-bolt"></i> V<sub>R1</sub></h4>
+                <div class="measurement-value" id="voltageR1">0 V</div>
+              </div>
+              <div class="measurement-card">
+                <h4><i class="fas fa-bolt"></i> V<sub>R2</sub></h4>
+                <div class="measurement-value" id="voltageR2">0 V</div>
+              </div>
+              <div class="measurement-card">
+                <h4><i class="fas fa-wave-square"></i> Phase Angle</h4>
+                <div class="measurement-value" id="phaseAngle">0°</div>
+              </div>
+              <div class="measurement-card">
+                <h4><i class="fas fa-impedance"></i> Impedance</h4>
+                <div class="measurement-value" id="impedance">0 Ω</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <h3><i class="fas fa-tachometer-alt"></i> Ammeter</h3>
+            <label for="ammeterPosition"><i class="fas fa-map-marker-alt"></i> Measurement Point:</label>
+            <select id="ammeterPosition" onchange="updateAmmeterPosition()">
+              <option value="main">Main Line</option>
+              <option value="r1">After Resistor 1</option>
+              <option value="r2">After Resistor 2</option>
+            </select>
+            
+            <button onclick="toggleAmmeter()" id="ammeterToggle"><i class="fas fa-eye"></i> Show Ammeter</button>
+          </div>
+        </div>
+        
+        <div class="theory-box">
+          <h3><i class="fas fa-book"></i> Circuit Equations</h3>
+          <div class="theory-content" id="circuitEquations">
+            V = I × R // Ohm's Law
+            P = V × I // Power
+          </div>
+        </div>
+        
+        <button onclick="resetSimulator()" class="accent"><i class="fas fa-redo"></i> Reset Simulation</button>
       </div>
-      <div class="ammeter-controls">
-        <button onclick="toggleAmmeter()" id="ammeterToggle">Show Ammeter</button>
+      
+      <div class="visualization-container">
+        <div class="visualization-area">
+          <canvas id="renderCanvas"></canvas>
+          <div class="ammeter-display" id="currentReading">0.000 A</div>
+          <div class="info-button" onclick="toggleInfo()">ℹ️</div>
+          
+          <div class="schematic-view">
+            <h4><i class="fas fa-drafting-compass"></i> Schematic</h4>
+            <div class="schematic">
+              <div class="schematic-wire" id="schematic-wire1" style="width: 40px; height: 2px; top: 50px; left: 30px;"></div>
+              <div class="schematic-wire" id="schematic-wire2" style="width: 40px; height: 2px; top: 50px; left: 100px;"></div>
+              <div class="schematic-wire" id="schematic-wire3" style="width: 40px; height: 2px; top: 50px; left: 160px;"></div>
+              
+              <div class="schematic-element schematic-battery">
+                <i class="fas fa-battery-full" style="font-size: 24px; color: #3498db;"></i>
+                <div>Battery</div>
+              </div>
+              <div class="schematic-element schematic-resistor">
+                <i class="fas fa-resistance" style="font-size: 24px; color: #e74c3c;"></i>
+                <div>R1</div>
+              </div>
+              <div class="schematic-element schematic-resistor2">
+                <i class="fas fa-resistance" style="font-size: 24px; color: #2ecc71;"></i>
+                <div>R2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="oscilloscope">
+          <div class="oscilloscope-header">
+            <i class="fas fa-wave-square"></i>
+            <h3>Oscilloscope</h3>
+            <div style="margin-left: auto; display: flex; gap: 10px;">
+              <button style="width: auto; padding: 5px 10px; font-size: 0.9rem;"><i class="fas fa-wave-square"></i> Voltage</button>
+              <button style="width: auto; padding: 5px 10px; font-size: 0.9rem;"><i class="fas fa-bolt"></i> Current</button>
+              <button style="width: auto; padding: 5px 10px; font-size: 0.9rem;"><i class="fas fa-exchange-alt"></i> Both</button>
+            </div>
+          </div>
+          <div class="oscilloscope-content">
+            <canvas id="oscilloscopeCanvas"></canvas>
+          </div>
+        </div>
       </div>
     </div>
-    
-    <!-- Reset Button -->
-    <button onclick="resetSimulator()" style="background-color:#d32f2f;">Reset Simulation</button>
   </div>
 
-  <!-- Info Panel with detailed explanations, theory, and an inline 2D SVG diagram -->
-  <div id="infoPanel">
-    <h4>Theoretical Overview &amp; AC vs. DC</h4>
+  <div class="info-panel">
+    <div class="close-btn" onclick="toggleInfo()">×</div>
+    <h3><i class="fas fa-book-open"></i> Circuit Theory & Principles</h3>
+    
     <p><strong>DC (Direct Current):</strong> In a DC circuit the voltage is constant, so the current flows steadily in one direction. The electron flow is unidirectional, and Ohm’s Law (\( V = IR \)) directly governs the behavior of the circuit.</p>
+    
     <p><strong>AC (Alternating Current):</strong> In an AC circuit the voltage varies sinusoidally with time, causing the current to alternate its direction periodically. The effective voltage at any moment is given by \( V_{\mathrm{eff}} = V_0 \sin(2\pi f t) \), where \( V_0 \) is the amplitude and \( f \) is the frequency.</p>
-    <p><strong>Components:</strong></p>
+    
+    <p><strong>Key Formulas:</strong></p>
     <ul>
-      <li><em>Battery:</em> Supplies the driving voltage (DC or AC amplitude).</li>
-      <li><em>Resistor:</em> Limits current and drops voltage (\( V = IR \)).</li>
-      <li><em>Capacitor:</em> Stores energy in an electric field; its capacitive reactance \( X_C = \frac{1}{2\pi f C} \) determines its behavior in AC circuits.</li>
-      <li><em>Inductor:</em> Stores energy in a magnetic field; its inductive reactance \( X_L = 2\pi f L \) affects current in AC circuits.</li>
-      <li><em>Ammeter:</em> Measures current; in AC circuits it shows RMS or instantaneous values.</li>
+      <li><strong>Ohm's Law:</strong> \( V = I \times R \)</li>
+      <li><strong>Power:</strong> \( P = V \times I = I^2 \times R = \frac{V^2}{R} \)</li>
+      <li><strong>Series Resistance:</strong> \( R_{total} = R_1 + R_2 + \cdots \)</li>
+      <li><strong>Parallel Resistance:</strong> \( \frac{1}{R_{total}} = \frac{1}{R_1} + \frac{1}{R_2} + \cdots \)</li>
+      <li><strong>Impedance (AC):</strong> \( Z = \sqrt{R^2 + (X_L - X_C)^2} \)</li>
+      <li><strong>Phase Angle:</strong> \( \theta = \tan^{-1}\left(\frac{X_L - X_C}{R}\right) \)</li>
     </ul>
-    <p><strong>2D Circuit Diagram Example:</strong></p>
-    <div style="text-align: center;">
-      <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
-        <!-- Battery -->
-        <rect x="10" y="50" width="20" height="50" fill="#4444ff" />
-        <line x1="30" y1="65" x2="50" y2="65" stroke="black" stroke-width="2" />
-        <!-- Resistor -->
-        <rect x="50" y="60" width="40" height="30" fill="#ff4444" />
-        <line x1="90" y1="75" x2="110" y2="75" stroke="black" stroke-width="2" />
-        <!-- Ammeter -->
-        <circle cx="140" cy="75" r="15" fill="#2196f3" />
-        <text x="140" y="80" text-anchor="middle" fill="white" font-size="12">A</text>
-        <line x1="155" y1="75" x2="175" y2="75" stroke="black" stroke-width="2" />
-        <!-- Ground -->
-        <line x1="175" y1="75" x2="175" y2="100" stroke="black" stroke-width="2" />
-        <line x1="165" y1="100" x2="185" y2="100" stroke="black" stroke-width="2" />
-      </svg>
-    </div>
-    <button onclick="toggleInfo()">Close</button>
+    
+    <p><strong>Component Functions:</strong></p>
+    <ul>
+      <li><strong>Resistor:</strong> Opposes current flow, converts electrical energy to heat</li>
+      <li><strong>Capacitor:</strong> Stores energy in an electric field, blocks DC while passing AC</li>
+      <li><strong>Inductor:</strong> Stores energy in a magnetic field, resists changes in current</li>
+      <li><strong>LED:</strong> Light-emitting diode that emits light when current flows through it</li>
+    </ul>
   </div>
 
   <script>
-    // Global variables and simulation parameters
+    // Global variables
     let scene, camera, renderer, controls;
     let battery, resistor1, resistor2, ammeter;
     let wireGroup, wireCurves = [];
     let electrons = [];
-    let extraComponents = []; // Each entry: { id, type, object, value, pos }
-    let ammeterVisible = false;
-    let animationSpeed = 0.002; // Base electron flow speed for DC
     let currentMeasurements = { main: 0, r1: 0, r2: 0 };
-    let extraComponentIdCounter = 0;
-
-    // Initialization
-    init();
-    updateCircuit();
-    // For demo: add one extra component to show dynamic parameters
-    addComponent();
-
-    // Toggle display of AC parameters based on operation mode
-    function toggleACParams() {
-      const mode = document.getElementById("operationMode").value;
-      document.getElementById("acParameters").style.display = (mode === "ac") ? "block" : "none";
-      updateComponentAnalytics();
-    }
-
+    let ammeterVisible = false;
+    let components = [];
+    let acTime = 0;
+    
+    // Initialize the simulator
     function init() {
       // Scene Setup
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xeaeaea);
+      scene.background = new THREE.Color(0x0f172a);
       camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
       camera.position.set(0, 0, 40);
       
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        canvas: document.getElementById('renderCanvas')
+      });
+      renderer.setSize(document.querySelector('.visualization-area').clientWidth, 
+                      document.querySelector('.visualization-area').clientHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
-      document.body.appendChild(renderer.domElement);
       
       // OrbitControls for click-and-drag rotation
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
       
-      // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(10, 10, 10);
-      scene.add(ambientLight, directionalLight);
+      // Enhanced Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight1.position.set(10, 10, 10);
+      directionalLight1.castShadow = true;
       
-      // Group for wires (for dynamic updates)
+      const directionalLight2 = new THREE.DirectionalLight(0x334155, 0.5);
+      directionalLight2.position.set(-10, -10, -10);
+      
+      scene.add(ambientLight, directionalLight1, directionalLight2);
+      
+      // Group for wires
       wireGroup = new THREE.Group();
       scene.add(wireGroup);
       
       // Create base components
       battery = createBattery();
       resistor1 = createResistor(0xff4444);
-      resistor2 = createResistor(0xff4444);
+      resistor2 = createResistor(0x44ff44);
       ammeter = createAmmeter();
       
       scene.add(battery, resistor1, resistor2);
       
+      // Setup tabs
+      setupTabs();
+      
+      // Set up oscilloscope canvas
+      const oscCanvas = document.getElementById('oscilloscopeCanvas');
+      oscCanvas.width = document.querySelector('.oscilloscope-content').clientWidth;
+      oscCanvas.height = document.querySelector('.oscilloscope-content').clientHeight;
+      
+      // Set up AC frequency group visibility
+      document.getElementById('operationMode').addEventListener('change', function() {
+        document.getElementById('acFrequencyGroup').style.display = 
+          this.value === 'ac' ? 'block' : 'none';
+      });
+      
+      // Initial circuit
+      updateCircuit();
+      
+      // Start animation
       animate();
+    }
+    
+    // Set up tab functionality
+    function setupTabs() {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabName = this.dataset.tab;
+          
+          // Remove active class from all tabs
+          tabs.forEach(t => t.classList.remove('active'));
+          
+          // Hide all tab contents
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+          });
+          
+          // Activate clicked tab
+          this.classList.add('active');
+          
+          // Show corresponding content
+          document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+      });
     }
     
     // Component Creation Functions
     function createBattery() {
       const group = new THREE.Group();
-      const bodyGeom = new THREE.CylinderGeometry(1.2, 1.2, 6, 32);
-      const bodyMat = new THREE.MeshPhongMaterial({ color: 0x4444ff, shininess: 100 });
+      
+      // Battery body
+      const bodyGeom = new THREE.CylinderGeometry(1.5, 1.5, 8, 32);
+      const bodyMat = new THREE.MeshPhongMaterial({ 
+        color: 0x3498db,
+        shininess: 100,
+        specular: 0x1188ff
+      });
       const body = new THREE.Mesh(bodyGeom, bodyMat);
-      const termGeom = new THREE.CylinderGeometry(0.6, 0.6, 0.7, 32);
-      const termMat = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 100 });
+      
+      // Terminals
+      const termGeom = new THREE.CylinderGeometry(0.7, 0.7, 0.8, 32);
+      const termMat = new THREE.MeshPhongMaterial({ 
+        color: 0x95a5a6,
+        shininess: 80
+      });
       const posTerm = new THREE.Mesh(termGeom, termMat);
       const negTerm = new THREE.Mesh(termGeom, termMat);
-      posTerm.position.y = 3.5;
-      negTerm.position.y = -3.5;
+      posTerm.position.y = 4.5;
+      negTerm.position.y = -4.5;
+      
+      // Plus sign on positive terminal
+      const plusGeom1 = new THREE.BoxGeometry(0.4, 1.5, 0.2);
+      const plusGeom2 = new THREE.BoxGeometry(1.5, 0.4, 0.2);
+      const plusMat = new THREE.MeshPhongMaterial({ color: 0x2c3e50 });
+      const plus1 = new THREE.Mesh(plusGeom1, plusMat);
+      const plus2 = new THREE.Mesh(plusGeom2, plusMat);
+      plus1.position.z = 0.4;
+      plus2.position.z = 0.4;
+      posTerm.add(plus1, plus2);
+      
       group.add(body, posTerm, negTerm);
       group.rotation.z = Math.PI / 2;
       return group;
@@ -374,191 +1003,211 @@
     
     function createResistor(color) {
       const group = new THREE.Group();
-      const bodyGeom = new THREE.BoxGeometry(5, 1.2, 1.2);
-      const bodyMat = new THREE.MeshPhongMaterial({ color: color, shininess: 50 });
+      
+      // Resistor body (longer and thinner)
+      const bodyGeom = new THREE.CylinderGeometry(0.6, 0.6, 6, 32);
+      const bodyMat = new THREE.MeshPhongMaterial({ 
+        color: color,
+        shininess: 50,
+        specular: 0x888888
+      });
       const body = new THREE.Mesh(bodyGeom, bodyMat);
-      // Simulate color bands
-      const bandGeom = new THREE.BoxGeometry(0.3, 1.4, 1.4);
-      const bandMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
-      for (let i = -1; i <= 1; i++) {
+      
+      // Resistor leads
+      const leadLength = 2;
+      const leadGeom = new THREE.CylinderGeometry(0.15, 0.15, leadLength, 16);
+      const leadMat = new THREE.MeshPhongMaterial({ 
+        color: 0xaaaaaa,
+        shininess: 80
+      });
+      const lead1 = new THREE.Mesh(leadGeom, leadMat);
+      const lead2 = new THREE.Mesh(leadGeom, leadMat);
+      
+      // Position leads on either end of the resistor body
+      lead1.position.x = - (6/2 + leadLength/2);
+      lead2.position.x = 6/2 + leadLength/2;
+      
+      // Add color bands to represent resistance value
+      const bandGeom = new THREE.TorusGeometry(0.65, 0.15, 16, 32);
+      const bandMat = new THREE.MeshPhongMaterial({ 
+        color: 0x333333,
+        shininess: 60
+      });
+      
+      // Position bands along the resistor body
+      const bandPositions = [-2.2, -0.8, 0.8, 2.2];
+      bandPositions.forEach(pos => {
         const band = new THREE.Mesh(bandGeom, bandMat);
-        band.position.x = i;
+        band.position.x = pos;
+        band.rotation.x = Math.PI / 2;
         group.add(band);
-      }
-      group.add(body);
+      });
+      
+      group.add(body, lead1, lead2);
+      group.rotation.z = Math.PI / 2;
       return group;
     }
     
-    function createAmmeter() {
-      const group = new THREE.Group();
-      const bodyGeom = new THREE.BoxGeometry(2.5, 2.5, 1.2);
-      const bodyMat = new THREE.MeshPhongMaterial({ color: 0x2196f3, shininess: 100 });
-      const body = new THREE.Mesh(bodyGeom, bodyMat);
-      const screenGeom = new THREE.BoxGeometry(2, 1, 1.3);
-      const screenMat = new THREE.MeshPhongMaterial({ color: 0x000000, shininess: 30 });
-      const screen = new THREE.Mesh(screenGeom, screenMat);
-      screen.position.z = 0.15;
-      const connGeom = new THREE.CylinderGeometry(0.25, 0.25, 0.6, 16);
-      const connMat = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 100 });
-      const conn1 = new THREE.Mesh(connGeom, connMat);
-      const conn2 = new THREE.Mesh(connGeom, connMat);
-      conn1.rotation.z = Math.PI / 2;
-      conn2.rotation.z = Math.PI / 2;
-      conn1.position.x = -1.5;
-      conn2.position.x = 1.5;
-      group.add(body, screen, conn1, conn2);
-      return group;
-    }
-    
-    // Extra Components: Capacitor & Inductor
     function createCapacitor() {
       const group = new THREE.Group();
-      const plateGeom = new THREE.BoxGeometry(2, 0.1, 1);
-      const plateMat = new THREE.MeshPhongMaterial({ color: 0x00ccff });
+      
+      // Capacitor plates
+      const plateGeom = new THREE.BoxGeometry(1, 5, 0.4);
+      const plateMat = new THREE.MeshPhongMaterial({ 
+        color: 0xf1c40f,
+        shininess: 70
+      });
       const plate1 = new THREE.Mesh(plateGeom, plateMat);
       const plate2 = new THREE.Mesh(plateGeom, plateMat);
-      plate1.position.set(0, 0.6, 0);
-      plate2.position.set(0, -0.6, 0);
-      group.add(plate1, plate2);
+      plate1.position.x = -0.6;
+      plate2.position.x = 0.6;
+      
+      // Leads
+      const leadGeom = new THREE.CylinderGeometry(0.15, 0.15, 2, 16);
+      const leadMat = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
+      const lead1 = new THREE.Mesh(leadGeom, leadMat);
+      const lead2 = new THREE.Mesh(leadGeom, leadMat);
+      lead1.position.x = -2.5;
+      lead2.position.x = 2.5;
+      
+      group.add(plate1, plate2, lead1, lead2);
+      group.rotation.z = Math.PI / 2;
       return group;
     }
     
     function createInductor() {
       const group = new THREE.Group();
-      const coilGeom = new THREE.TorusGeometry(1, 0.2, 16, 100);
-      const coilMat = new THREE.MeshPhongMaterial({ color: 0xffaa00 });
-      const coil = new THREE.Mesh(coilGeom, coilMat);
-      group.add(coil);
+      
+      // Inductor coil
+      const coilGeom = new THREE.TorusGeometry(0.8, 0.12, 16, 32);
+      const coilMat = new THREE.MeshPhongMaterial({ 
+        color: 0x9b59b6,
+        shininess: 80
+      });
+      const coils = [];
+      for (let i = -2.5; i <= 2.5; i += 0.6) {
+        const coil = new THREE.Mesh(coilGeom, coilMat);
+        coil.position.x = i;
+        coil.rotation.x = Math.PI / 2;
+        coils.push(coil);
+      }
+      
+      // Leads
+      const leadGeom = new THREE.CylinderGeometry(0.15, 0.15, 2, 16);
+      const leadMat = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
+      const lead1 = new THREE.Mesh(leadGeom, leadMat);
+      const lead2 = new THREE.Mesh(leadGeom, leadMat);
+      lead1.position.x = -4.2;
+      lead2.position.x = 4.2;
+      
+      group.add(lead1, lead2, ...coils);
+      group.rotation.z = Math.PI / 2;
       return group;
     }
     
-    // --- Extra Component Management ---
-    function addComponent() {
-      const type = document.getElementById("newComponent").value;
-      let component;
-      let defaultValue;
-      if (type === "resistor") {
-        component = createResistor(0x00aa00);
-        defaultValue = 10; // Ohms
-      } else if (type === "capacitor") {
-        component = createCapacitor();
-        defaultValue = 1e-6; // Farads
-      } else if (type === "inductor") {
-        component = createInductor();
-        defaultValue = 1e-3; // Henries
-      }
-      // Default random position
-      component.position.set(0, Math.random() * 10 - 5, 0);
-      scene.add(component);
-      let compEntry = {
-        id: extraComponentIdCounter++,
-        type: type,
-        object: component,
-        value: defaultValue,
-        pos: { x: component.position.x, y: component.position.y, z: component.position.z }
-      };
-      extraComponents.push(compEntry);
-      refreshExtraComponentsUI();
-      updateComponentAnalytics();
-    }
-    
-    function refreshExtraComponentsUI() {
-      const container = document.getElementById("componentParameters");
-      container.innerHTML = "<h4>Component Parameters</h4>";
-      extraComponents.forEach(comp => {
-        const div = document.createElement("div");
-        div.id = "componentParam" + comp.id;
-        div.style.border = "1px solid #ddd";
-        div.style.padding = "5px";
-        div.style.marginBottom = "8px";
-        let extraField = "";
-        if (comp.type === "resistor") {
-          extraField = `<label>Resistance (Ω): <input type="number" value="${comp.value}" step="0.1" onchange="updateComponentValue(${comp.id}, this.value)" /></label>`;
-        } else if (comp.type === "capacitor") {
-          extraField = `<label>Capacitance (F): <input type="number" value="${comp.value}" step="1e-7" onchange="updateComponentValue(${comp.id}, this.value)" /></label>`;
-        } else if (comp.type === "inductor") {
-          extraField = `<label>Inductance (H): <input type="number" value="${comp.value}" step="1e-4" onchange="updateComponentValue(${comp.id}, this.value)" /></label>`;
-        }
-        div.innerHTML = `<h4>Component ${comp.id} (${comp.type})</h4>
-          <label>X: <input type="number" value="${comp.pos.x.toFixed(2)}" step="0.1" onchange="updateComponentPositionUI(${comp.id}, 'x', this.value)" /></label>
-          <label>Y: <input type="number" value="${comp.pos.y.toFixed(2)}" step="0.1" onchange="updateComponentPositionUI(${comp.id}, 'y', this.value)" /></label>
-          <label>Z: <input type="number" value="${comp.pos.z.toFixed(2)}" step="0.1" onchange="updateComponentPositionUI(${comp.id}, 'z', this.value)" /></label>
-          ${extraField}
-          <button onclick="deleteComponent(${comp.id})" style="background-color:#d32f2f;">Delete Component</button>`;
-        container.appendChild(div);
+    function createLED(color = 0xff0000) {
+      const group = new THREE.Group();
+      
+      // LED body
+      const bodyGeom = new THREE.SphereGeometry(0.7, 32, 32);
+      const bodyMat = new THREE.MeshPhongMaterial({ 
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.3,
+        shininess: 90,
+        transparent: true,
+        opacity: 0.8
       });
+      const body = new THREE.Mesh(bodyGeom, bodyMat);
+      
+      // Leads
+      const leadGeom = new THREE.CylinderGeometry(0.1, 0.1, 2, 16);
+      const leadMat = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
+      const lead1 = new THREE.Mesh(leadGeom, leadMat);
+      const lead2 = new THREE.Mesh(leadGeom, leadMat);
+      lead1.position.x = -1.7;
+      lead2.position.x = 1.7;
+      
+      // Anode/Cathode indicators
+      const anodeGeom = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+      const anodeMat = new THREE.MeshPhongMaterial({ color: 0x3498db });
+      const anode = new THREE.Mesh(anodeGeom, anodeMat);
+      anode.position.set(-1.7, -1.2, 0);
+      
+      group.add(body, lead1, lead2, anode);
+      group.rotation.z = Math.PI / 2;
+      return group;
     }
     
-    function updateComponentValue(id, newVal) {
-      extraComponents.forEach(comp => {
-        if (comp.id === id) {
-          comp.value = parseFloat(newVal);
-        }
+    function createAmmeter() {
+      const group = new THREE.Group();
+      const bodyGeom = new THREE.BoxGeometry(3, 3, 1.5);
+      const bodyMat = new THREE.MeshPhongMaterial({ 
+        color: 0x3498db,
+        shininess: 100,
+        specular: 0x1188ff
       });
-      updateComponentAnalytics();
-    }
-    
-    function updateComponentPositionUI(id, axis, newVal) {
-      extraComponents.forEach(comp => {
-        if (comp.id === id) {
-          comp.pos[axis] = parseFloat(newVal);
-          comp.object.position[axis] = parseFloat(newVal);
-        }
+      const body = new THREE.Mesh(bodyGeom, bodyMat);
+      
+      const screenGeom = new THREE.PlaneGeometry(2.5, 1.2);
+      const screenMat = new THREE.MeshPhongMaterial({ 
+        color: 0x111111,
+        emissive: 0x00ff00,
+        emissiveIntensity: 0.2
       });
-    }
-    
-    function deleteComponent(id) {
-      extraComponents = extraComponents.filter(comp => {
-        if (comp.id === id) {
-          scene.remove(comp.object);
-          return false;
-        }
-        return true;
+      const screen = new THREE.Mesh(screenGeom, screenMat);
+      screen.position.z = 0.76;
+      screen.position.y = -0.2;
+      
+      const connGeom = new THREE.CylinderGeometry(0.3, 0.3, 0.8, 16);
+      const connMat = new THREE.MeshPhongMaterial({ 
+        color: 0x95a5a6,
+        shininess: 100
       });
-      refreshExtraComponentsUI();
-      updateComponentAnalytics();
+      const conn1 = new THREE.Mesh(connGeom, connMat);
+      const conn2 = new THREE.Mesh(connGeom, connMat);
+      conn1.rotation.z = Math.PI / 2;
+      conn2.rotation.z = Math.PI / 2;
+      conn1.position.x = -2;
+      conn2.position.x = 2;
+      
+      // Display text
+      const textCanvas = document.createElement('canvas');
+      textCanvas.width = 128;
+      textCanvas.height = 32;
+      const textCtx = textCanvas.getContext('2d');
+      textCtx.fillStyle = '#00ff9d';
+      textCtx.font = 'bold 20px Arial';
+      textCtx.fillText('Ammeter', 10, 22);
+      
+      const textTexture = new THREE.CanvasTexture(textCanvas);
+      const textMat = new THREE.MeshBasicMaterial({ 
+        map: textTexture,
+        transparent: true
+      });
+      const textGeom = new THREE.PlaneGeometry(2, 0.5);
+      const textMesh = new THREE.Mesh(textGeom, textMat);
+      textMesh.position.z = 0.76;
+      textMesh.position.y = 0.8;
+      
+      group.add(body, screen, conn1, conn2, textMesh);
+      return group;
     }
     
-    function updateComponentAnalytics() {
-      const analyticsDiv = document.getElementById("componentAnalytics");
-      let mode = document.getElementById("operationMode").value;
-      let freq = parseFloat(document.getElementById("frequency").value);
-      let html = "<h4>Component Analytics</h4>";
-      if (extraComponents.length === 0) {
-        html += "<p>No extra components added.</p>";
-      } else {
-        extraComponents.forEach(comp => {
-          if (comp.type === "resistor") {
-            html += `<p>Resistor ${comp.id}: ${comp.value} Ω</p>`;
-          } else if (comp.type === "capacitor") {
-            if (mode === "ac") {
-              let Xc = 1 / (2 * Math.PI * freq * comp.value);
-              html += `<p>Capacitor ${comp.id}: ${comp.value} F, Capacitive Reactance: ${Xc.toFixed(2)} Ω</p>`;
-            } else {
-              html += `<p>Capacitor ${comp.id}: ${comp.value} F (DC: Blocks steady-state current)</p>`;
-            }
-          } else if (comp.type === "inductor") {
-            if (mode === "ac") {
-              let Xl = 2 * Math.PI * freq * comp.value;
-              html += `<p>Inductor ${comp.id}: ${comp.value} H, Inductive Reactance: ${Xl.toFixed(2)} Ω</p>`;
-            } else {
-              html += `<p>Inductor ${comp.id}: ${comp.value} H (DC: Acts as a short circuit)</p>`;
-            }
-          }
-        });
-      }
-      analyticsDiv.innerHTML = html;
-    }
-    
-    // --- Wire and Circuit Calculations ---
+    // Wire functions
     function createWireCurve(start, end, controlOffset = new THREE.Vector3(0, 0, 0)) {
       const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5).add(controlOffset);
       return new THREE.CatmullRomCurve3([start, mid, end]);
     }
     
-    function createWireMesh(curve, color = 0x444444) {
-      const tubeGeom = new THREE.TubeGeometry(curve, 20, 0.2, 8, false);
-      const tubeMat = new THREE.MeshPhongMaterial({ color: color, shininess: 30 });
+    function createWireMesh(curve, color = 0xaaaaaa) {
+      const tubeGeom = new THREE.TubeGeometry(curve, 64, 0.15, 8, false);
+      const tubeMat = new THREE.MeshPhongMaterial({ 
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.05,
+        shininess: 30
+      });
       return new THREE.Mesh(tubeGeom, tubeMat);
     }
     
@@ -568,6 +1217,8 @@
       const r1 = parseFloat(document.getElementById("resistor1").value);
       const r2 = parseFloat(document.getElementById("resistor2").value);
       const circuitType = document.getElementById("circuitType").value;
+      const isAC = document.getElementById("operationMode").value === "ac";
+      const frequency = isAC ? parseFloat(document.getElementById("frequency").value) : 0;
       
       // Clear wires
       while (wireGroup.children.length) {
@@ -576,12 +1227,32 @@
       wireCurves = [];
       
       let totalResistance, totalCurrent, voltageDropBattery, voltageR1, voltageR2;
-      let powerR1, powerR2, totalPower;
+      let powerR1, powerR2, totalPower, impedance = 0, phaseAngle = 0;
       
       if (circuitType === "series") {
         arrangeSeriesCircuit();
         totalResistance = batteryInternal + r1 + r2;
-        totalCurrent = batteryVoltage / totalResistance;
+        
+        if (isAC) {
+          // AC calculations with imaginary components
+          const omega = 2 * Math.PI * frequency;
+          let XL = 0, XC = 0;
+          
+          // Find inductor and capacitor in components
+          components.forEach(comp => {
+            if (comp.type === 'inductor') XL = omega * comp.value;
+            if (comp.type === 'capacitor') XC = 1 / (omega * comp.value);
+          });
+          
+          impedance = Math.sqrt(totalResistance*totalResistance + Math.pow(XL - XC, 2));
+          phaseAngle = Math.atan2(XL - XC, totalResistance) * 180 / Math.PI;
+          totalCurrent = batteryVoltage / impedance;
+        } else {
+          // DC calculations
+          totalCurrent = batteryVoltage / totalResistance;
+          impedance = totalResistance;
+        }
+        
         voltageDropBattery = totalCurrent * batteryInternal;
         voltageR1 = totalCurrent * r1;
         voltageR2 = totalCurrent * r2;
@@ -591,7 +1262,7 @@
         currentMeasurements.main = totalCurrent;
         currentMeasurements.r1 = totalCurrent;
         currentMeasurements.r2 = totalCurrent;
-      } else {
+      } else if (circuitType === "parallel") {
         arrangeParallelCircuit();
         let parallelResistance = 1 / (1 / r1 + 1 / r2);
         totalResistance = batteryInternal + parallelResistance;
@@ -608,20 +1279,51 @@
         currentMeasurements.r1 = currentR1;
         currentMeasurements.r2 = currentR2;
         voltageDropBattery = totalCurrent * batteryInternal;
+        impedance = totalResistance;
+      } else {
+        arrangeComplexCircuit();
+        totalResistance = batteryInternal + r1 + r2; // Simplified for demo
+        totalCurrent = batteryVoltage / totalResistance;
+        voltageDropBattery = totalCurrent * batteryInternal;
+        voltageR1 = totalCurrent * r1;
+        voltageR2 = totalCurrent * r2;
+        powerR1 = voltageR1 * totalCurrent;
+        powerR2 = voltageR2 * totalCurrent;
+        totalPower = batteryVoltage * totalCurrent;
+        currentMeasurements.main = totalCurrent;
+        currentMeasurements.r1 = totalCurrent;
+        currentMeasurements.r2 = totalCurrent;
+        impedance = totalResistance;
       }
       
-      document.getElementById("totalResistance").textContent = `${totalResistance.toFixed(2)} Ω`;
+      // Update UI
+      document.getElementById("totalResistance").textContent = `${isAC ? impedance.toFixed(2) : totalResistance.toFixed(2)} ${isAC ? 'Ω (Z)' : 'Ω'}`;
       document.getElementById("totalCurrent").textContent = `${totalCurrent.toFixed(3)} A`;
       document.getElementById("batteryDrop").textContent = `${voltageDropBattery.toFixed(2)} V`;
       document.getElementById("voltageR1").textContent = `${voltageR1.toFixed(2)} V`;
       document.getElementById("voltageR2").textContent = `${voltageR2.toFixed(2)} V`;
-      document.getElementById("powerR1").textContent = `${powerR1.toFixed(2)} W`;
-      document.getElementById("powerR2").textContent = `${powerR2.toFixed(2)} W`;
       document.getElementById("totalPower").textContent = `${totalPower.toFixed(2)} W`;
+      document.getElementById("impedance").textContent = `${impedance.toFixed(2)} Ω`;
+      document.getElementById("phaseAngle").textContent = `${phaseAngle.toFixed(1)}°`;
+      
+      // Update indicators
+      document.getElementById("resistanceIndicator").style.width = `${Math.min(100, totalResistance/50*100)}%`;
+      document.getElementById("currentIndicator").style.width = `${Math.min(100, totalCurrent/2*100)}%`;
+      document.getElementById("voltageIndicator").style.width = `${Math.min(100, voltageDropBattery/12*100)}%`;
+      document.getElementById("powerIndicator").style.width = `${Math.min(100, totalPower/50*100)}%`;
+      
+      // Update schematic wires
+      const wireIntensity = Math.min(1, totalCurrent * 2);
+      const wireColor = `rgb(${Math.floor(96 + 159 * wireIntensity)}, ${Math.floor(165 + 90 * wireIntensity)}, ${Math.floor(250 * wireIntensity)})`;
+      document.querySelectorAll('.schematic-wire').forEach(wire => {
+        wire.style.background = wireColor;
+      });
+      
+      // Update circuit equations
+      updateCircuitEquations();
       
       resetElectrons();
       updateAmmeterPosition();
-      updateComponentAnalytics();
     }
     
     function arrangeSeriesCircuit() {
@@ -670,47 +1372,205 @@
       wireCurves.push(curve1, curve2, curve3, curve4);
     }
     
+    function arrangeComplexCircuit() {
+      battery.position.set(-12, 0, 0);
+      resistor1.position.set(-3, 3, 0);
+      resistor2.position.set(3, -3, 0);
+      
+      // Create a more complex wire arrangement
+      let points = [
+        new THREE.Vector3(-8, 0, 0),
+        new THREE.Vector3(-5, 3, 0),
+        new THREE.Vector3(-3, 3, 0),
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(3, -3, 0),
+        new THREE.Vector3(5, -3, 0),
+        new THREE.Vector3(8, 0, 0),
+        new THREE.Vector3(5, 3, 0),
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(-5, -3, 0),
+        new THREE.Vector3(-8, 0, 0)
+      ];
+      
+      // Create multiple wire segments
+      for (let i = 0; i < points.length - 1; i++) {
+        let curve = createWireCurve(points[i], points[i+1]);
+        let wire = createWireMesh(curve);
+        wireGroup.add(wire);
+        wireCurves.push(curve);
+      }
+    }
+    
+    function updateCircuitEquations() {
+      const circuitType = document.getElementById("circuitType").value;
+      const isAC = document.getElementById("operationMode").value === "ac";
+      const r1 = parseFloat(document.getElementById("resistor1").value);
+      const r2 = parseFloat(document.getElementById("resistor2").value);
+      
+      let equations = "";
+      
+      if (circuitType === "series") {
+        if (isAC) {
+          equations = "Z = √(R² + (X_L - X_C)²)\nθ = tan⁻¹((X_L - X_C)/R)\nI = V / Z\nV_R = I × R";
+        } else {
+          equations = "R_total = R1 + R2\nI = V / R_total\nV_R1 = I × R1\nV_R2 = I × R2";
+        }
+      } else if (circuitType === "parallel") {
+        equations = "1/R_total = 1/R1 + 1/R2\nI_total = V / R_total\nI_R1 = V / R1\nI_R2 = V / R2";
+      } else {
+        equations = "Complex circuit analysis\nusing Kirchhoff's laws";
+      }
+      
+      document.getElementById("circuitEquations").textContent = equations;
+    }
+    
     // Electron flow visualization
     function resetElectrons() {
       electrons.forEach(e => scene.remove(e.mesh));
       electrons = [];
-      const electronsPerCurve = 5;
+      const electronsPerCurve = 15;
+      const isAC = document.getElementById("operationMode").value === "ac";
+      const totalCurrent = parseFloat(document.getElementById("totalCurrent").textContent);
+      
       wireCurves.forEach(curve => {
         for (let i = 0; i < electronsPerCurve; i++) {
-          const electronGeom = new THREE.SphereGeometry(0.15, 12, 12);
+          const electronGeom = new THREE.SphereGeometry(0.25, 12, 12);
           const electronMat = new THREE.MeshPhongMaterial({
             color: 0xffff00,
             emissive: 0xffff00,
             emissiveIntensity: 0.7
           });
           const electronMesh = new THREE.Mesh(electronGeom, electronMat);
+          
           const progress = Math.random();
           electronMesh.position.copy(curve.getPoint(progress));
+          
+          // Scale based on current
+          const scale = 0.5 + Math.min(1, totalCurrent * 0.5);
+          electronMesh.scale.set(scale, scale, scale);
+          
           scene.add(electronMesh);
-          electrons.push({ mesh: electronMesh, curve: curve, progress: progress });
+          electrons.push({ 
+            mesh: electronMesh, 
+            curve: curve, 
+            progress: progress,
+            speed: 0.002 + Math.random() * 0.003,
+            direction: 1,
+            phase: Math.random() * Math.PI * 2
+          });
         }
       });
     }
     
     function updateElectrons() {
       const mode = document.getElementById("operationMode").value;
-      let acTime = performance.now() / 1000;
+      acTime = performance.now() / 1000;
+      const totalCurrent = parseFloat(document.getElementById("totalCurrent").textContent);
+      
       if (mode === "ac") {
-        let freq = parseFloat(document.getElementById("frequency").value);
         electrons.forEach(electron => {
-          if (electron.phase === undefined) {
-            electron.phase = Math.random() * 2 * Math.PI;
-          }
-          electron.progress = 0.5 * (1 + Math.sin(2 * Math.PI * freq * acTime + electron.phase));
+          // Oscillate the progress back and forth
+          electron.progress = 0.5 + 0.2 * Math.sin(acTime * 2 + electron.phase);
           electron.mesh.position.copy(electron.curve.getPoint(electron.progress));
+          
+          // Update color intensity based on current
+          const intensity = 0.5 + 0.5 * Math.abs(Math.sin(acTime * 2 + electron.phase));
+          electron.mesh.material.emissiveIntensity = intensity * Math.min(1, totalCurrent);
         });
       } else {
         electrons.forEach(electron => {
-          electron.progress += animationSpeed;
+          electron.progress += electron.speed * Math.min(2, totalCurrent * 2);
           if (electron.progress > 1) electron.progress = 0;
           electron.mesh.position.copy(electron.curve.getPoint(electron.progress));
+          
+          // Update color intensity based on current
+          electron.mesh.material.emissiveIntensity = 0.3 * Math.min(1, totalCurrent);
         });
       }
+    }
+    
+    // Oscilloscope drawing
+    function drawOscilloscope() {
+      const canvas = document.getElementById('oscilloscopeCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      
+      // Clear canvas
+      ctx.fillStyle = '#0c1320';
+      ctx.fillRect(0, 0, width, height);
+      
+      // Draw grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      
+      // Vertical lines
+      for (let x = 0; x <= width; x += width / 10) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+      }
+      
+      // Horizontal lines
+      for (let y = 0; y <= height; y += height / 8) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+      }
+      
+      ctx.stroke();
+      
+      // Draw axes
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, height/2);
+      ctx.lineTo(width, height/2);
+      ctx.moveTo(width/2, 0);
+      ctx.lineTo(width/2, height);
+      ctx.stroke();
+      
+      const isAC = document.getElementById("operationMode").value === "ac";
+      const voltage = parseFloat(document.getElementById("voltage").value);
+      const totalCurrent = parseFloat(document.getElementById("totalCurrent").textContent);
+      
+      // Draw voltage waveform (yellow)
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+      ctx.lineWidth = 2;
+      
+      for (let x = 0; x < width; x++) {
+        const t = (x / width) * 2;
+        const y = isAC ? 
+          height/2 - (voltage * Math.sin(2 * Math.PI * t + acTime) * (height/2 - 20) / voltage) : 
+          height/2 - (voltage * (height/2 - 20) / voltage);
+        
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+      
+      // Draw current waveform (cyan)
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
+      ctx.lineWidth = 2;
+      
+      for (let x = 0; x < width; x++) {
+        const t = (x / width) * 2;
+        const phaseShift = isAC ? Math.PI / 4 : 0; // Simulate phase shift
+        const y = isAC ? 
+          height/2 - (totalCurrent * 15 * Math.sin(2 * Math.PI * t + acTime + phaseShift) * (height/2 - 20) / voltage) : 
+          height/2 - (totalCurrent * 15 * (height/2 - 20) / voltage);
+        
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
     }
     
     // Ammeter functions
@@ -718,10 +1578,10 @@
       ammeterVisible = !ammeterVisible;
       if (ammeterVisible) {
         scene.add(ammeter);
-        document.getElementById("ammeterToggle").textContent = "Hide Ammeter";
+        document.getElementById("ammeterToggle").innerHTML = '<i class="fas fa-eye-slash"></i> Hide Ammeter';
       } else {
         scene.remove(ammeter);
-        document.getElementById("ammeterToggle").textContent = "Show Ammeter";
+        document.getElementById("ammeterToggle").innerHTML = '<i class="fas fa-eye"></i> Show Ammeter';
       }
       updateAmmeterPosition();
     }
@@ -734,10 +1594,14 @@
         if (pos === "main") ammeter.position.set(-6, 0, 0);
         else if (pos === "r1") ammeter.position.set(0, 0, 0);
         else if (pos === "r2") ammeter.position.set(6, 0, 0);
-      } else {
+      } else if (type === "parallel") {
         if (pos === "main") ammeter.position.set(-6, 0, 0);
         else if (pos === "r1") ammeter.position.set(2, 4, 0);
         else if (pos === "r2") ammeter.position.set(2, -4, 0);
+      } else {
+        if (pos === "main") ammeter.position.set(-6, 0, 0);
+        else if (pos === "r1") ammeter.position.set(-3, 3, 0);
+        else if (pos === "r2") ammeter.position.set(3, -3, 0);
       }
       updateCurrentReadings();
     }
@@ -747,83 +1611,147 @@
       document.getElementById("currentReading").textContent = `${currentMeasurements[pos].toFixed(3)} A`;
     }
     
-    // Visual enhancement: adjust wire emissive intensity
-    function updateCurrentVisualization() {
-      const intensity = Math.min(currentMeasurements.main / 5, 1);
-      wireGroup.children.forEach(wire => {
-        if (wire.material) {
-          wire.material.emissive = new THREE.Color(0x00ff00).multiplyScalar(intensity);
-        }
-      });
-    }
-    
-    // In AC mode, update physics based on sinusoidal voltage.
-    function updateACPhysics() {
-      let batteryVoltage = parseFloat(document.getElementById("voltage").value);
-      let batteryInternal = parseFloat(document.getElementById("batteryInternal").value);
-      let r1 = parseFloat(document.getElementById("resistor1").value);
-      let r2 = parseFloat(document.getElementById("resistor2").value);
-      let circuitType = document.getElementById("circuitType").value;
-      let freq = parseFloat(document.getElementById("frequency").value);
-      let acTime = performance.now() / 1000;
-      let effectiveVoltage = batteryVoltage * Math.sin(2 * Math.PI * freq * acTime);
-      let totalResistance, totalCurrent, voltageDropBattery, voltageR1, voltageR2, powerR1, powerR2, totalPower;
-      if (circuitType === "series") {
-        totalResistance = batteryInternal + r1 + r2;
-        totalCurrent = effectiveVoltage / totalResistance;
-        voltageDropBattery = totalCurrent * batteryInternal;
-        voltageR1 = totalCurrent * r1;
-        voltageR2 = totalCurrent * r2;
-        powerR1 = voltageR1 * totalCurrent;
-        powerR2 = voltageR2 * totalCurrent;
-        totalPower = effectiveVoltage * totalCurrent;
-        currentMeasurements.main = totalCurrent;
-        currentMeasurements.r1 = totalCurrent;
-        currentMeasurements.r2 = totalCurrent;
-      } else {
-        let parallelResistance = 1 / (1 / r1 + 1 / r2);
-        totalResistance = batteryInternal + parallelResistance;
-        totalCurrent = effectiveVoltage / totalResistance;
-        let voltageParallel = effectiveVoltage - (totalCurrent * batteryInternal);
-        let currentR1 = voltageParallel / r1;
-        let currentR2 = voltageParallel / r2;
-        voltageR1 = currentR1 * r1;
-        voltageR2 = currentR2 * r2;
-        powerR1 = voltageR1 * currentR1;
-        powerR2 = voltageR2 * currentR2;
-        totalPower = effectiveVoltage * totalCurrent;
-        currentMeasurements.main = totalCurrent;
-        currentMeasurements.r1 = currentR1;
-        currentMeasurements.r2 = currentR2;
-        voltageDropBattery = totalCurrent * batteryInternal;
-      }
-      document.getElementById("totalResistance").textContent = `${totalResistance.toFixed(2)} Ω`;
-      document.getElementById("totalCurrent").textContent = `${totalCurrent.toFixed(3)} A`;
-      document.getElementById("batteryDrop").textContent = `${voltageDropBattery.toFixed(2)} V`;
-      document.getElementById("voltageR1").textContent = `${voltageR1.toFixed(2)} V`;
-      document.getElementById("voltageR2").textContent = `${voltageR2.toFixed(2)} V`;
-      document.getElementById("powerR1").textContent = `${powerR1.toFixed(2)} W`;
-      document.getElementById("powerR2").textContent = `${powerR2.toFixed(2)} W`;
-      document.getElementById("totalPower").textContent = `${totalPower.toFixed(2)} W`;
-    }
-    
     // Toggle Info Panel
     function toggleInfo() {
-      const infoPanel = document.getElementById("infoPanel");
+      const infoPanel = document.querySelector('.info-panel');
       infoPanel.style.display = (infoPanel.style.display === "none") ? "block" : "none";
     }
     
-    // Reset Simulation: clear extra components and reset base circuit
+    // Reset Simulation
     function resetSimulator() {
-      // Remove extra components from scene
-      extraComponents.forEach(comp => {
-        scene.remove(comp.object);
+      // Reset UI values
+      document.getElementById("voltage").value = "12";
+      document.getElementById("batteryInternal").value = "0.5";
+      document.getElementById("resistor1").value = "10";
+      document.getElementById("resistor2").value = "10";
+      document.getElementById("operationMode").value = "dc";
+      document.getElementById("circuitType").value = "series";
+      document.getElementById("acFrequencyGroup").style.display = "none";
+      
+      // Reset components
+      components = [];
+      updateComponentParametersUI();
+      
+      // Reset circuit
+      updateCircuit();
+    }
+    
+    // Component management functions
+    function addComponent() {
+      const type = document.getElementById("newComponent").value;
+      const component = {
+        id: Date.now(),
+        type: type,
+        value: type === 'resistor' ? 100 : 
+               type === 'capacitor' ? 0.01 : 
+               type === 'inductor' ? 0.1 : 2,
+        unit: type === 'resistor' ? 'Ω' : 
+              type === 'capacitor' ? 'F' : 
+              type === 'inductor' ? 'H' : 'V',
+        color: type === 'led' ? 'red' : null
+      };
+      
+      components.push(component);
+      updateComponentParametersUI();
+      
+      // Add component to 3D scene
+      let component3D;
+      switch(type) {
+        case 'capacitor':
+          component3D = createCapacitor();
+          break;
+        case 'inductor':
+          component3D = createInductor();
+          break;
+        case 'led':
+          component3D = createLED(component.color);
+          break;
+        default:
+          return;
+      }
+      
+      // Position based on circuit type
+      const circuitType = document.getElementById("circuitType").value;
+      if (circuitType === "series") {
+        component3D.position.set(0, -5, 0);
+      } else if (circuitType === "parallel") {
+        component3D.position.set(0, 0, 5);
+      } else {
+        component3D.position.set(0, 5, 0);
+      }
+      
+      scene.add(component3D);
+      updateCircuit();
+    }
+    
+    function updateComponentParametersUI() {
+      const container = document.getElementById("componentParameters");
+      container.innerHTML = "<h3><i class='fas fa-cog'></i> Component Parameters</h3>";
+      
+      if (components.length === 0) {
+        container.innerHTML += `<p class="hint">Add components to see their parameters here</p>`;
+        return;
+      }
+      
+      components.forEach(comp => {
+        const compDiv = document.createElement("div");
+        compDiv.className = "component-params";
+        compDiv.innerHTML = `
+          <h4>
+            <i class="fas fa-${comp.type === 'resistor' ? 'resistance' : 
+                              comp.type === 'capacitor' ? 'capacitor' : 
+                              comp.type === 'inductor' ? 'coil' : 'lightbulb'}"></i>
+            ${comp.type.charAt(0).toUpperCase() + comp.type.slice(1)} 
+            <button class="delete-btn" onclick="removeComponent(${comp.id})">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </h4>
+          <div class="input-group">
+            <label>Value:</label>
+            <input type="number" id="comp-${comp.id}" value="${comp.value}" 
+                   min="${comp.type === 'capacitor' ? 0.001 : 1}" 
+                   max="${comp.type === 'capacitor' ? 1 : comp.type === 'inductor' ? 10 : 1000}" 
+                   step="${comp.type === 'capacitor' ? 0.001 : 1}">
+          </div>
+          ${comp.type === 'led' ? `
+          <div class="input-group">
+            <label>Color:</label>
+            <select id="color-${comp.id}">
+              <option value="red" ${comp.color === 'red' ? 'selected' : ''}>Red</option>
+              <option value="green" ${comp.color === 'green' ? 'selected' : ''}>Green</option>
+              <option value="blue" ${comp.color === 'blue' ? 'selected' : ''}>Blue</option>
+              <option value="yellow" ${comp.color === 'yellow' ? 'selected' : ''}>Yellow</option>
+            </select>
+          </div>
+          ` : ''}
+          <div class="component-badge">
+            <i class="fas fa-info-circle"></i>
+            ${comp.value} ${comp.unit}
+          </div>
+        `;
+        
+        // Add event listeners
+        const input = compDiv.querySelector(`input`);
+        input.addEventListener('change', () => {
+          comp.value = parseFloat(input.value);
+          updateCircuit();
+        });
+        
+        if (comp.type === 'led') {
+          const select = compDiv.querySelector(`select`);
+          select.addEventListener('change', () => {
+            comp.color = select.value;
+            updateCircuit();
+          });
+        }
+        
+        container.appendChild(compDiv);
       });
-      extraComponents = [];
-      // Clear dynamic UI panels
-      document.getElementById("componentParameters").innerHTML = "<h4>Component Parameters</h4>";
-      document.getElementById("componentAnalytics").innerHTML = "<h4>Component Analytics</h4>";
-      // Recalculate base circuit
+    }
+    
+    function removeComponent(id) {
+      components = components.filter(comp => comp.id !== id);
+      updateComponentParametersUI();
       updateCircuit();
     }
     
@@ -831,20 +1759,29 @@
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
-      let mode = document.getElementById("operationMode").value;
-      if (mode === "ac") {
-        updateACPhysics();
-      }
       updateElectrons();
-      updateCurrentVisualization();
+      drawOscilloscope();
       renderer.render(scene, camera);
     }
     
+    // Handle window resize
     window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = document.querySelector('.visualization-area').clientWidth / 
+                      document.querySelector('.visualization-area').clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(document.querySelector('.visualization-area').clientWidth, 
+                      document.querySelector('.visualization-area').clientHeight);
+      
+      // Resize oscilloscope
+      const oscCanvas = document.getElementById('oscilloscopeCanvas');
+      if (oscCanvas) {
+        oscCanvas.width = document.querySelector('.oscilloscope-content').clientWidth;
+        oscCanvas.height = document.querySelector('.oscilloscope-content').clientHeight;
+      }
     });
+    
+    // Initialize the simulator
+    window.addEventListener('load', init);
   </script>
 </body>
 </html>
