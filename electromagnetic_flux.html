@@ -3,35 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Faraday's Law of Induction Simulator</title>
+    <title>Enhanced Faraday's Law of Induction Simulator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <style>
         :root {
-            --primary-color: #2196F3;
-            --secondary-color: #4CAF50;
-            --accent-color: #FF4081;
-            --background-color: #f5f5f5;
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --background-color: #f8f9fa;
             --panel-background: #ffffff;
-            --text-color: #333333;
+            --text-color: #2c3e50;
+            --border-radius: 12px;
+            --shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: var(--background-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
             max-width: 1400px;
             width: 100%;
             margin: 0 auto;
@@ -39,156 +74,321 @@
 
         .panel {
             background-color: var(--panel-background);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
         }
 
         .panel:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            font-size: 1.6rem;
         }
 
         .simulation-container {
             background-color: var(--panel-background);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             grid-column: span 2;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .simulation-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .simulation-title h3 {
+            font-size: 1.4rem;
+            color: var(--primary-color);
         }
 
         .graphs-container {
             grid-column: span 2;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
         }
 
         canvas {
             width: 100%;
             height: auto;
-            border-radius: 8px;
+            border-radius: 10px;
             background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
         }
 
         .control-group {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.02);
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: rgba(236, 240, 241, 0.5);
+            border-left: 4px solid var(--primary-color);
         }
 
         .control-label {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             color: var(--text-color);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         input[type="range"] {
             width: 100%;
-            height: 6px;
-            background: var(--primary-color);
-            border-radius: 3px;
+            height: 8px;
+            background: linear-gradient(to right, #e0e0e0, var(--primary-color));
+            border-radius: 4px;
             outline: none;
             -webkit-appearance: none;
+            margin: 15px 0;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             background: var(--primary-color);
             border-radius: 50%;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: var(--transition);
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
+            transform: scale(1.25);
+            background: #2980b9;
         }
 
         input[type="number"] {
-            width: 80px;
-            padding: 8px;
+            width: 90px;
+            padding: 10px;
             border: 2px solid var(--primary-color);
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 16px;
             outline: none;
+            font-weight: 600;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
         }
 
         button {
-            background-color: var(--secondary-color);
+            background: linear-gradient(to right, var(--primary-color), #2980b9);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
+            transition: var(--transition);
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 5px;
+            letter-spacing: 0.8px;
+            flex: 1;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button.secondary {
+            background: linear-gradient(to right, var(--secondary-color), #27ae60);
+        }
+
+        button.accent {
+            background: linear-gradient(to right, var(--accent-color), #c0392b);
         }
 
         .value-display {
-            font-family: 'Consolas', monospace;
-            font-size: 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
             color: var(--primary-color);
-            background-color: rgba(33, 150, 243, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+            min-width: 100px;
+            text-align: center;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .measurement-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .measurement-card h4 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+
+        .measurement-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary-color);
         }
 
         .theory-content {
             line-height: 1.8;
-            font-size: 15px;
+            font-size: 16px;
         }
 
-        .theory-content ul {
-            padding-left: 20px;
+        .theory-content p {
+            margin-bottom: 15px;
+        }
+
+        .theory-content ul, .theory-content ol {
+            padding-left: 25px;
+            margin-bottom: 20px;
         }
 
         .theory-content li {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .theory-content li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: -20px;
         }
 
         .tabs {
             display: flex;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--primary-color);
+            background: #ecf0f1;
+            border-radius: 8px;
+            padding: 5px;
         }
 
         .tab {
-            padding: 10px 20px;
+            padding: 12px 25px;
             cursor: pointer;
             background: none;
             border: none;
             color: var(--text-color);
-            font-weight: 500;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: var(--transition);
+            border-radius: 6px;
+            flex: 1;
+            text-align: center;
         }
 
         .tab.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 6px 6px 0 0;
+            background-color: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .tab-content.active {
             display: block;
+        }
+
+        .key-equation {
+            background: rgba(236, 240, 241, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .direction-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(236, 240, 241, 0.8);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.5; transform: scale(0.9); }
         }
 
         @media (max-width: 1200px) {
@@ -202,15 +402,35 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .panel {
+                padding: 20px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>Faraday's Law of Induction Simulator</h1>
+        <p class="subtitle">Explore the relationship between magnetic flux, electromotive force, and electromagnetic induction through interactive simulation</p>
+    </div>
+
     <div class="container">
         <div class="panel">
-            <h3>Control Panel</h3>
+            <h3 class="panel-title">⚙️ Control Panel</h3>
             <div class="control-group">
                 <label class="control-label">
-                    Magnet Speed (m/s):
+                    Magnet Speed (m/s)
                     <span class="value-display" id="speedValue">3.0</span>
                 </label>
                 <input type="range" id="speed" min="0.1" max="10" value="3" step="0.1">
@@ -218,7 +438,7 @@
             
             <div class="control-group">
                 <label class="control-label">
-                    Coil Turns:
+                    Coil Turns
                     <span class="value-display" id="turnsValue">20</span>
                 </label>
                 <input type="range" id="turns" min="1" max="100" value="20">
@@ -226,7 +446,7 @@
 
             <div class="control-group">
                 <label class="control-label">
-                    Magnetic Field Strength (T):
+                    Magnetic Field (T)
                     <span class="value-display" id="fieldValue">0.1</span>
                 </label>
                 <input type="range" id="fieldStrength" min="0.01" max="0.5" value="0.1" step="0.01">
@@ -234,375 +454,579 @@
 
             <div class="control-group">
                 <label class="control-label">
-                    Coil Radius (cm):
+                    Coil Radius (cm)
                     <span class="value-display" id="radiusValue">3.0</span>
                 </label>
                 <input type="range" id="coilRadius" min="1" max="10" value="3" step="0.1">
             </div>
 
-            <div class="control-group">
-                <button id="resetBtn" onclick="resetSimulation()">Reset Simulation</button>
-                <button id="pauseBtn" onclick="togglePause()">Pause</button>
+            <div class="button-group">
+                <button id="resetBtn" class="accent">🔄 Reset</button>
+                <button id="pauseBtn" class="secondary">⏸️ Pause</button>
             </div>
 
-            <div class="control-group">
-                <p><strong>Measurements:</strong></p>
-                <p>Induced EMF: <span class="value-display" id="emfValue">0</span> V</p>
-                <p>Magnetic Flux: <span class="value-display" id="fluxValue">0</span> Wb</p>
-                <p>Distance: <span class="value-display" id="distanceValue">0</span> m</p>
+            <div class="measurement-grid">
+                <div class="measurement-card">
+                    <h4>Induced EMF</h4>
+                    <div class="measurement-value" id="emfValue">0.000 V</div>
+                </div>
+                <div class="measurement-card">
+                    <h4>Magnetic Flux</h4>
+                    <div class="measurement-value" id="fluxValue">0.000000 Wb</div>
+                </div>
+                <div class="measurement-card">
+                    <h4>Distance</h4>
+                    <div class="measurement-value" id="distanceValue">0.00 m</div>
+                </div>
+                <div class="measurement-card">
+                    <h4>Direction</h4>
+                    <div class="direction-indicator">
+                        <div class="indicator-dot"></div>
+                        <span id="directionValue">Right →</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="panel">
             <div class="tabs">
-                <button class="tab active" onclick="showTab('theory')">Theory</button>
-                <button class="tab" onclick="showTab('advanced')">Advanced</button>
-                <button class="tab" onclick="showTab('examples')">Examples</button>
+                <button class="tab active" data-tab="theory">Theory</button>
+                <button class="tab" data-tab="advanced">Advanced</button>
+                <button class="tab" data-tab="examples">Examples</button>
             </div>
 
             <div id="theory" class="tab-content theory-content active">
-                <p><strong>Faraday's Law of Induction:</strong></p>
-                <div>\[ \mathcal{E} = -N \frac{d\Phi_B}{dt} \]</div>
+                <div class="key-equation">
+                    <p><strong>Faraday's Law of Induction:</strong></p>
+                    <div>\[ \mathcal{E} = -N \frac{d\Phi_B}{dt} \]</div>
+                </div>
                 <p>Where:</p>
                 <ul>
-                    <li>\(N\) = Number of coil turns</li>
-                    <li>\(\Phi_B\) = Magnetic flux \(= BA\cos\theta\)</li>
-                    <li>\(B\) = Magnetic field strength</li>
-                    <li>\(A\) = Coil cross-sectional area</li>
-                    <li>\(\theta\) = Angle between B and A</li>
+                    <li>\(\mathcal{E}\) = Induced electromotive force (EMF) in volts</li>
+                    <li>\(N\) = Number of turns in the coil</li>
+                    <li>\(\frac{d\Phi_B}{dt}\) = Rate of change of magnetic flux</li>
                 </ul>
-                <p>The negative sign indicates Lenz's Law: the induced current creates a magnetic field that opposes the change in flux.</p>
+                <p><strong>Magnetic Flux:</strong> \(\Phi_B = B \cdot A \cdot \cos\theta\)</p>
+                <ul>
+                    <li>\(B\) = Magnetic field strength in teslas</li>
+                    <li>\(A\) = Area of the coil in m² (\(A = \pi r^2\))</li>
+                    <li>\(\theta\) = Angle between magnetic field and normal to surface</li>
+                </ul>
+                <p>The negative sign represents <strong>Lenz's Law</strong>: the induced EMF creates a current whose magnetic field opposes the change in flux that produced it.</p>
             </div>
 
             <div id="advanced" class="tab-content theory-content">
                 <p><strong>Advanced Concepts:</strong></p>
                 <ul>
-                    <li><strong>Magnetic Field Strength:</strong> Decreases with square of distance (\(B \propto \frac{1}{r^2}\))</li>
-                    <li><strong>Flux Change:</strong> Maximum when magnet moves perpendicular to coil axis</li>
-                    <li><strong>Induced Current:</strong> Proportional to rate of flux change</li>
-                    <li><strong>Lenz's Law:</strong> Induced current opposes flux change</li>
+                    <li>The magnetic field strength decreases with the square of distance (\(B \propto \frac{1}{r^2}\))</li>
+                    <li>Maximum flux change occurs when the magnet moves perpendicular to the coil's axis</li>
+                    <li>Induced current is proportional to the rate of flux change</li>
+                    <li>Lenz's Law ensures conservation of energy - the induced current opposes the motion creating it</li>
                 </ul>
-                <div>\[ B(r) = \frac{B_0}{(r^2 + a^2)} \]</div>
-                <p>Where \(a\) is the characteristic length of the magnet.</p>
+                <div class="key-equation">
+                    <p>Magnetic Field Model:</p>
+                    <div>\[ B(r) = \frac{B_0 \cdot a^2}{(r^2 + a^2)^{3/2}} \]</div>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li>\(B_0\) = Magnetic field strength at magnet surface</li>
+                    <li>\(a\) = Characteristic length of the magnet (radius)</li>
+                    <li>\(r\) = Distance from magnet center</li>
+                </ul>
             </div>
 
             <div id="examples" class="tab-content theory-content">
                 <p><strong>Real-world Applications:</strong></p>
                 <ul>
-                    <li>Electric Generators</li>
-                    <li>Electromagnetic Braking</li>
-                    <li>Induction Cooktops</li>
-                    <li>Transformers</li>
+                    <li><strong>Electric Generators:</strong> Convert mechanical energy to electrical energy through electromagnetic induction</li>
+                    <li><strong>Transformers:</strong> Transfer electrical energy between circuits through changing magnetic flux</li>
+                    <li><strong>Induction Cooktops:</strong> Use induced currents to generate heat in cookware</li>
+                    <li><strong>Electric Guitar Pickups:</strong> Convert string vibrations to electrical signals</li>
                 </ul>
-                <p>Try these experiments:</p>
+                <div class="key-equation">
+                    <p><strong>Experiments to Try:</strong></p>
+                </div>
                 <ol>
-                    <li>Increase speed and observe EMF change</li>
-                    <li>Add more turns to see amplification</li>
-                    <li>Adjust field strength for different materials</li>
+                    <li>Increase magnet speed and observe how EMF peaks become higher and narrower</li>
+                    <li>Add more coil turns to see amplification of the induced EMF</li>
+                    <li>Adjust magnetic field strength to simulate different magnet strengths</li>
+                    <li>Pause when the magnet is near the coil to examine flux relationships</li>
                 </ol>
             </div>
         </div>
 
         <div class="simulation-container">
+            <div class="simulation-title">
+                <h3>Electromagnetic Induction Simulation</h3>
+                <div class="value-display">Real-time Physics</div>
+            </div>
             <canvas id="simulationCanvas" width="800" height="400"></canvas>
         </div>
 
         <div class="graphs-container">
             <div class="panel">
-                <h3>EMF vs. Time</h3>
+                <h3 class="panel-title">📈 EMF vs. Time</h3>
                 <canvas id="emfChart"></canvas>
             </div>
             <div class="panel">
-                <h3>Magnetic Flux vs. Position</h3>
+                <h3 class="panel-title">📊 Magnetic Flux vs. Position</h3>
                 <canvas id="fluxChart"></canvas>
             </div>
         </div>
     </div>
+
+    <div class="footer">
+        <p>Enhanced Faraday's Law of Induction Simulator | Demonstrating electromagnetic induction principles</p>
+        <p>Based on the original work by Michael Faraday (1791-1867)</p>
+    </div>
+    
     <script>
-      // Initialize canvas and context
-const canvas = document.getElementById('simulationCanvas');
-const ctx = canvas.getContext('2d');
-
-// Charts initialization
-let emfChart, fluxChart;
-
-// Simulation state management
-const state = {
-    magnetPos: 100,
-    magnetSpeed: 3,
-    coilTurns: 20,
-    coilRadius: 3,
-    fieldStrength: 0.1,
-    time: 0,
-    paused: false,
-    emfHistory: [],
-    fluxHistory: [],
-    timeHistory: [],
-    positionHistory: [],
-    maxDataPoints: 100,
-    lastFrameTime: 0,
-    deltaTime: 0
-};
-
-// Physics constants
-const PHYSICS = {
-    CHARACTERISTIC_LENGTH: 0.01,
-    MAX_FIELD_DISTANCE: 0.5,
-    PERMEABILITY: 4 * Math.PI * 1e-7,
-    MIN_DISTANCE: 0.01,
-    FIELD_SCALE: 1e-4
-};
-
-// Initialize charts
-function initializeCharts() {
-    // EMF Chart
-    const emfCtx = document.getElementById('emfChart').getContext('2d');
-    emfChart = new Chart(emfCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'EMF (V)',
-                data: [],
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            animation: false,
-            scales: {
-                y: {
-                    beginAtZero: true
+        // Initialize canvas and context
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions based on container
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth - 50;
+            canvas.height = 400;
+        }
+        
+        // Initial resize
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Charts initialization
+        let emfChart, fluxChart;
+        
+        // Simulation state management
+        const state = {
+            magnetPos: 100,
+            magnetSpeed: 3,
+            coilTurns: 20,
+            coilRadius: 3,
+            fieldStrength: 0.1,
+            time: 0,
+            paused: false,
+            emfHistory: [],
+            fluxHistory: [],
+            timeHistory: [],
+            positionHistory: [],
+            maxDataPoints: 100,
+            lastFrameTime: 0,
+            deltaTime: 0
+        };
+        
+        // Physics constants
+        const PHYSICS = {
+            CHARACTERISTIC_LENGTH: 0.02,
+            MAX_FIELD_DISTANCE: 0.5,
+            PERMEABILITY: 4 * Math.PI * 1e-7,
+            MIN_DISTANCE: 0.01,
+            FIELD_SCALE: 1e-4,
+            MAGNET_WIDTH: 40,
+            MAGNET_HEIGHT: 40
+        };
+        
+        // Initialize charts
+        function initializeCharts() {
+            // EMF Chart
+            const emfCtx = document.getElementById('emfChart').getContext('2d');
+            emfChart = new Chart(emfCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'EMF (V)',
+                        data: [],
+                        borderColor: 'rgb(52, 152, 219)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    animation: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'EMF (Volts)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (s)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
                 }
+            });
+        
+            // Flux Chart
+            const fluxCtx = document.getElementById('fluxChart').getContext('2d');
+            fluxChart = new Chart(fluxCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Magnetic Flux (Wb)',
+                        data: [],
+                        borderColor: 'rgb(46, 204, 113)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    animation: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Flux (Webers)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            reverse: true,
+                            title: {
+                                display: true,
+                                text: 'Position (m)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Physics calculations
+        function calculateMagneticField(distance) {
+            const r = Math.max(distance, PHYSICS.MIN_DISTANCE);
+            // More accurate model for magnetic field of a dipole
+            return state.fieldStrength * Math.pow(PHYSICS.CHARACTERISTIC_LENGTH, 3) / 
+                   Math.pow(Math.pow(r, 2) + Math.pow(PHYSICS.CHARACTERISTIC_LENGTH, 2), 1.5);
+        }
+        
+        function calculateFlux(distance) {
+            const B = calculateMagneticField(distance);
+            const area = Math.PI * Math.pow(state.coilRadius/100, 2);
+            const d = distance/100;
+            const cosTheta = d / Math.sqrt(d * d + Math.pow(state.coilRadius/100, 2));
+            return B * area * cosTheta;
+        }
+        
+        function calculateEMF(distance, velocity) {
+            const dx = 0.001;
+            const flux1 = calculateFlux(distance);
+            const flux2 = calculateFlux(distance + dx);
+            const dFluxdx = (flux2 - flux1) / dx;
+            const dFluxdt = dFluxdx * velocity;
+            return -state.coilTurns * dFluxdt;
+        }
+        
+        // Drawing functions
+        function drawMagnet(ctx, x, y) {
+            const magnetX = x - PHYSICS.MAGNET_WIDTH/2;
+            const magnetY = y - PHYSICS.MAGNET_HEIGHT/2;
+            
+            // Draw magnetic field visualization
+            drawMagneticField(ctx, x, y);
+            
+            // Draw magnet body with gradient
+            const gradient = ctx.createLinearGradient(
+                magnetX, magnetY, 
+                magnetX + PHYSICS.MAGNET_WIDTH, magnetY + PHYSICS.MAGNET_HEIGHT
+            );
+            gradient.addColorStop(0, '#ff6b6b');
+            gradient.addColorStop(1, '#ff3838');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(magnetX, magnetY, PHYSICS.MAGNET_WIDTH, PHYSICS.MAGNET_HEIGHT, 8);
+            ctx.fill();
+            
+            // Draw magnet border
+            ctx.strokeStyle = '#c0392b';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw poles
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('N', magnetX + PHYSICS.MAGNET_WIDTH * 0.3, magnetY + PHYSICS.MAGNET_HEIGHT/2);
+            ctx.fillText('S', magnetX + PHYSICS.MAGNET_WIDTH * 0.7, magnetY + PHYSICS.MAGNET_HEIGHT/2);
+        }
+        
+        function drawCoil(ctx, x, y) {
+            const radius = state.coilRadius * 10;
+            
+            // Draw coil base
+            ctx.fillStyle = 'rgba(189, 195, 199, 0.3)';
+            ctx.beginPath();
+            ctx.arc(x, y, radius + 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw coil turns
+            for (let i = 0; i < state.coilTurns; i++) {
+                const coilRadius = radius + i * 2;
+                const alpha = 1 - i / (state.coilTurns + 5);
+                
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(52, 152, 219, ${alpha})`;
+                ctx.lineWidth = 2;
+                ctx.arc(x, y, coilRadius, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+            
+            // Draw coil leads
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - radius - 20, y - 40);
+            ctx.lineTo(x - radius - 20, y + 40);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(x + radius + 20, y - 40);
+            ctx.lineTo(x + radius + 20, y + 40);
+            ctx.stroke();
+        }
+        
+        function drawMagneticField(ctx, magnetX, magnetY) {
+            const distance = Math.abs(magnetX - canvas.width/2) / 100;
+            const fieldStrength = calculateMagneticField(distance);
+            const maxLines = 24;
+            const lineSpacing = 2 * Math.PI / maxLines;
+            
+            ctx.save();
+            ctx.strokeStyle = `rgba(41, 128, 185, ${0.1 + fieldStrength * PHYSICS.FIELD_SCALE * 2})`;
+            ctx.lineWidth = 1 + fieldStrength * PHYSICS.FIELD_SCALE * 10;
+            ctx.setLineDash([5, 5]);
+            
+            for (let angle = 0; angle < 2 * Math.PI; angle += lineSpacing) {
+                const radius = 100 * fieldStrength * PHYSICS.FIELD_SCALE;
+                ctx.beginPath();
+                ctx.moveTo(
+                    magnetX + Math.cos(angle) * 20,
+                    magnetY + Math.sin(angle) * 20
+                );
+                ctx.lineTo(
+                    magnetX + Math.cos(angle) * (20 + radius),
+                    magnetY + Math.sin(angle) * (20 + radius)
+                );
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+        
+        // Update charts
+        function updateCharts() {
+            const timeData = state.timeHistory.slice(-state.maxDataPoints);
+            const posData = state.positionHistory.slice(-state.maxDataPoints);
+            
+            emfChart.data.labels = timeData;
+            emfChart.data.datasets[0].data = state.emfHistory.slice(-state.maxDataPoints);
+            emfChart.update('none');
+            
+            fluxChart.data.labels = posData;
+            fluxChart.data.datasets[0].data = state.fluxHistory.slice(-state.maxDataPoints);
+            fluxChart.update('none');
+        }
+        
+        // Main animation loop
+        function animate(timestamp) {
+            if (!state.lastFrameTime) {
+                state.lastFrameTime = timestamp;
+            }
+            
+            state.deltaTime = (timestamp - state.lastFrameTime) / 1000;
+            state.lastFrameTime = timestamp;
+            
+            if (!state.paused) {
+                state.time += state.deltaTime;
+                state.magnetPos += state.magnetSpeed;
+                
+                // Reverse direction when hitting canvas boundaries
+                if (state.magnetPos > canvas.width - 100 || state.magnetPos < 100) {
+                    state.magnetSpeed *= -1;
+                }
+                
+                // Update direction display
+                document.getElementById('directionValue').textContent = 
+                    state.magnetSpeed > 0 ? 'Right →' : '← Left';
+                
+                const distance = Math.abs(state.magnetPos - canvas.width/2);
+                const emf = calculateEMF(distance, state.magnetSpeed);
+                const flux = calculateFlux(distance);
+                
+                // Add current values to history
+                state.timeHistory.push(state.time.toFixed(1));
+                state.positionHistory.push((distance/100).toFixed(2));
+                state.emfHistory.push(emf);
+                state.fluxHistory.push(flux);
+                
+                // Limit history size
+                if (state.emfHistory.length > state.maxDataPoints) {
+                    state.timeHistory.shift();
+                    state.positionHistory.shift();
+                    state.emfHistory.shift();
+                    state.fluxHistory.shift();
+                }
+                
+                // Update display values
+                document.getElementById('emfValue').textContent = emf.toFixed(5) + ' V';
+                document.getElementById('fluxValue').textContent = flux.toFixed(8) + ' Wb';
+                document.getElementById('distanceValue').textContent = (distance/100).toFixed(2) + ' m';
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw components
+                drawCoil(ctx, canvas.width/2, canvas.height/2);
+                drawMagnet(ctx, state.magnetPos, canvas.height/2);
+                
+                // Update charts
+                updateCharts();
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Control functions
+        function updateControls() {
+            const speedSign = state.magnetSpeed < 0 ? -1 : 1;
+            state.magnetSpeed = parseFloat(document.getElementById('speed').value) * speedSign;
+            state.coilTurns = parseInt(document.getElementById('turns').value);
+            state.fieldStrength = parseFloat(document.getElementById('fieldStrength').value);
+            state.coilRadius = parseFloat(document.getElementById('coilRadius').value);
+            
+            document.getElementById('speedValue').textContent = Math.abs(state.magnetSpeed).toFixed(1);
+            document.getElementById('turnsValue').textContent = state.coilTurns;
+            document.getElementById('fieldValue').textContent = state.fieldStrength.toFixed(2);
+            document.getElementById('radiusValue').textContent = state.coilRadius.toFixed(1);
+        }
+        
+        function resetSimulation() {
+            state.magnetPos = 100;
+            state.magnetSpeed = Math.abs(state.magnetSpeed);
+            state.emfHistory = [];
+            state.fluxHistory = [];
+            state.timeHistory = [];
+            state.positionHistory = [];
+            state.time = 0;
+            state.paused = false;
+            
+            document.getElementById('speed').value = "3";
+            document.getElementById('turns').value = "20";
+            document.getElementById('fieldStrength').value = "0.1";
+            document.getElementById('coilRadius').value = "3";
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            
+            updateControls();
+            
+            // Reset charts
+            if (emfChart && fluxChart) {
+                emfChart.data.labels = [];
+                emfChart.data.datasets[0].data = [];
+                emfChart.update();
+                
+                fluxChart.data.labels = [];
+                fluxChart.data.datasets[0].data = [];
+                fluxChart.update();
             }
         }
-    });
-
-    // Flux Chart
-    const fluxCtx = document.getElementById('fluxChart').getContext('2d');
-    fluxChart = new Chart(fluxCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Magnetic Flux (Wb)',
-                data: [],
-                borderColor: 'rgb(153, 102, 255)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            animation: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-}
-
-// Physics calculations
-function calculateMagneticField(distance) {
-    const r = Math.max(distance, PHYSICS.MIN_DISTANCE);
-    return state.fieldStrength / (Math.pow(r/PHYSICS.CHARACTERISTIC_LENGTH, 2) + 1);
-}
-
-function calculateFlux(distance) {
-    const B = calculateMagneticField(distance);
-    const area = Math.PI * Math.pow(state.coilRadius/100, 2);
-    const d = distance/100;
-    const cosTheta = d / Math.sqrt(d * d + state.coilRadius * state.coilRadius/10000);
-    return B * area * cosTheta;
-}
-
-function calculateEMF(distance, velocity) {
-    const dx = 0.001;
-    const flux1 = calculateFlux(distance);
-    const flux2 = calculateFlux(distance + dx);
-    const dFluxdx = (flux2 - flux1) / dx;
-    const dFluxdt = dFluxdx * velocity;
-    return -state.coilTurns * dFluxdt;
-}
-
-// Drawing functions
-function drawMagnet(ctx, x, y) {
-    const gradient = ctx.createLinearGradient(x, y, x + 40, y + 40);
-    gradient.addColorStop(0, '#ff4444');
-    gradient.addColorStop(1, '#cc0000');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, 40, 40);
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '16px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('N', x + 10, y + 25);
-    ctx.fillText('S', x + 30, y + 25);
-}
-
-function drawCoil(ctx, x, y) {
-    for (let i = 0; i < state.coilTurns; i++) {
-        const alpha = 1 - i / (state.coilTurns + 5);
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(51, 51, 255, ${alpha})`;
-        ctx.lineWidth = 2;
-        ctx.arc(x, y, state.coilRadius * 10 + i * 2, 0, 2 * Math.PI);
-        ctx.stroke();
-    }
-}
-
-function drawMagneticField(ctx, magnetX, magnetY, coilX, coilY) {
-    const distance = Math.abs(magnetX - coilX) / 100;
-    const fieldStrength = calculateMagneticField(distance);
-    const maxLines = 16;
-    const lineSpacing = 2 * Math.PI / maxLines;
-    
-    ctx.save();
-    ctx.strokeStyle = `rgba(0, 0, 255, ${fieldStrength * PHYSICS.FIELD_SCALE})`;
-    ctx.setLineDash([5, 5]);
-    
-    for (let angle = 0; angle < 2 * Math.PI; angle += lineSpacing) {
-        const radius = 100 * fieldStrength * PHYSICS.FIELD_SCALE;
-        ctx.beginPath();
-        ctx.moveTo(
-            magnetX + Math.cos(angle) * 20,
-            magnetY + Math.sin(angle) * 20
-        );
-        ctx.lineTo(
-            magnetX + Math.cos(angle) * (20 + radius),
-            magnetY + Math.sin(angle) * (20 + radius)
-        );
-        ctx.stroke();
-    }
-    
-    ctx.restore();
-}
-
-// Update charts
-function updateCharts() {
-    const timeData = state.timeHistory.slice(-state.maxDataPoints);
-    const posData = state.positionHistory.slice(-state.maxDataPoints);
-    
-    emfChart.data.labels = timeData;
-    emfChart.data.datasets[0].data = state.emfHistory.slice(-state.maxDataPoints);
-    emfChart.update('none');
-    
-    fluxChart.data.labels = posData;
-    fluxChart.data.datasets[0].data = state.fluxHistory.slice(-state.maxDataPoints);
-    fluxChart.update('none');
-}
-
-// Main animation loop
-function animate(timestamp) {
-    if (!state.lastFrameTime) {
-        state.lastFrameTime = timestamp;
-    }
-    
-    state.deltaTime = (timestamp - state.lastFrameTime) / 1000;
-    state.lastFrameTime = timestamp;
-    
-    if (!state.paused) {
-        state.time += state.deltaTime;
-        state.magnetPos += state.magnetSpeed;
         
-        if (state.magnetPos > canvas.width - 100 || state.magnetPos < 100) {
-            state.magnetSpeed *= -1;
+        function togglePause() {
+            state.paused = !state.paused;
+            document.getElementById('pauseBtn').innerHTML = state.paused ? '▶️ Resume' : '⏸️ Pause';
         }
         
-        const distance = Math.abs(state.magnetPos - 400);
-        const emf = calculateEMF(distance, state.magnetSpeed);
-        const flux = calculateFlux(distance);
-        
-        state.timeHistory.push(state.time.toFixed(1));
-        state.positionHistory.push((distance/100).toFixed(2));
-        state.emfHistory.push(emf);
-        state.fluxHistory.push(flux);
-        
-        if (state.emfHistory.length > state.maxDataPoints) {
-            state.timeHistory.shift();
-            state.positionHistory.shift();
-            state.emfHistory.shift();
-            state.fluxHistory.shift();
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
         }
         
-        document.getElementById('emfValue').textContent = emf.toFixed(3);
-        document.getElementById('fluxValue').textContent = flux.toFixed(6);
-        document.getElementById('distanceValue').textContent = (distance/100).toFixed(2);
+        // Event listeners for tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                showTab(tabName);
+            });
+        });
         
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawMagneticField(ctx, state.magnetPos + 20, 200, 400, 200);
-        drawMagnet(ctx, state.magnetPos, 180);
-        drawCoil(ctx, 400, 200);
-        
-        updateCharts();
-    }
-    
-    requestAnimationFrame(animate);
-}
-
-// Control functions
-function updateControls() {
-    state.magnetSpeed = parseFloat(document.getElementById('speed').value) * 
-        (state.magnetSpeed < 0 ? -1 : 1);
-    state.coilTurns = parseInt(document.getElementById('turns').value);
-    state.fieldStrength = parseFloat(document.getElementById('fieldStrength').value);
-    state.coilRadius = parseFloat(document.getElementById('coilRadius').value);
-    
-    document.getElementById('speedValue').textContent = Math.abs(state.magnetSpeed).toFixed(1);
-    document.getElementById('turnsValue').textContent = state.coilTurns;
-    document.getElementById('fieldValue').textContent = state.fieldStrength.toFixed(2);
-    document.getElementById('radiusValue').textContent = state.coilRadius.toFixed(1);
-}
-
-function resetSimulation() {
-    state.magnetPos = 100;
-    state.magnetSpeed = Math.abs(state.magnetSpeed);
-    state.emfHistory = [];
-    state.fluxHistory = [];
-    state.timeHistory = [];
-    state.positionHistory = [];
-    state.time = 0;
-    
-    document.getElementById('speed').value = "3";
-    document.getElementById('turns').value = "20";
-    document.getElementById('fieldStrength').value = "0.1";
-    document.getElementById('coilRadius').value = "3";
-    updateControls();
-}
-
-function togglePause() {
-    state.paused = !state.paused;
-    document.getElementById('pauseBtn').textContent = state.paused ? 'Resume' : 'Pause';
-}
-
-function showTab(tabName) {
-    const tabs = document.getElementsByClassName('tab-content');
-    for (let tab of tabs) {
-        tab.classList.remove('active');
-    }
-    document.getElementById(tabName).classList.add('active');
-    
-    const buttons = document.getElementsByClassName('tab');
-    for (let button of buttons) {
-        button.classList.remove('active');
-    }
-    event.target.classList.add('active');
-}
-
-// Event listeners
-document.getElementById('speed').addEventListener('input', updateControls);
-document.getElementById('turns').addEventListener('input', updateControls);
-document.getElementById('fieldStrength').addEventListener('input', updateControls);
-document.getElementById('coilRadius').addEventListener('input', updateControls);
-
-// Initialize and start
-window.onload = function() {
-    initializeCharts();
-    requestAnimationFrame(animate);
-};
+        // Initialize and start
+        window.onload = function() {
+            initializeCharts();
+            resizeCanvas();
+            requestAnimationFrame(animate);
+            
+            // Initialize control values
+            updateControls();
+            
+            // Set up event listeners
+            document.getElementById('speed').addEventListener('input', updateControls);
+            document.getElementById('turns').addEventListener('input', updateControls);
+            document.getElementById('fieldStrength').addEventListener('input', updateControls);
+            document.getElementById('coilRadius').addEventListener('input', updateControls);
+            document.getElementById('resetBtn').addEventListener('click', resetSimulation);
+            document.getElementById('pauseBtn').addEventListener('click', togglePause);
+        };
     </script>
 </body>
 </html>
