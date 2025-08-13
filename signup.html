@@ -6,8 +6,6 @@
   <title>Sign Up - Lumenos</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     body {
@@ -63,6 +61,13 @@
       padding: 20px;
       display: inline-flex;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
   <script type="module">
@@ -240,7 +245,7 @@
               const loadingOverlay = document.getElementById('loadingOverlay');
               if (loadingOverlay) {
                 loadingOverlay.innerHTML = `
-                  <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full">
+                  <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full fade-in">
                     <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                       <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -253,6 +258,7 @@
                     </a>
                   </div>
                 `;
+                loadingOverlay.classList.remove('hidden');
               }
             }
           }, 2000);
@@ -325,7 +331,7 @@
         
         // Update status message
         loadingOverlay.innerHTML = `
-          <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full">
+          <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full fade-in">
             <div class="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-blue-500 mx-auto mb-8"></div>
             <h3 class="text-2xl font-bold text-gray-800 mb-3">Account Created Successfully!</h3>
             <p class="text-gray-600 mb-6">Preparing your dashboard experience...</p>
@@ -432,6 +438,7 @@
       
       // Show the form once everything is initialized
       document.getElementById('formContainer').classList.remove('hidden');
+      document.getElementById('formContainer').classList.add('fade-in');
       document.getElementById('initialLoading').classList.add('hidden');
     });
   </script>
@@ -552,7 +559,7 @@
   
   <footer class="py-8 text-center text-gray-500">
     <div class="max-w-7xl mx-auto px-4">
-      <p class="mb-3">© 2023 Lumenos. All rights reserved.</p>
+      <p class="mb-3">© 2025 LumenOS. All rights reserved.</p>
       <div class="flex justify-center space-x-6">
         <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
         <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook"></i></a>
