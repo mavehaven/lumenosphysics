@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Physics Hub</title>
+  <title>Physics Hub - Interactive Learning</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
@@ -164,21 +165,36 @@
       will-change: transform;
       backface-visibility: hidden;
       transform: translate3d(0,0,0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     /* Loading indicator */
-    .loading-spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left-color: #3b82f6;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
+    .loading-icon {
+      font-size: 3rem;
+      color: #3b82f6;
+      animation: pulse 2s infinite;
     }
     
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .dark .loading-icon {
+      color: #6ee7b7;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    .loading-text {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: #6b7280;
+    }
+    
+    .dark .loading-text {
+      color: #9ca3af;
     }
     
     /* Error message styling */
@@ -189,6 +205,11 @@
       border-radius: 0.5rem;
       margin: 1rem 0;
       display: none;
+    }
+    
+    .dark .error-message {
+      background-color: #7f1d1d;
+      color: #fecaca;
     }
     
     /* Content card styling */
@@ -330,8 +351,11 @@
   <!-- Hero Section with Animation -->
   <section class="pt-32 pb-20 px-6">
     <div class="max-w-7xl mx-auto">
-      <div id="animationHero" class="animation-container flex items-center justify-center">
-        <div class="loading-spinner"></div>
+      <div id="animationHero" class="animation-container">
+        <div class="text-center">
+          <i class="fas fa-atom loading-icon"></i>
+          <p class="loading-text">Loading Physics Hub...</p>
+        </div>
       </div>
       <h1 class="section-title font-semibold mb-6">
         Experience Physics.<br />Like Never Before.
@@ -353,8 +377,11 @@
           </svg>
         </span>
       </h2>
-      <div id="animationMechanics" class="animation-container flex items-center justify-center">
-        <div class="loading-spinner"></div>
+      <div id="animationMechanics" class="animation-container">
+        <div class="text-center">
+          <i class="fas fa-cogs loading-icon"></i>
+          <p class="loading-text">Loading Mechanics Simulations...</p>
+        </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <a href="newtonian.html" class="sim-card group content-card p-6">
@@ -411,8 +438,11 @@
           </svg>
         </span>
       </h2>
-      <div id="animationEM" class="animation-container flex items-center justify-center">
-        <div class="loading-spinner"></div>
+      <div id="animationEM" class="animation-container">
+        <div class="text-center">
+          <i class="fas fa-bolt loading-icon"></i>
+          <p class="loading-text">Loading Electromagnetism Simulations...</p>
+        </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <a href="circuit_simulator.html" class="sim-card group content-card p-6">
@@ -456,8 +486,11 @@
           </svg>
         </span>
       </h2>
-      <div id="animationWaves" class="animation-container flex items-center justify-center">
-        <div class="loading-spinner"></div>
+      <div id="animationWaves" class="animation-container">
+        <div class="text-center">
+          <i class="fas fa-wave-square loading-icon"></i>
+          <p class="loading-text">Loading Waves & Optics Simulations...</p>
+        </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <a href="waves.html" class="sim-card group content-card p-6">
@@ -503,8 +536,11 @@
           </svg>
         </span>
       </h2>
-      <div id="animationModern" class="animation-container flex items-center justify-center">
-        <div class="loading-spinner"></div>
+      <div id="animationModern" class="animation-container">
+        <div class="text-center">
+          <i class="fas fa-rocket loading-icon"></i>
+          <p class="loading-text">Loading Modern Physics Simulations...</p>
+        </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <a href="quantum_mechanics" class="sim-card group content-card p-6">
@@ -537,18 +573,22 @@
     </div>
   </section>
   
-  <!-- Paywall Modal (Firebase Login) with Lock Animation -->
+  <!-- Paywall Modal (Firebase Login) -->
   <div id="paywallModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
     <div class="absolute inset-0 modal-bg"></div>
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 p-6 w-11/12 md:w-1/3">
-      <div id="animationLock" class="animation-container"></div>
-      <h2 class="text-2xl font-bold mb-4">Access Restricted</h2>
-      <p class="mb-4">You must be signed in to access this content.</p>
+      <div class="animation-container mb-6">
+        <div class="text-center">
+          <i class="fas fa-lock text-5xl text-blue-600 dark:text-blue-400 mb-4"></i>
+          <h2 class="text-2xl font-bold mb-4">Access Restricted</h2>
+        </div>
+      </div>
+      <p class="mb-4 text-center">You must be signed in to access this content.</p>
       <div id="loginError" class="error-message">Login error message</div>
       <form id="loginForm" class="text-black">
         <input type="email" id="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded mb-4 text-black" required />
         <input type="password" id="password" placeholder="Password" class="w-full p-2 border border-gray-300 rounded mb-4 text-black" required />
-        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Login</button>
+        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">Login</button>
       </form>
       <p class="mt-4 text-center">
         Don't have an account? 
@@ -557,13 +597,17 @@
     </div>
   </div>
   
-  <!-- Lottie Web Library for animations -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
-  
   <!-- Firebase and Custom Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signInWithEmailAndPassword, 
+      signOut,
+      setPersistence,
+      browserSessionPersistence
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCEaoy_zMOnmQawZ8uNhyAXHsSbSZcsug4",
@@ -577,8 +621,14 @@
     
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    
+    // Set session persistence
+    setPersistence(auth, browserSessionPersistence)
+      .catch((error) => {
+        console.error("Persistence error:", error);
+      });
 
-    // DOM element references with null checks
+    // DOM element references
     const paywallModal = document.getElementById("paywallModal");
     const sidebarUsername = document.getElementById("sidebarUsername");
     const sidebarEmail = document.getElementById("sidebarEmail");
@@ -586,15 +636,41 @@
     const profileAvatar = document.getElementById("profileAvatar");
     const teacherOptions = document.getElementById("teacherOptions");
     const loginError = document.getElementById("loginError");
+    
+    // Store the requested simulation URL
+    let requestedSimulation = null;
+    
+    // Function to show paywall modal
+    function showPaywall(simulationUrl) {
+      requestedSimulation = simulationUrl;
+      if (paywallModal) paywallModal.classList.remove("hidden");
+    }
+    
+    // Function to redirect to the requested simulation after login
+    function redirectToRequestedSimulation() {
+      if (requestedSimulation) {
+        window.location.href = requestedSimulation;
+      }
+    }
+
+    // Add click handlers to simulation links
+    document.querySelectorAll('a.sim-card').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (!auth.currentUser) {
+          e.preventDefault();
+          showPaywall(link.href);
+        }
+      });
+    });
 
     // Auth state change handler
     onAuthStateChanged(auth, (user) => {
       try {
         if (user) {
-          // Hide paywall modal if it exists
+          // Hide paywall modal
           if (paywallModal) paywallModal.classList.add("hidden");
           
-          // Update user info in sidebar if elements exist
+          // Update user info in sidebar
           if (sidebarUsername) sidebarUsername.textContent = user.displayName || user.email;
           if (sidebarEmail) sidebarEmail.textContent = user.email;
           
@@ -607,7 +683,11 @@
             }
           } else {
             if (sidebarAvatar) sidebarAvatar.src = "https://via.placeholder.com/40";
-            if (profileAvatar) profileAvatar.textContent = user.email?.charAt(0)?.toUpperCase() || "U";
+            if (profileAvatar) {
+              profileAvatar.textContent = user.email?.charAt(0)?.toUpperCase() || "U";
+              profileAvatar.style.backgroundColor = "#3b82f6";
+              profileAvatar.style.color = "white";
+            }
           }
           
           // Check teacher role
@@ -624,8 +704,12 @@
                 if (teacherOptions) teacherOptions.classList.add("hidden");
               });
           }
-        } else if (paywallModal) {
-          paywallModal.classList.remove("hidden");
+          
+          // Redirect to requested simulation if any
+          redirectToRequestedSimulation();
+        } else {
+          // User is not authenticated - reset requested simulation
+          requestedSimulation = null;
         }
       } catch (error) {
         console.error("Auth state error:", error);
@@ -680,7 +764,7 @@
     }
   </script>
   
-  <!-- Additional Scripts (Dark mode, Mobile menu, Search, Sidebar, Animations) -->
+  <!-- Additional Scripts (Dark mode, Mobile menu, Search, Sidebar) -->
   <script>
     // Dark mode toggle
     const themeToggle = document.getElementById('themeToggle');
@@ -813,58 +897,13 @@
       });
     }
     
-    // Lottie Animations Initialization
-    const animations = {
-      hero: 'https://assets3.lottiefiles.com/packages/lf20_jcikwtux.json',
-      mechanics: 'https://assets3.lottiefiles.com/packages/lf20_u4yrau.json',
-      electromagnetism: 'https://assets3.lottiefiles.com/packages/lf20_ydo1amjm.json',
-      waves: 'https://assets3.lottiefiles.com/packages/lf20_GU1j1a.json',
-      modern: 'https://assets3.lottiefiles.com/packages/lf20_z3nq1p.json',
-      lock: 'https://assets3.lottiefiles.com/packages/lf20_sFzONL.json'
-    };
-
-    function loadAnimation(containerId, animationPath) {
-      const container = document.getElementById(containerId);
-      if (container) {
-        lottie.loadAnimation({
-          container: container,
-          renderer: 'svg',
-          loop: true,
-          autoplay: true,
-          path: animationPath
-        });
-      }
-    }
-
-    // Only load essential animations immediately
-    loadAnimation('animationHero', animations.hero);
-    loadAnimation('animationLock', animations.lock);
-    
-    // Lazy load other animations when they become visible
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id.replace('animation', '').toLowerCase();
-          if (animations[id]) {
-            loadAnimation(entry.target.id, animations[id]);
-            observer.unobserve(entry.target);
-          }
-        }
+    // Simulate loading completion after 2 seconds
+    setTimeout(() => {
+      const loadingContainers = document.querySelectorAll('.animation-container');
+      loadingContainers.forEach(container => {
+        container.innerHTML = '';
       });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.animation-container').forEach(el => {
-      if (el.id !== 'animationHero' && el.id !== 'animationLock') {
-        observer.observe(el);
-      }
-    });
-    
-    // Initialize theme from localStorage
-    if (localStorage.theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      if (sunIcon) sunIcon.classList.remove('hidden');
-      if (moonIcon) moonIcon.classList.add('hidden');
-    }
+    }, 2000);
   </script>
 </body>
 </html>
