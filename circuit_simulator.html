@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enhanced AC/DC Circuit Simulator</title>
+  <title>Educational Circuit Simulator - Learn Ohm's Law</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -636,6 +635,63 @@
       }
     }
 
+    /* New styles for the learning section */
+    .learning-panel {
+      background: var(--panel-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--panel-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .learning-step {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .learning-step h4 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .step-number {
+      background: var(--primary);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .circuit-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 15px 0;
+      padding: 10px;
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 8px;
+    }
+
+    .formula {
+      font-family: 'Courier New', monospace;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      color: var(--secondary);
+    }
+
     @media (max-width: 768px) {
       header h1 {
         font-size: 2rem;
@@ -696,9 +752,45 @@
 <body>
   <div class="container">
     <header>
-      <h1><i class="fas fa-bolt"></i> Advanced AC/DC Circuit Simulator</h1>
-      <p class="subtitle">Interactive simulation to explore direct current (DC) and alternating current (AC) circuits with realistic physics visualization</p>
+      <h1><i class="fas fa-bolt"></i> Educational Circuit Simulator</h1>
+      <p class="subtitle">Learn Ohm's Law and circuit fundamentals through interactive simulation</p>
     </header>
+
+    <div class="learning-panel">
+      <h2><i class="fas fa-graduation-cap"></i> Learn Circuit Fundamentals</h2>
+      <div class="learning-step">
+        <h4><span class="step-number">1</span> Understanding Ohm's Law</h4>
+        <p>Ohm's Law states that the current through a conductor between two points is directly proportional to the voltage across the two points and inversely proportional to the resistance between them.</p>
+        <div class="formula">V = I × R</div>
+        <p>Where V is voltage (volts), I is current (amperes), and R is resistance (ohms).</p>
+      </div>
+      <div class="learning-step">
+        <h4><span class="step-number">2</span> Series Circuits</h4>
+        <p>In a series circuit, components are connected end-to-end in a single path. The same current flows through all components, but voltage is divided among them.</p>
+        <div class="formula">R_total = R1 + R2 + ...</div>
+        <div class="circuit-diagram">
+          <div style="font-family: monospace; font-size: 18px; color: var(--light);">
+            +---[Battery]---[R1]---[R2]---+
+            |                             |
+            +-----------------------------+
+          </div>
+        </div>
+      </div>
+      <div class="learning-step">
+        <h4><span class="step-number">3</span> Parallel Circuits</h4>
+        <p>In a parallel circuit, components are connected across common points, providing multiple paths for current. Voltage is the same across all components, but current is divided.</p>
+        <div class="formula">1/R_total = 1/R1 + 1/R2 + ...</div>
+        <div class="circuit-diagram">
+          <div style="font-family: monospace; font-size: 18px; color: var(--light);">
+            +---[Battery]---+
+            |               |
+            +---[R1]--------+
+            |               |
+            +---[R2]--------+
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="main-content">
       <div class="control-panel">
@@ -902,7 +994,7 @@
     <div class="close-btn" onclick="toggleInfo()">×</div>
     <h3><i class="fas fa-book-open"></i> Circuit Theory & Principles</h3>
     
-    <p><strong>DC (Direct Current):</strong> In a DC circuit the voltage is constant, so the current flows steadily in one direction. The electron flow is unidirectional, and Ohm’s Law (\( V = IR \)) directly governs the behavior of the circuit.</p>
+    <p><strong>DC (Direct Current):</strong> In a DC circuit the voltage is constant, so the current flows steadily in one direction. The electron flow is unidirectional, and Ohm's Law (\( V = IR \)) directly governs the behavior of the circuit.</p>
     
     <p><strong>AC (Alternating Current):</strong> In an AC circuit the voltage varies sinusoidally with time, causing the current to alternate its direction periodically. The effective voltage at any moment is given by \( V_{\mathrm{eff}} = V_0 \sin(2\pi f t) \), where \( V_0 \) is the amplitude and \( f \) is the frequency.</p>
     
@@ -1434,10 +1526,10 @@
     }
     
     function arrangeSeriesCircuit() {
-      // Position battery and resistors
-      battery.position.set(-12, 0, 0);
-      resistor1.position.set(0, 0, 0);
-      resistor2.position.set(12, 0, 0);
+      // Position battery and resistors in a structured series circuit
+      battery.position.set(-15, 0, 0);
+      resistor1.position.set(-5, 0, 0);
+      resistor2.position.set(5, 0, 0);
       
       // Get terminal positions
       const batteryPos = new THREE.Vector3().copy(battery.userData.positiveTerminal).add(battery.position);
@@ -1447,7 +1539,7 @@
       const r2Term1 = new THREE.Vector3().copy(resistor2.userData.terminal1).add(resistor2.position);
       const r2Term2 = new THREE.Vector3().copy(resistor2.userData.terminal2).add(resistor2.position);
       
-      // Create wires
+      // Create wires with realistic curves
       const curve1 = createWireCurve(batteryPos, r1Term1, new THREE.Vector3(0, 2, 0));
       const wire1 = createWireMesh(curve1);
       
@@ -1459,13 +1551,39 @@
       
       wireGroup.add(wire1, wire2, wire3);
       wireCurves.push(curve1, curve2, curve3);
+      
+      // Position additional components properly
+      components.forEach(comp => {
+        if (comp.mesh3D) {
+          // Position additional components after the resistors
+          comp.mesh3D.position.set(10, 0, 0);
+          scene.add(comp.mesh3D);
+          
+          // Connect the component to the circuit
+          const compTerm1 = new THREE.Vector3().copy(comp.mesh3D.userData.terminal1).add(comp.mesh3D.position);
+          const compTerm2 = new THREE.Vector3().copy(comp.mesh3D.userData.terminal2).add(comp.mesh3D.position);
+          
+          // Remove the wire from r2 to battery and replace with wires to the component
+          wireGroup.remove(wire3);
+          wireCurves.pop();
+          
+          const curve4 = createWireCurve(r2Term2, compTerm1, new THREE.Vector3(0, 2, 0));
+          const wire4 = createWireMesh(curve4);
+          
+          const curve5 = createWireCurve(compTerm2, batteryNeg, new THREE.Vector3(0, -2, 0));
+          const wire5 = createWireMesh(curve5);
+          
+          wireGroup.add(wire4, wire5);
+          wireCurves.push(curve4, curve5);
+        }
+      });
     }
     
     function arrangeParallelCircuit() {
-      // Position battery and resistors
-      battery.position.set(-10, 0, 0);
-      resistor1.position.set(5, 3, 0);
-      resistor2.position.set(5, -3, 0);
+      // Position battery and resistors in a structured parallel circuit
+      battery.position.set(-15, 0, 0);
+      resistor1.position.set(-2, 5, 0);
+      resistor2.position.set(-2, -5, 0);
       
       // Get terminal positions
       const batteryPos = new THREE.Vector3().copy(battery.userData.positiveTerminal).add(battery.position);
@@ -1476,23 +1594,23 @@
       const r2Term2 = new THREE.Vector3().copy(resistor2.userData.terminal2).add(resistor2.position);
       
       // Junction points
-      const junction1 = new THREE.Vector3(0, 0, 0);
-      const junction2 = new THREE.Vector3(10, 0, 0);
+      const junction1 = new THREE.Vector3(-8, 0, 0);
+      const junction2 = new THREE.Vector3(4, 0, 0);
       
       // Create wires
       const curve1 = createWireCurve(batteryPos, junction1, new THREE.Vector3(0, 0, 0));
       const wire1 = createWireMesh(curve1);
       
-      const curve2 = createWireCurve(junction1, r1Term1, new THREE.Vector3(2, 2, 0));
+      const curve2 = createWireCurve(junction1, r1Term1, new THREE.Vector3(-5, 3, 0));
       const wire2 = createWireMesh(curve2);
       
-      const curve3 = createWireCurve(junction1, r2Term1, new THREE.Vector3(2, -2, 0));
+      const curve3 = createWireCurve(junction1, r2Term1, new THREE.Vector3(-5, -3, 0));
       const wire3 = createWireMesh(curve3);
       
-      const curve4 = createWireCurve(r1Term2, junction2, new THREE.Vector3(8, 2, 0));
+      const curve4 = createWireCurve(r1Term2, junction2, new THREE.Vector3(0, 3, 0));
       const wire4 = createWireMesh(curve4);
       
-      const curve5 = createWireCurve(r2Term2, junction2, new THREE.Vector3(8, -2, 0));
+      const curve5 = createWireCurve(r2Term2, junction2, new THREE.Vector3(0, -3, 0));
       const wire5 = createWireMesh(curve5);
       
       const curve6 = createWireCurve(junction2, batteryNeg, new THREE.Vector3(0, 0, 0));
@@ -1500,13 +1618,34 @@
       
       wireGroup.add(wire1, wire2, wire3, wire4, wire5, wire6);
       wireCurves.push(curve1, curve2, curve3, curve4, curve5, curve6);
+      
+      // Position additional components properly
+      components.forEach(comp => {
+        if (comp.mesh3D) {
+          // Position additional components in a third parallel branch
+          comp.mesh3D.position.set(-2, 0, 0);
+          scene.add(comp.mesh3D);
+          
+          const compTerm1 = new THREE.Vector3().copy(comp.mesh3D.userData.terminal1).add(comp.mesh3D.position);
+          const compTerm2 = new THREE.Vector3().copy(comp.mesh3D.userData.terminal2).add(comp.mesh3D.position);
+          
+          const curve7 = createWireCurve(junction1, compTerm1, new THREE.Vector3(-5, 0, 0));
+          const wire7 = createWireMesh(curve7);
+          
+          const curve8 = createWireCurve(compTerm2, junction2, new THREE.Vector3(0, 0, 0));
+          const wire8 = createWireMesh(curve8);
+          
+          wireGroup.add(wire7, wire8);
+          wireCurves.push(curve7, curve8);
+        }
+      });
     }
     
     function arrangeComplexCircuit() {
-      // Position battery and resistors
+      // Position battery and resistors in a structured complex circuit
       battery.position.set(-15, 0, 0);
-      resistor1.position.set(0, 5, 0);
-      resistor2.position.set(0, -5, 0);
+      resistor1.position.set(-8, 5, 0);
+      resistor2.position.set(2, -5, 0);
       
       // Get terminal positions
       const batteryPos = new THREE.Vector3().copy(battery.userData.positiveTerminal).add(battery.position);
@@ -1517,30 +1656,30 @@
       const r2Term2 = new THREE.Vector3().copy(resistor2.userData.terminal2).add(resistor2.position);
       
       // Junction points
-      const junction1 = new THREE.Vector3(-5, 0, 0);
-      const junction2 = new THREE.Vector3(5, 0, 0);
-      const junction3 = new THREE.Vector3(10, 0, 0);
+      const junction1 = new THREE.Vector3(-8, 0, 0);
+      const junction2 = new THREE.Vector3(2, 0, 0);
+      const junction3 = new THREE.Vector3(-2, 0, 0);
       
       // Create wires
       const curve1 = createWireCurve(batteryPos, junction1, new THREE.Vector3(0, 0, 0));
       const wire1 = createWireMesh(curve1);
       
-      const curve2 = createWireCurve(junction1, r1Term1, new THREE.Vector3(-2, 3, 0));
+      const curve2 = createWireCurve(junction1, r1Term1, new THREE.Vector3(0, 3, 0));
       const wire2 = createWireMesh(curve2);
       
-      const curve3 = createWireCurve(junction1, r2Term1, new THREE.Vector3(-2, -3, 0));
+      const curve3 = createWireCurve(r1Term2, junction3, new THREE.Vector3(0, 3, 0));
       const wire3 = createWireMesh(curve3);
       
-      const curve4 = createWireCurve(r1Term2, junction2, new THREE.Vector3(3, 3, 0));
+      const curve4 = createWireCurve(junction1, junction3, new THREE.Vector3(-5, 0, 0));
       const wire4 = createWireMesh(curve4);
       
-      const curve5 = createWireCurve(r2Term2, junction2, new THREE.Vector3(3, -3, 0));
+      const curve5 = createWireCurve(junction3, r2Term1, new THREE.Vector3(0, -3, 0));
       const wire5 = createWireMesh(curve5);
       
-      const curve6 = createWireCurve(junction2, junction3, new THREE.Vector3(0, 0, 0));
+      const curve6 = createWireCurve(r2Term2, junction2, new THREE.Vector3(0, -3, 0));
       const wire6 = createWireMesh(curve6);
       
-      const curve7 = createWireCurve(junction3, batteryNeg, new THREE.Vector3(0, 0, 0));
+      const curve7 = createWireCurve(junction2, batteryNeg, new THREE.Vector3(0, 0, 0));
       const wire7 = createWireMesh(curve7);
       
       wireGroup.add(wire1, wire2, wire3, wire4, wire5, wire6, wire7);
@@ -1746,17 +1885,17 @@
       const pos = document.getElementById("ammeterPosition").value;
       const type = document.getElementById("circuitType").value;
       if (type === "series") {
-        if (pos === "main") ammeter.position.set(-6, 0, 0);
-        else if (pos === "r1") ammeter.position.set(0, 0, 0);
-        else if (pos === "r2") ammeter.position.set(6, 0, 0);
+        if (pos === "main") ammeter.position.set(-10, 0, 0);
+        else if (pos === "r1") ammeter.position.set(-2, 0, 0);
+        else if (pos === "r2") ammeter.position.set(2, 0, 0);
       } else if (type === "parallel") {
-        if (pos === "main") ammeter.position.set(-6, 0, 0);
-        else if (pos === "r1") ammeter.position.set(2, 4, 0);
-        else if (pos === "r2") ammeter.position.set(2, -4, 0);
+        if (pos === "main") ammeter.position.set(-10, 0, 0);
+        else if (pos === "r1") ammeter.position.set(0, 2, 0);
+        else if (pos === "r2") ammeter.position.set(0, -2, 0);
       } else {
-        if (pos === "main") ammeter.position.set(-6, 0, 0);
-        else if (pos === "r1") ammeter.position.set(-3, 3, 0);
-        else if (pos === "r2") ammeter.position.set(3, -3, 0);
+        if (pos === "main") ammeter.position.set(-10, 0, 0);
+        else if (pos === "r1") ammeter.position.set(-5, 2, 0);
+        else if (pos === "r2") ammeter.position.set(5, -2, 0);
       }
       updateCurrentReadings();
     }
@@ -1784,6 +1923,11 @@
       document.getElementById("acFrequencyGroup").style.display = "none";
       
       // Reset components
+      components.forEach(comp => {
+        if (comp.mesh3D) {
+          scene.remove(comp.mesh3D);
+        }
+      });
       components = [];
       updateComponentParametersUI();
       
@@ -1794,6 +1938,22 @@
     // Component management functions
     function addComponent() {
       const type = document.getElementById("newComponent").value;
+      let mesh3D;
+      
+      switch(type) {
+        case 'capacitor':
+          mesh3D = createCapacitor();
+          break;
+        case 'inductor':
+          mesh3D = createInductor();
+          break;
+        case 'led':
+          mesh3D = createLED();
+          break;
+        default:
+          return;
+      }
+      
       const component = {
         id: Date.now(),
         type: type,
@@ -1803,39 +1963,12 @@
         unit: type === 'resistor' ? 'Ω' : 
               type === 'capacitor' ? 'F' : 
               type === 'inductor' ? 'H' : 'V',
-        color: type === 'led' ? 'red' : null
+        color: type === 'led' ? 'red' : null,
+        mesh3D: mesh3D
       };
       
       components.push(component);
       updateComponentParametersUI();
-      
-      // Add component to 3D scene
-      let component3D;
-      switch(type) {
-        case 'capacitor':
-          component3D = createCapacitor();
-          break;
-        case 'inductor':
-          component3D = createInductor();
-          break;
-        case 'led':
-          component3D = createLED(component.color);
-          break;
-        default:
-          return;
-      }
-      
-      // Position based on circuit type
-      const circuitType = document.getElementById("circuitType").value;
-      if (circuitType === "series") {
-        component3D.position.set(0, -5, 0);
-      } else if (circuitType === "parallel") {
-        component3D.position.set(0, 0, 5);
-      } else {
-        component3D.position.set(0, 5, 0);
-      }
-      
-      scene.add(component3D);
       updateCircuit();
     }
     
@@ -1905,7 +2038,13 @@
     }
     
     function removeComponent(id) {
-      components = components.filter(comp => comp.id !== id);
+      const compIndex = components.findIndex(comp => comp.id === id);
+      if (compIndex !== -1) {
+        if (components[compIndex].mesh3D) {
+          scene.remove(components[compIndex].mesh3D);
+        }
+        components.splice(compIndex, 1);
+      }
       updateComponentParametersUI();
       updateCircuit();
     }
